@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Day Report</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    background:#0b0b0b;
+    color:white;
+    font-family:Arial;
+
+    padding:40px;
+
+}
+
+h1{
+
+    text-align:center;
+    margin-bottom:35px;
+
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(5,1fr);
+
+    gap:12px;
+
+    max-width:700px;
+
+    margin:auto;
+
+}
+
+.day{
+
+    height:55px;
+
+    background:#181818;
+
+    border:1px solid #333;
+
+    color:white;
+
+    cursor:pointer;
+
+    border-radius:8px;
+
+    transition:.2s;
+
+}
+
+.day:hover{
+
+    background:#2b2b2b;
+
+}
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.75);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.box{
+
+    width:500px;
+
+    background:#161616;
+
+    border-radius:15px;
+
+    padding:30px;
+
+}
+
+.box h2{
+
+    margin-bottom:15px;
+
+}
+
+.close{
+
+    margin-top:25px;
+
+    padding:10px 20px;
+
+    cursor:pointer;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>365 Day Report</h1>
+
+<div class="grid" id="grid"></div>
+
+<div class="modal" id="modal">
+
+<div class="box">
+
+<h2 id="title"></h2>
+
+<p id="content"></p>
+
+<button class="close" onclick="closeModal()">닫기</button>
+
+</div>
+
+</div>
+
+<script>
+
+const reports = {
+
+1:{
+title:"Day 1",
+content:"메인 UI 제작\nGitHub Repository 생성\nDay Report 페이지 제작"
+}
+
+};
+
+const grid=document.getElementById("grid");
+
+for(let i=1;i<=365;i++){
+
+const btn=document.createElement("button");
+
+btn.className="day";
+
+btn.textContent="DAY "+String(i).padStart(3,"0");
+
+btn.onclick=()=>openReport(i);
+
+grid.appendChild(btn);
+
+}
+
+function openReport(day){
+
+const data=reports[day];
+
+document.getElementById("modal").style.display="flex";
+
+if(data){
+
+document.getElementById("title").innerText=data.title;
+document.getElementById("content").innerText=data.content;
+
+}else{
+
+document.getElementById("title").innerText="Day "+day;
+document.getElementById("content").innerText="??";
+
+}
+
+}
+
+function closeModal(){
+
+document.getElementById("modal").style.display="none";
+
+}
+
+</script>
+
+</body>
+
+</html>
