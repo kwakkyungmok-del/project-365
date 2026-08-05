@@ -6,7 +6,6 @@
 
 <title>1년 프로젝트</title>
 
-<!-- Pixel Font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -25,117 +24,73 @@ body{
     font-family:Arial, Helvetica, sans-serif;
 }
 
-/* 중앙 */
-
 .center{
-
     position:absolute;
-
     top:50%;
     left:50%;
-
     transform:translate(-50%,-50%);
     text-align:center;
-
 }
 
 h1{
-
     font-family:'Press Start 2P', cursive;
     font-size:52px;
     line-height:1.6;
     margin-bottom:30px;
-
 }
 
 .subtitle{
-
     color:#8f8f8f;
     font-size:18px;
     margin-bottom:55px;
-
 }
 
-/* 버튼 */
-
 .start{
-
     background:white;
     color:black;
-
     border:none;
     border-radius:12px;
-
     padding:18px 42px;
-
     font-size:18px;
     font-weight:bold;
-
     cursor:pointer;
-
     transition:.25s;
-
 }
 
 .start:hover{
-
     transform:translateY(-4px);
     box-shadow:0 0 25px rgba(255,255,255,.35);
-
 }
 
-/* 활동내역 */
-
 .log{
-
     position:absolute;
-
     top:25px;
     left:25px;
-
     border:1px solid #444;
     background:#141414;
-
     color:white;
-
     padding:12px 18px;
-
     border-radius:10px;
-
     cursor:pointer;
-
     transition:.2s;
-
 }
 
 .log:hover{
-
     background:#222;
-
 }
 
-/* Day */
-
 .day{
-
     position:absolute;
-
     right:25px;
     bottom:25px;
-
     color:#666;
-
     font-size:15px;
-
     letter-spacing:2px;
-
 }
 
 .version{
-
     margin-top:8px;
     font-size:12px;
-
 }
 
 </style>
@@ -144,31 +99,34 @@ h1{
 
 <body>
 
-<button class="log">
+<!-- 일별 활동내역 -->
+<button class="log" onclick="location.href='dayreport/'">
 📜 일별 활동내역
 </button>
 
+<!-- 중앙 -->
 <div class="center">
 
-<h1>1년 프로젝트</h1>
+    <h1>1년 프로젝트</h1>
 
-<div class="subtitle">
-매일 조금씩, 365일 동안 성장하는 웹사이트
+    <div class="subtitle">
+        매일 조금씩, 365일 동안 성장하는 웹사이트
+    </div>
+
+    <button class="start" onclick="location.href='project/'">
+        프로젝트 시작
+    </button>
+
 </div>
 
-<button class="start">
-프로젝트 시작
-</button>
-
-</div>
-
+<!-- 버전 -->
 <div class="day">
 
-DAY 001 / 365
+    DAY 001 / 365
 
-<div class="version">
-v0.0.1
-</div>
+    <div class="version">
+        v0.0.1
+    </div>
 
 </div>
 
