@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Computer — Main Terminal</title>
+<style>
+  /* ============================================================
+     폰트: VT323(픽셀/CRT 느낌의 로고·헤더용) + IBM Plex Mono(본문/터미널)
+     ============================================================ */
+  @import url('https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#0b0b0b;
+    --bezel-dark:#17171a;
+    --bezel-mid:#2b2b2f;
+    --bezel-light:#47474d;
+    --screen-black:#050705;
+    --phosphor:#3dffa0;
+    --phosphor-strong:#79ffc0;
+    --phosphor-dim:#1c6b45;
+    --phosphor-glow: rgba(61,255,160,0.55);
+    --amber:#e0a530;
+    --amber-dim:#5c481f;
+    --text-soft:#8fb3a2;
+    --text-faint:#4c6058;
+    --danger:#ff5d5d;
+    --font-pixel:'VT323', monospace;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:
+      radial-gradient(ellipse at 50% 38%, #161616 0%, var(--bg) 55%, #060606 100%);
+    font-family:var(--font-mono);
+    color:var(--text-soft);
+    overflow-x:hidden;
+  }
+
+  /* 바닥에 아주 은은한 격자 노이즈를 깔아 실험실 바닥 느낌을 낸다 */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size:38px 38px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  /* ============================================================
+     상단 나가기 버튼
+     ============================================================ */
+  .exit-btn{
+    position:fixed;
+    top:22px; left:22px;
+    z-index:50;
+    background:transparent;
+    border:1px solid var(--phosphor-dim);
+    color:var(--phosphor);
+    font-family:var(--font-mono);
+    font-size:13px;
+    letter-spacing:0.03em;
+    padding:9px 16px;
+    border-radius:4px;
+    cursor:pointer;
+    transition:background .2s ease, box-shadow .2s ease, transform .12s ease, color .2s ease;
+  }
+  .exit-btn:hover{
+    background:rgba(61,255,160,0.08);
+    box-shadow:0 0 14px rgba(61,255,160,0.25);
+    color:var(--phosphor-strong);
+  }
+  .exit-btn:active{
+    transform:scale(0.96);
+  }
+
+  /* ============================================================
+     모니터 전체 레이아웃
+     ============================================================ */
+  .monitor-wrap{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    padding:90px 20px 60px;
+  }
+
+  .monitor{
+    position:relative;
+    width:min(920px, 92vw);
+    background:linear-gradient(155deg, var(--bezel-light) 0%, var(--bezel-mid) 45%, var(--bezel-dark) 100%);
+    border-radius:28px;
+    padding:26px 26px 46px;
+    box-shadow:
+      0 30px 60px rgba(0,0,0,0.65),          /* 바닥 그림자 */
+      0 0 0 1px rgba(0,0,0,0.4),             /* 테두리 라인 */
+      inset 0 2px 2px rgba(255,255,255,0.06),/* 위쪽 하이라이트로 입체감 */
+      inset 0 -6px 12px rgba(0,0,0,0.5);     /* 아래쪽 그림자로 두께감 */
+  }
+
+  /* 모니터가 켜지면 은은하게 초록빛으로 주변을 밝힌다 */
+  .monitor.is-on{
+    animation: monitor-ambient-glow 4s ease-in-out infinite alternate;
+  }
+  @keyframes monitor-ambient-glow{
+    from{ box-shadow:
+      0 30px 60px rgba(0,0,0,0.65),
+      0 0 0 1px rgba(0,0,0,0.4),
+      inset 0 2px 2px rgba(255,255,255,0.06),
+      inset 0 -6px 12px rgba(0,0,0,0.5),
+      0 0 40px rgba(61,255,160,0.06); }
+    to{ box-shadow:
+      0 30px 60px rgba(0,0,0,0.65),
+      0 0 0 1px rgba(0,0,0,0.4),
+      inset 0 2px 2px rgba(255,255,255,0.06),
+      inset 0 -6px 12px rgba(0,0,0,0.5),
+      0 0 70px rgba(61,255,160,0.16); }
+  }
+
+  .bezel-label{
+    position:absolute;
+    top:8px; left:36px;
+    font-family:var(--font-pixel);
+    font-size:13px;
+    letter-spacing:0.12em;
+    color:rgba(255,255,255,0.18);
+    user-select:none;
+  }
+
+  /* ============================================================
+     화면 (스크린)
+     ============================================================ */
+  .screen{
+    position:relative;
+    background:var(--screen-black);
+    border-radius:14px;
+    overflow:hidden;
+    min-height:560px;
+    box-shadow:
+      inset 0 0 60px rgba(0,0,0,0.9),
+      inset 0 0 2px rgba(0,0,0,1);
+    opacity:0;
+    filter:brightness(0);
+  }
+
+  /* 전원 켜짐 애니메이션: 깜빡이며 켜진다 */
+  .screen.is-booting{
+    animation: flicker-on 1.15s steps(2, end) forwards;
+  }
+  @keyframes flicker-on{
+    0%   { opacity:0;    filter:brightness(0); }
+    6%   { opacity:1;    filter:brightness(2.2); }
+    11%  { opacity:0.1;  filter:brightness(0); }
+    18%  { opacity:0.9;  filter:brightness(1.6); }
+    24%  { opacity:0.15; filter:brightness(0.2); }
+    32%  { opacity:1;    filter:brightness(1.8); }
+    40%  { opacity:0.3;  filter:brightness(0.4); }
+    55%  { opacity:1;    filter:brightness(1.1); }
+    100% { opacity:1;    filter:brightness(1); }
+  }
+  .screen.is-on{
+    opacity:1;
+    filter:brightness(1);
+  }
+
+  /* CRT 스캔라인 */
+  .scanlines{
+    position:absolute; inset:0;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.035) 0px,
+      rgba(255,255,255,0.035) 1px,
+      transparent 2px,
+      transparent 4px
+    );
+    pointer-events:none;
+    z-index:5;
+  }
+  /* 화면 가장자리를 살짝 어둡게(비네트) */
+  .vignette{
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+    pointer-events:none;
+    z-index:6;
+  }
+  /* 위에서 아래로 천천히 흐르는 스캔 빛줄기 */
+  .scan-sweep{
+    position:absolute; left:0; right:0; height:70px;
+    background:linear-gradient(to bottom, transparent, rgba(61,255,160,0.05), transparent);
+    pointer-events:none;
+    z-index:5;
+    animation:sweep 7s linear infinite;
+    opacity:0;
+  }
+  .screen.is-on .scan-sweep{ opacity:1; }
+  @keyframes sweep{
+    from{ top:-80px; }
+    to{ top:100%; }
+  }
+
+  /* ============================================================
+     OS UI
+     ============================================================ */
+  .os{
+    position:relative;
+    z-index:2;
+    height:100%;
+    min-height:560px;
+    display:flex;
+    flex-direction:column;
+    opacity:0;
+    transform:translateY(6px);
+    transition:opacity .5s ease, transform .5s ease;
+    color:var(--text-soft);
+  }
+  .os.is-visible{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  .os-header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    padding:14px 20px;
+    border-bottom:1px dashed var(--phosphor-dim);
+    flex-shrink:0;
+  }
+  .os-title{
+    font-family:var(--font-pixel);
+    font-size:22px;
+    letter-spacing:0.06em;
+    color:var(--phosphor);
+    text-shadow:0 0 10px var(--phosphor-glow);
+  }
+  .os-title .version{
+    font-size:13px;
+    color:var(--text-faint);
+    font-family:var(--font-mono);
+    margin-left:6px;
+  }
+  .os-clock{
+    font-size:12px;
+    color:var(--text-faint);
+    letter-spacing:0.05em;
+  }
+
+  .os-body{
+    flex:1;
+    display:flex;
+    min-height:0;
+  }
+
+  /* -------- 사이드바: 설치된 프로그램 -------- */
+  .sidebar{
+    width:250px;
+    flex-shrink:0;
+    border-right:1px dashed var(--phosphor-dim);
+    padding:18px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .sidebar-title{
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--text-faint);
+    margin-bottom:6px;
+    padding-left:4px;
+  }
+
+  .program{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    text-align:left;
+    background:transparent;
+    border:1px solid transparent;
+    border-left:3px solid transparent;
+    color:var(--text-faint);
+    font-family:var(--font-mono);
+    font-size:13.5px;
+    padding:10px 10px;
+    border-radius:3px;
+    cursor:not-allowed;
+    opacity:0.5;
+    transition:background .18s ease, transform .15s ease, opacity .18s ease, border-color .18s ease;
+  }
+  .program .lock{ font-size:12px; opacity:0.8; }
+
+  .program.active{
+    color:var(--phosphor);
+    opacity:1;
+    cursor:pointer;
+    border-left-color:transparent;
+  }
+  .program.active:hover{
+    background:rgba(61,255,160,0.08);
+    transform:translateX(4px);
+    box-shadow:inset 0 0 18px rgba(61,255,160,0.06);
+  }
+  .program.active:active{
+    transform:translateX(4px) scale(0.98);
+  }
+  .program.active.selected{
+    background:rgba(61,255,160,0.1);
+    border-left-color:var(--phosphor);
+    box-shadow:inset 0 0 20px rgba(61,255,160,0.08);
+  }
+
+  .sidebar-footer{
+    margin-top:auto;
+    font-size:11px;
+    color:var(--text-faint);
+    line-height:1.5;
+    padding:10px 4px 2px;
+    border-top:1px dashed var(--phosphor-dim);
+  }
+
+  /* -------- 작업 영역 -------- */
+  .workspace{
+    flex:1;
+    position:relative;
+    padding:26px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:auto;
+  }
+
+  .placeholder{
+    text-align:center;
+    color:var(--text-faint);
+    font-size:13.5px;
+    line-height:1.9;
+  }
+  .placeholder .blink{
+    display:inline-block;
+    animation:blink 1s step-end infinite;
+    color:var(--phosphor);
+  }
+  @keyframes blink{
+    0%, 49%{ opacity:1; }
+    50%, 100%{ opacity:0; }
+  }
+
+  /* ============================================================
+     계산기 앱
+     ============================================================ */
+  .calc-app{
+    width:280px;
+    background:linear-gradient(160deg, #101312 0%, #0a0c0b 100%);
+    border:1px solid var(--phosphor-dim);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 0 30px rgba(61,255,160,0.08), 0 20px 40px rgba(0,0,0,0.5);
+    animation:app-launch .35s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes app-launch{
+    from{ opacity:0; transform:scale(0.88) translateY(14px); }
+    to{ opacity:1; transform:scale(1) translateY(0); }
+  }
+
+  .calc-titlebar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--bezel-mid);
+    padding:8px 12px;
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:var(--text-soft);
+    border-bottom:1px solid rgba(61,255,160,0.15);
+  }
+  .calc-titlebar .close{
+    background:none;
+    border:none;
+    color:var(--text-faint);
+    cursor:pointer;
+    font-size:14px;
+    line-height:1;
+    padding:2px 6px;
+    border-radius:3px;
+    transition:color .15s ease, background .15s ease;
+  }
+  .calc-titlebar .close:hover{
+    color:var(--danger);
+    background:rgba(255,93,93,0.1);
+  }
+
+  .calc-display{
+    background:var(--screen-black);
+    text-align:right;
+    padding:22px 16px;
+    border-bottom:1px solid rgba(61,255,160,0.15);
+    overflow:hidden;
+  }
+  .calc-display .op-preview{
+    display:block;
+    font-size:11px;
+    color:var(--text-faint);
+    min-height:14px;
+    letter-spacing:0.04em;
+  }
+  .calc-display .value{
+    display:block;
+    font-size:2.1rem;
+    color:var(--phosphor);
+    text-shadow:0 0 12px var(--phosphor-glow);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    transition:transform .1s ease;
+  }
+  .calc-display .value.pulse{
+    animation:digit-pulse .16s ease;
+  }
+  @keyframes digit-pulse{
+    0%{ transform:scale(1.12); }
+    100%{ transform:scale(1); }
+  }
+
+  .calc-keys{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:rgba(61,255,160,0.08);
+  }
+
+  .calc-keys button{
+    border:none;
+    outline:none;
+    background:#0f1210;
+    color:var(--text-soft);
+    font-family:var(--font-mono);
+    font-size:15px;
+    padding:16px 0;
+    cursor:pointer;
+    transition:filter .15s ease, transform .08s ease, background .15s ease;
+  }
+  .calc-keys button:hover{
+    filter:brightness(1.35);
+  }
+  .calc-keys button:active{
+    transform:scale(0.93);
+  }
+  .calc-keys button.op{
+    background:#12241c;
+    color:var(--phosphor);
+  }
+  .calc-keys button.func{
+    background:#221a10;
+    color:var(--amber);
+  }
+  .calc-keys button.equals{
+    background:var(--phosphor-dim);
+    color:#04150c;
+    font-weight:700;
+    grid-row:span 2;
+  }
+  .calc-keys button.zero{
+    grid-column:span 2;
+  }
+
+  /* ============================================================
+     LED + 하단 라벨
+     ============================================================ */
+  .power-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .led{
+    width:9px; height:9px;
+    border-radius:50%;
+    background:#1a2a20;
+    box-shadow:inset 0 0 2px rgba(0,0,0,0.8);
+    transition:background .4s ease, box-shadow .4s ease;
+  }
+  .led.on{
+    background:#3dffa0;
+    box-shadow:0 0 8px 2px rgba(61,255,160,0.8), 0 0 18px 6px rgba(61,255,160,0.3);
+    animation:led-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes led-pulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:0.72; }
+  }
+  .power-label{
+    font-size:11px;
+    letter-spacing:0.08em;
+    color:var(--text-faint);
+  }
+
+  /* ============================================================
+     반응형
+     ============================================================ */
+  @media (max-width: 720px){
+    .os-body{ flex-direction:column; }
+    .sidebar{
+      width:auto;
+      border-right:none;
+      border-bottom:1px dashed var(--phosphor-dim);
+      flex-direction:row;
+      flex-wrap:wrap;
+    }
+    .program{ width:auto; flex:1 1 45%; }
+    .sidebar-footer{ display:none; }
+    .screen{ min-height:640px; }
+    .os{ min-height:640px; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- 연구소 로비로 돌아가는 버튼 -->
+  <button class="exit-btn" onclick="location.href='../'">← Exit Research Computer</button>
+
+  <div class="monitor-wrap">
+    <div class="monitor" id="monitor">
+      <div class="bezel-label">MODEL T-9 · RESEARCH TERMINAL</div>
+
+      <div class="screen" id="screen">
+        <div class="scan-sweep"></div>
+        <div class="scanlines"></div>
+        <div class="vignette"></div>
+
+        <!-- ============ OS UI ============ -->
+        <div class="os" id="os">
+          <div class="os-header">
+            <span class="os-title">PROJECT_OS<span class="version">v0.0.1</span></span>
+            <span class="os-clock" id="clock">--:--:--</span>
+          </div>
+
+          <div class="os-body">
+            <!-- 좌측: 설치된 프로그램 목록 -->
+            <aside class="sidebar">
+              <div class="sidebar-title">Installed Programs</div>
+
+              <button class="program active" id="prog-calc" data-program="calc">
+                <span>🧮 Calculation Engine</span>
+              </button>
+
+              <button class="program locked" disabled title="Coming soon">
+                <span>🌌 Gravity Simulator</span><span class="lock">🔒</span>
+              </button>
+              <button class="program locked" disabled title="Coming soon">
+                <span>🧪 Chemical Lab</span><span class="lock">🔒</span>
+              </button>
+              <button class="program locked" disabled title="Coming soon">
+                <span>🤖 AI Assistant</span><span class="lock">🔒</span>
+              </button>
+              <button class="program locked" disabled title="Coming soon">
+                <span>📈 Graph Plotter</span><span class="lock">🔒</span>
+              </button>
+
+              <div class="sidebar-footer">4 programs pending deployment…</div>
+            </aside>
+
+            <!-- 우측: 실제 프로그램이 실행되는 작업 영역 -->
+            <main class="workspace" id="workspace">
+              <div class="placeholder" id="placeholder">
+                Select a program to launch<span class="blink">_</span>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="power-row">
+      <span class="led" id="led"></span>
+      <span class="power-label">Project Computer v0.0.1</span>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ==========================================================
+     1) 전원 켜짐 시퀀스
+     ========================================================== */
+  const monitor = document.getElementById('monitor');
+  const screen  = document.getElementById('screen');
+  const os      = document.getElementById('os');
+  const led     = document.getElementById('led');
+
+  window.addEventListener('load', function(){
+    // 살짝 텀을 두고 부팅 시작 (사용자가 화면에 들어온 직후 느낌)
+    setTimeout(function(){
+      screen.classList.add('is-booting');
+
+      screen.addEventListener('animationend', function onFlickerEnd(){
+        screen.removeEventListener('animationend', onFlickerEnd);
+        screen.classList.remove('is-booting');
+        screen.classList.add('is-on');
+        monitor.classList.add('is-on');
+        led.classList.add('on');
+        os.classList.add('is-visible');
+      }, { once:true });
+
+    }, 300);
+  });
+
+  /* ==========================================================
+     2) 상단 시계
+     ========================================================== */
+  const clockEl = document.getElementById('clock');
+  function tickClock(){
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    clockEl.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+  }
+  tickClock();
+  setInterval(tickClock, 1000);
+
+  /* ==========================================================
+     3) 프로그램 실행 (Calculation Engine)
+     ========================================================== */
+  const workspace   = document.getElementById('workspace');
+  const progCalcBtn = document.getElementById('prog-calc');
+
+  const CALC_HTML = `
+    <div class="calc-app" id="calcApp">
+      <div class="calc-titlebar">
+        <span>CALCULATION_ENGINE.exe</span>
+        <button class="close" id="calcClose" title="Close">×</button>
+      </div>
+      <div class="calc-display">
+        <span class="op-preview" id="calcPreview">&nbsp;</span>
+        <span class="value" id="calcValue">0</span>
+      </div>
+      <div class="calc-keys">
+        <button class="func" data-key="clear">C</button>
+        <button class="func" data-key="back">⌫</button>
+        <button class="op" data-key="/">÷</button>
+        <button class="op" data-key="*">×</button>
+
+        <button data-key="7">7</button>
+        <button data-key="8">8</button>
+        <button data-key="9">9</button>
+        <button class="op" data-key="-">−</button>
+
+        <button data-key="4">4</button>
+        <button data-key="5">5</button>
+        <button data-key="6">6</button>
+        <button class="op" data-key="+">+</button>
+
+        <button data-key="1">1</button>
+        <button data-key="2">2</button>
+        <button data-key="3">3</button>
+        <button class="equals" data-key="=">=</button>
+
+        <button class="zero" data-key="0">0</button>
+        <button data-key=".">.</button>
+      </div>
+    </div>
+  `;
+
+  function launchCalculator(){
+    // 사이드바에서 선택된 항목 표시
+    progCalcBtn.classList.add('selected');
+
+    // 이미 열려있으면 다시 열지 않음
+    if (document.getElementById('calcApp')) return;
+
+    workspace.innerHTML = CALC_HTML;
+    initCalculator();
+  }
+
+  progCalcBtn.addEventListener('click', launchCalculator);
+
+  /* ==========================================================
+     4) 계산기 로직
+     ========================================================== */
+  let calcState = null; // initCalculator 안에서 생성
+
+  function initCalculator(){
+    const valueEl   = document.getElementById('calcValue');
+    const previewEl = document.getElementById('calcPreview');
+    const closeBtn  = document.getElementById('calcClose');
+
+    calcState = {
+      current: '0',      // 현재 입력 중인 숫자
+      previous: null,     // 이전에 저장된 값
+      operator: null,      // 대기 중인 연산자
+      justEvaluated: false  // 방금 '=' 를 눌렀는지 여부
+    };
+
+    const OP_SYMBOL = { '+':'+', '-':'−', '*':'×', '/':'÷' };
+
+    function render(){
+      valueEl.textContent = calcState.current;
+      previewEl.textContent = calcState.previous !== null
+        ? formatNum(calcState.previous) + ' ' + OP_SYMBOL[calcState.operator] + ' '
+        : '\u00A0';
+
+      // 숫자 변경 애니메이션
+      valueEl.classList.remove('pulse');
+      void valueEl.offsetWidth; // 리플로우로 애니메이션 재시작
+      valueEl.classList.add('pulse');
+    }
+
+    function formatNum(n){
+      if (!isFinite(n)) return 'Error';
+      // 너무 긴 소수는 잘라서 표시
+      const rounded = Math.round(n * 1e9) / 1e9;
+      return String(rounded);
+    }
+
+    function inputDigit(d){
+      if (calcState.justEvaluated){
+        calcState.current = '0';
+        calcState.justEvaluated = false;
+      }
+      if (calcState.current === '0'){
+        calcState.current = d;
+      } else {
+        calcState.current += d;
+      }
+      render();
+    }
+
+    function inputDecimal(){
+      if (calcState.justEvaluated){
+        calcState.current = '0';
+        calcState.justEvaluated = false;
+      }
+      if (!calcState.current.includes('.')){
+        calcState.current += '.';
+      }
+      render();
+    }
+
+    function chooseOperator(op){
+      if (calcState.operator && !calcState.justEvaluated){
+        evaluate(); // 연산자가 이미 있으면 먼저 계산
+      }
+      calcState.previous = parseFloat(calcState.current);
+      calcState.operator = op;
+      calcState.justEvaluated = false;
+      calcState.current = '0';
+      render();
+    }
+
+    function evaluate(){
+      if (calcState.operator === null || calcState.previous === null) return;
+      const a = calcState.previous;
+      const b = parseFloat(calcState.current);
+      let result;
+      switch (calcState.operator){
+        case '+': result = a + b; break;
+        case '-': result = a - b; break;
+        case '*': result = a * b; break;
+        case '/': result = b === 0 ? NaN : a / b; break;
+        default:  result = b;
+      }
+      calcState.current = formatNum(result);
+      calcState.previous = null;
+      calcState.operator = null;
+      calcState.justEvaluated = true;
+      render();
+    }
+
+    function backspace(){
+      if (calcState.current.length <= 1 || (calcState.current.length === 2 && calcState.current.startsWith('-'))){
+        calcState.current = '0';
+      } else {
+        calcState.current = calcState.current.slice(0, -1);
+      }
+      render();
+    }
+
+    function clearAll(){
+      calcState.current = '0';
+      calcState.previous = null;
+      calcState.operator = null;
+      calcState.justEvaluated = false;
+      render();
+    }
+
+    // 버튼 클릭 처리
+    document.querySelectorAll('.calc-keys button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        handleKey(btn.dataset.key);
+      });
+    });
+
+    function handleKey(key){
+      if (/^[0-9]$/.test(key)) return inputDigit(key);
+      if (key === '.') return inputDecimal();
+      if (['+','-','*','/'].includes(key)) return chooseOperator(key);
+      if (key === '=') return evaluate();
+      if (key === 'clear') return clearAll();
+      if (key === 'back') return backspace();
+    }
+
+    // 프로그램 닫기 -> 다시 placeholder 로
+    closeBtn.addEventListener('click', function(){
+      progCalcBtn.classList.remove('selected');
+      workspace.innerHTML =
+        '<div class="placeholder">Select a program to launch<span class="blink">_</span></div>';
+      calcState = null;
+    });
+
+    // 노출: 키보드 핸들러에서 재사용
+    calcState._handleKey = handleKey;
+
+    render();
+  }
+
+  /* ==========================================================
+     5) 키보드 입력 지원 (계산기가 열려 있을 때만 동작)
+     ========================================================== */
+  window.addEventListener('keydown', function(e){
+    if (!calcState || !document.getElementById('calcApp')) return;
+
+    if (/^[0-9]$/.test(e.key)){
+      calcState._handleKey(e.key);
+    } else if (e.key === '.'){
+      calcState._handleKey('.');
+    } else if (['+','-','*','/'].includes(e.key)){
+      calcState._handleKey(e.key);
+    } else if (e.key === 'Enter' || e.key === '='){
+      e.preventDefault();
+      calcState._handleKey('=');
+    } else if (e.key === 'Backspace'){
+      e.preventDefault();
+      calcState._handleKey('back');
+    } else if (e.key === 'Escape'){
+      calcState._handleKey('clear');
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
