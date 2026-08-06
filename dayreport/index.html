@@ -169,15 +169,29 @@ h1{
 
 <script>
 
-const reports = {
+const reports = [
 
-1:{
+{
+day:1,
 title:"Day 1",
-content:"메인 UI 제작\n깃허브 저장소 생성\n일별 활동 페이지 제작\n프로젝트 시작시 표시 화면 제작"
+content:`
+메인 UI 제작
+깃허브 저장소 생성
+일별 활동 페이지 제작
+프로젝트 시작시 표시 화면 제작
+`
+},
+
+{
+day:2,
+title:"Day 2",
+content:`
+프로그램 뼈대 완성
+컴퓨터 구현
+`
 }
 
-};
-
+];
 const grid=document.getElementById("grid");
 
 for(let i=1;i<=365;i++){
@@ -196,19 +210,19 @@ grid.appendChild(btn);
 
 function openReport(day){
 
-const data=reports[day];
+const data = reports.find(report => report.day === day);
 
 document.getElementById("modal").style.display="flex";
 
 if(data){
 
-document.getElementById("title").innerText=data.title;
-document.getElementById("content").innerText=data.content;
+document.getElementById("title").innerText = data.title;
+document.getElementById("content").innerText = data.content.trim();
 
 }else{
 
-document.getElementById("title").innerText="Day "+day;
-document.getElementById("content").innerText="??";
+document.getElementById("title").innerText = "Day " + day;
+document.getElementById("content").innerText = "??";
 
 }
 
