@@ -552,9 +552,10 @@
                 <span>🧮 Calculation Engine</span>
               </button>
 
-              <button class="program locked" disabled title="Coming soon">
-                <span>🌌 Gravity Simulator</span><span class="lock">🔒</span>
+              <button class="program active" id="prog-gravity" data-program="gravity">
+                <span>🌌 Gravity Simulator</span>
               </button>
+
               <button class="program locked" disabled title="Coming soon">
                 <span>🧪 Chemical Lab</span><span class="lock">🔒</span>
               </button>
@@ -565,7 +566,7 @@
                 <span>📈 Graph Plotter</span><span class="lock">🔒</span>
               </button>
 
-              <div class="sidebar-footer">4 programs pending deployment…</div>
+              <div class="sidebar-footer">3 programs pending deployment…</div>
             </aside>
 
             <!-- 우측: 실제 프로그램이 실행되는 작업 영역 -->
@@ -631,6 +632,26 @@
      ========================================================== */
   const workspace   = document.getElementById('workspace');
   const progCalcBtn = document.getElementById('prog-calc');
+
+  /* ==========================================================
+     3-1) 프로그램 실행 (Gravity Simulator)
+     - 워크스페이스 안에서 여는 계산기와 달리, 별도의 전용 페이지로 이동한다.
+     - 클릭 시 잠깐 "실행 중" 표시를 준 뒤 gravity/index.html 로 이동해
+       프로그램이 로딩되는 듯한 느낌을 준다.
+     ========================================================== */
+  const progGravityBtn = document.getElementById('prog-gravity');
+
+  progGravityBtn.addEventListener('click', function(){
+    if (progGravityBtn.classList.contains('launching')) return; // 중복 클릭 방지
+
+    progGravityBtn.classList.add('selected', 'launching');
+    workspace.innerHTML =
+      '<div class="placeholder">Launching Gravity Simulator<span class="blink">_</span></div>';
+
+    setTimeout(function(){
+      location.href = 'gravity/index.html';
+    }, 260);
+  });
 
   const CALC_HTML = `
     <div class="calc-app" id="calcApp">
