@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Gravity Laboratory v1.0 — Project 365</title>
+<style>
+  /* ============================================================
+     폰트 : Space Grotesk(디스플레이) + IBM Plex Mono(수치/데이터)
+     ============================================================ */
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg-deep:#03060c;
+    --bg-panel:rgba(13,18,29,0.68);
+    --bg-panel-solid:#0d1220;
+    --bg-input:rgba(255,255,255,0.04);
+    --border-soft:rgba(255,255,255,0.09);
+    --border-strong:rgba(255,255,255,0.16);
+    --accent:#4fc3ff;
+    --accent-strong:#9fe6ff;
+    --accent-amber:#ffb454;
+    --accent-purple:#b98bff;
+    --success:#38e1c6;
+    --warn:#ffb454;
+    --danger:#ff5d7a;
+    --text:#c9d5e3;
+    --text-dim:#63728a;
+    --text-bright:#eef4fb;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --radius-lg:16px;
+    --radius-md:10px;
+    --radius-sm:6px;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg-deep);
+    color:var(--text);
+    font-family:var(--font-mono);
+    overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  button{ font-family:inherit; }
+  input[type="number"]{ font-family:inherit; }
+
+  /* ============================================================
+     전체 레이아웃 : 상단 툴바 / (사이드바 + 캔버스) / 하단 상태바
+     ============================================================ */
+  .app{
+    display:grid;
+    grid-template-rows:auto 1fr auto;
+    width:100%;
+    height:100%;
+  }
+
+  /* ------------------------------------------------------------
+     상단 툴바
+     ------------------------------------------------------------ */
+  .toolbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:0 16px;
+    height:54px;
+    background:linear-gradient(180deg, rgba(20,26,42,0.92), rgba(11,15,25,0.92));
+    border-bottom:1px solid var(--border-soft);
+    box-shadow:0 4px 24px rgba(0,0,0,0.35);
+    z-index:30;
+    flex-shrink:0;
+  }
+
+  .exit-btn{
+    display:flex; align-items:center; gap:6px;
+    background:transparent;
+    border:1px solid var(--border-soft);
+    color:var(--text);
+    padding:8px 12px;
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+    font-size:12.5px;
+    transition:background .18s ease, border-color .18s ease, color .18s ease, transform .12s ease;
+    flex-shrink:0;
+  }
+  .exit-btn:hover{ background:rgba(255,255,255,0.06); border-color:var(--border-strong); color:var(--text-bright); }
+  .exit-btn:active{ transform:scale(0.96); }
+
+  .toolbar-title{
+    display:flex; flex-direction:column; line-height:1.1;
+    margin-right:auto;
+    padding-left:6px;
+    border-left:1px solid var(--border-soft);
+    padding-left:14px;
+    flex-shrink:1;
+    min-width:0;
+  }
+  .toolbar-title .name{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:15px;
+    color:var(--text-bright);
+    letter-spacing:0.01em;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .toolbar-title .sub{
+    font-size:10.5px;
+    color:var(--text-dim);
+    letter-spacing:0.08em;
+    white-space:nowrap;
+  }
+
+  .toolbar-actions{
+    display:flex; align-items:center; gap:6px;
+    flex-shrink:0;
+  }
+
+  .tbtn{
+    display:flex; align-items:center; gap:6px;
+    background:var(--bg-input);
+    border:1px solid var(--border-soft);
+    color:var(--text);
+    padding:8px 13px;
+    border-radius:var(--radius-sm);
+    cursor:pointer;
+    font-size:12px;
+    letter-spacing:0.02em;
+    transition:background .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease, transform .1s ease;
+  }
+  .tbtn:hover{ background:rgba(255,255,255,0.08); border-color:var(--border-strong); }
+  .tbtn:active{ transform:scale(0.95); }
+  .tbtn.primary{ color:var(--accent-strong); border-color:rgba(79,195,255,0.35); }
+  .tbtn.primary.is-active{ background:rgba(79,195,255,0.14); box-shadow:0 0 14px rgba(79,195,255,0.25) inset; }
+  .tbtn.warnish{ color:var(--warn); border-color:rgba(255,180,84,0.35); }
+  .tbtn.warnish.is-active{ background:rgba(255,180,84,0.14); box-shadow:0 0 14px rgba(255,180,84,0.2) inset; }
+  .tbtn.dangerish:hover{ color:var(--danger); border-color:rgba(255,93,122,0.4); }
+
+  /* ------------------------------------------------------------
+     본문 : 좌측 패널 + 캔버스
+     ------------------------------------------------------------ */
+  .main{
+    display:flex;
+    min-height:0;
+    position:relative;
+  }
+
+  .sidebar{
+    width:288px;
+    flex-shrink:0;
+    background:var(--bg-panel);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-right:1px solid var(--border-soft);
+    overflow-y:auto;
+    padding:16px 14px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    z-index:20;
+  }
+  .sidebar::-webkit-scrollbar{ width:6px; }
+  .sidebar::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.12); border-radius:3px; }
+
+  .panel-card{
+    background:rgba(255,255,255,0.025);
+    border:1px solid var(--border-soft);
+    border-radius:var(--radius-lg);
+    padding:14px;
+    animation:panel-fade .35s ease;
+  }
+  @keyframes panel-fade{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:translateY(0); } }
+
+  .panel-title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:12px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--text-dim);
+    margin:0 0 12px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+
+  /* --- Objects 패널 --- */
+  .object-btn{
+    display:flex; align-items:center; gap:10px;
+    width:100%;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--border-soft);
+    color:var(--text);
+    padding:11px 12px;
+    border-radius:var(--radius-md);
+    cursor:pointer;
+    font-size:13px;
+    margin-bottom:8px;
+    transition:background .16s ease, border-color .16s ease, transform .12s ease, box-shadow .16s ease;
+  }
+  .object-btn:last-of-type{ margin-bottom:0; }
+  .object-btn .ico{ font-size:15px; width:18px; text-align:center; }
+  .object-btn .desc{ margin-left:auto; font-size:10px; color:var(--text-dim); }
+  .object-btn:hover{ background:rgba(255,255,255,0.07); transform:translateX(2px); }
+  .object-btn:active{ transform:translateX(2px) scale(0.98); }
+  .object-btn.armed{
+    border-color:var(--accent);
+    background:rgba(79,195,255,0.12);
+    color:var(--accent-strong);
+    box-shadow:0 0 16px rgba(79,195,255,0.18) inset;
+  }
+  .object-btn[data-type="star"].armed{ border-color:var(--accent-amber); color:var(--accent-amber); background:rgba(255,180,84,0.12); box-shadow:0 0 16px rgba(255,180,84,0.18) inset; }
+  .object-btn[data-type="blackhole"].armed{ border-color:var(--accent-purple); color:var(--accent-purple); background:rgba(185,139,255,0.12); box-shadow:0 0 16px rgba(185,139,255,0.18) inset; }
+
+  .hint-text{
+    font-size:10.5px;
+    color:var(--text-dim);
+    line-height:1.6;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px dashed var(--border-soft);
+  }
+
+  .toggle-row{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:12px;
+    font-size:12px;
+  }
+  .switch{
+    position:relative; width:34px; height:19px; flex-shrink:0;
+    background:rgba(255,255,255,0.12);
+    border-radius:20px; cursor:pointer;
+    transition:background .18s ease;
+  }
+  .switch::after{
+    content:""; position:absolute; top:2px; left:2px;
+    width:15px; height:15px; border-radius:50%;
+    background:#cfd8e3;
+    transition:transform .18s ease, background .18s ease;
+  }
+  .switch.on{ background:rgba(79,195,255,0.5); }
+  .switch.on::after{ transform:translateX(15px); background:var(--accent-strong); }
+
+  /* --- 슬라이더/숫자 입력 공통 --- */
+  .field-row{ margin-bottom:12px; }
+  .field-row:last-child{ margin-bottom:0; }
+  .field-label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:11.5px; color:var(--text-dim); margin-bottom:6px;
+    letter-spacing:0.02em;
+  }
+  .field-controls{ display:flex; align-items:center; gap:8px; }
+
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none;
+    flex:1; height:4px; border-radius:3px;
+    background:rgba(255,255,255,0.12);
+    outline:none; cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:14px; height:14px; border-radius:50%;
+    background:var(--accent-strong);
+    box-shadow:0 0 8px rgba(79,195,255,0.7);
+    border:2px solid #0d1220;
+    cursor:pointer;
+    transition:transform .1s ease;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover{ transform:scale(1.15); }
+  input[type="range"]::-moz-range-thumb{
+    width:12px; height:12px; border-radius:50%;
+    background:var(--accent-strong); border:2px solid #0d1220;
+    box-shadow:0 0 8px rgba(79,195,255,0.7); cursor:pointer;
+  }
+
+  input[type="number"]{
+    width:76px; flex-shrink:0;
+    background:var(--bg-input);
+    border:1px solid var(--border-soft);
+    color:var(--text-bright);
+    padding:5px 6px;
+    border-radius:var(--radius-sm);
+    font-size:11.5px;
+    text-align:right;
+  }
+  input[type="number"]:focus{ outline:none; border-color:var(--accent); }
+
+  /* --- Properties 패널 --- */
+  .props-empty{
+    font-size:12px; color:var(--text-dim); text-align:center;
+    padding:18px 6px; line-height:1.7;
+  }
+  .props-type{
+    font-family:var(--font-display); font-weight:600;
+    font-size:13.5px; color:var(--text-bright);
+    margin-bottom:12px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .props-type .dot{ width:9px; height:9px; border-radius:50%; box-shadow:0 0 8px currentColor; }
+
+  .stability-card{
+    margin-top:14px; padding-top:14px;
+    border-top:1px dashed var(--border-soft);
+  }
+  .stability-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:11px; color:var(--text-dim); letter-spacing:0.06em; margin-bottom:6px;
+  }
+  .stability-value{ font-family:var(--font-display); font-size:16px; color:var(--text-bright); }
+  .stability-bar-track{
+    height:5px; border-radius:3px; background:rgba(255,255,255,0.08);
+    overflow:hidden; margin-bottom:6px;
+  }
+  .stability-bar-fill{
+    height:100%; width:0%; background:var(--success);
+    transition:width .3s ease, background .3s ease;
+  }
+  .stability-label{ font-size:11px; color:var(--text-dim); }
+
+  .delete-btn{
+    margin-top:14px; width:100%;
+    background:rgba(255,93,122,0.08);
+    border:1px solid rgba(255,93,122,0.3);
+    color:var(--danger);
+    padding:9px; border-radius:var(--radius-md);
+    cursor:pointer; font-size:12px;
+    transition:background .16s ease, transform .12s ease;
+  }
+  .delete-btn:hover{ background:rgba(255,93,122,0.16); }
+  .delete-btn:active{ transform:scale(0.97); }
+
+  /* --- Time 패널 --- */
+  .timescale-grid{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+  }
+  .ts-btn{
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--border-soft);
+    color:var(--text);
+    padding:8px 2px;
+    border-radius:var(--radius-sm);
+    font-size:11px;
+    cursor:pointer;
+    transition:background .16s ease, border-color .16s ease, color .16s ease;
+  }
+  .ts-btn:hover{ background:rgba(255,255,255,0.08); }
+  .ts-btn.active{
+    background:rgba(79,195,255,0.16);
+    border-color:var(--accent);
+    color:var(--accent-strong);
+    box-shadow:0 0 10px rgba(79,195,255,0.25) inset;
+  }
+
+  /* ------------------------------------------------------------
+     캔버스 영역
+     ------------------------------------------------------------ */
+  .canvas-wrap{
+    position:relative;
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+  }
+  canvas{ display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+  .canvas-wrap.is-panning canvas{ cursor:grabbing; }
+  .canvas-wrap.is-armed canvas{ cursor:crosshair; }
+
+  .camera-badge{
+    position:absolute; top:12px; right:14px;
+    background:rgba(10,14,22,0.55);
+    border:1px solid var(--border-soft);
+    border-radius:20px;
+    padding:6px 12px;
+    font-size:10.5px; color:var(--text-dim);
+    display:none;
+    align-items:center; gap:6px;
+    backdrop-filter:blur(6px);
+  }
+  .camera-badge.show{ display:flex; }
+  .camera-badge b{ color:var(--accent-strong); font-weight:600; }
+
+  /* --- 토스트 --- */
+  .toast-stack{
+    position:absolute; left:50%; bottom:20px; transform:translateX(-50%);
+    display:flex; flex-direction:column; gap:8px; align-items:center;
+    z-index:40; pointer-events:none;
+  }
+  .toast{
+    background:rgba(12,16,26,0.9);
+    border:1px solid var(--border-soft);
+    border-left:3px solid var(--accent);
+    color:var(--text-bright);
+    padding:9px 16px;
+    border-radius:var(--radius-sm);
+    font-size:12px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    opacity:0; transform:translateY(6px);
+    animation:toast-in .25s ease forwards;
+    white-space:nowrap;
+  }
+  .toast.error{ border-left-color:var(--danger); }
+  .toast.fading{ animation:toast-out .3s ease forwards; }
+  @keyframes toast-in{ to{ opacity:1; transform:translateY(0); } }
+  @keyframes toast-out{ to{ opacity:0; transform:translateY(-6px); } }
+
+  /* ------------------------------------------------------------
+     하단 상태바
+     ------------------------------------------------------------ */
+  .statusbar{
+    display:flex; flex-wrap:wrap;
+    align-items:center; gap:0;
+    height:32px;
+    background:linear-gradient(0deg, rgba(20,26,42,0.92), rgba(11,15,25,0.92));
+    border-top:1px solid var(--border-soft);
+    padding:0 14px;
+    font-size:11px;
+    z-index:30;
+    flex-shrink:0;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+  .stat-item{
+    display:flex; align-items:center; gap:6px;
+    padding:0 14px;
+    border-right:1px solid var(--border-soft);
+    color:var(--text-dim);
+  }
+  .stat-item:last-child{ border-right:none; }
+  .stat-item span.val{ color:var(--accent-strong); font-weight:600; }
+
+  /* ============================================================
+     반응형 (모바일 / 좁은 화면)
+     ============================================================ */
+  @media (max-width: 860px){
+    .main{ flex-direction:column; }
+    .sidebar{
+      width:auto; max-height:38vh;
+      border-right:none;
+      border-bottom:1px solid var(--border-soft);
+      flex-direction:row;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      gap:10px;
+      padding:12px 10px;
+    }
+    .panel-card{ min-width:240px; flex-shrink:0; }
+    .toolbar-title .sub{ display:none; }
+    .statusbar{ height:auto; padding:6px 10px; }
+    .stat-item{ padding:4px 10px; }
+  }
+  @media (max-width: 520px){
+    .toolbar{ padding:0 10px; gap:6px; }
+    .tbtn span.label{ display:none; }
+    .toolbar-title{ padding-left:10px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============================================================
+       상단 툴바
+       ============================================================ -->
+  <header class="toolbar">
+    <button class="exit-btn" id="exitBtn">← Exit Research Computer</button>
+
+    <div class="toolbar-title">
+      <span class="name">Gravity Laboratory</span>
+      <span class="sub">v1.0 · PROJECT 365 RESEARCH SYSTEMS</span>
+    </div>
+
+    <div class="toolbar-actions">
+      <button class="tbtn primary" id="btnRun" title="Run simulation">▶ <span class="label">Run</span></button>
+      <button class="tbtn warnish" id="btnPause" title="Pause simulation">⏸ <span class="label">Pause</span></button>
+      <button class="tbtn dangerish" id="btnReset" title="Reset simulation">⟲ <span class="label">Reset</span></button>
+      <button class="tbtn" id="btnSave" title="Save to local storage">💾 <span class="label">Save</span></button>
+      <button class="tbtn" id="btnLoad" title="Load from local storage">📂 <span class="label">Load</span></button>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       본문
+       ============================================================ -->
+  <div class="main">
+
+    <!-- -------------------- 좌측 패널 -------------------- -->
+    <aside class="sidebar">
+
+      <!-- Objects -->
+      <section class="panel-card">
+        <h3 class="panel-title">Objects</h3>
+
+        <button class="object-btn" data-type="planet">
+          <span class="ico">●</span> Planet <span class="desc">rocky</span>
+        </button>
+        <button class="object-btn" data-type="star">
+          <span class="ico">☀</span> Star <span class="desc">luminous</span>
+        </button>
+        <button class="object-btn" data-type="blackhole">
+          <span class="ico">⚫</span> Black Hole <span class="desc">singular</span>
+        </button>
+
+        <div class="hint-text" id="placementHint">
+          Select an object, then click and drag on the canvas.<br>
+          Drag opposite the launch direction — releasing fires it the other way.
+        </div>
+
+        <div class="toggle-row">
+          <span>Show Trails</span>
+          <div class="switch on" id="trailToggle"></div>
+        </div>
+        <div class="field-row" style="margin-top:10px;">
+          <div class="field-label"><span>Trail Length</span><span id="trailLenLabel">140</span></div>
+          <div class="field-controls">
+            <input type="range" id="trailLenRange" min="10" max="300" step="10" value="140">
+          </div>
+        </div>
+      </section>
+
+      <!-- Properties -->
+      <section class="panel-card">
+        <h3 class="panel-title">Properties</h3>
+
+        <div class="props-empty" id="propsEmpty">No object selected.<br>Click an object on the canvas to inspect it.</div>
+
+        <div id="propsForm" style="display:none;">
+          <div class="props-type" id="propsType"><span class="dot"></span><span id="propsTypeText">—</span></div>
+
+          <div class="field-row" data-prop="mass">
+            <div class="field-label"><span>Mass</span></div>
+            <div class="field-controls">
+              <input type="range" class="prop-range" min="0" max="1000" value="0">
+              <input type="number" class="prop-number">
+            </div>
+          </div>
+          <div class="field-row" data-prop="radius">
+            <div class="field-label"><span>Radius</span></div>
+            <div class="field-controls">
+              <input type="range" class="prop-range" min="0" max="1000" value="0">
+              <input type="number" class="prop-number">
+            </div>
+          </div>
+          <div class="field-row" data-prop="density">
+            <div class="field-label"><span>Density</span></div>
+            <div class="field-controls">
+              <input type="range" class="prop-range" min="0" max="1000" value="0">
+              <input type="number" class="prop-number">
+            </div>
+          </div>
+          <div class="field-row" data-prop="vx">
+            <div class="field-label"><span>Velocity X</span></div>
+            <div class="field-controls">
+              <input type="range" class="prop-range" min="0" max="1000" value="0">
+              <input type="number" class="prop-number">
+            </div>
+          </div>
+          <div class="field-row" data-prop="vy">
+            <div class="field-label"><span>Velocity Y</span></div>
+            <div class="field-controls">
+              <input type="range" class="prop-range" min="0" max="1000" value="0">
+              <input type="number" class="prop-number">
+            </div>
+          </div>
+
+          <div class="stability-card">
+            <div class="stability-head"><span>Stable Orbit Probability</span><span class="stability-value" id="stabValue">—</span></div>
+            <div class="stability-bar-track"><div class="stability-bar-fill" id="stabBar"></div></div>
+            <div class="stability-label" id="stabLabel">Select an object with a reference body nearby.</div>
+          </div>
+
+          <button class="delete-btn" id="btnDelete">Delete Object</button>
+        </div>
+      </section>
+
+      <!-- Time -->
+      <section class="panel-card">
+        <h3 class="panel-title">Time</h3>
+        <div class="timescale-grid">
+          <button class="ts-btn" data-scale="0.1">0.1×</button>
+          <button class="ts-btn active" data-scale="1">1×</button>
+          <button class="ts-btn" data-scale="10">10×</button>
+          <button class="ts-btn" data-scale="100">100×</button>
+          <button class="ts-btn" data-scale="1000">1000×</button>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- -------------------- 캔버스 -------------------- -->
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="simCanvas"></canvas>
+      <div class="camera-badge" id="followBadge">Following <b id="followName">—</b></div>
+      <div class="toast-stack" id="toastStack"></div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       하단 상태바
+       ============================================================ -->
+  <footer class="statusbar">
+    <div class="stat-item">FPS <span class="val" id="statFps">60</span></div>
+    <div class="stat-item">Sim Speed <span class="val" id="statSpeed">1×</span></div>
+    <div class="stat-item">Objects <span class="val" id="statObjects">0</span></div>
+    <div class="stat-item">G <span class="val" id="statG">0.600</span></div>
+    <div class="stat-item">Selected <span class="val" id="statSelected">None</span></div>
+    <div class="stat-item">T+ <span class="val" id="statTime">00:00:00.0</span></div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ==============================================================
+     0. 전역 설정값 (한 곳에서 관리 → 유지보수 용이)
+     ============================================================== */
+  const CONFIG = {
+    G: 0.6,                     // 중력 상수 (연구용으로 스케일 조정된 값)
+    SOFTENING: 6,                // 근접 특이점 방지용 완충 거리
+    MAX_SUBSTEPS: 40,            // 프레임당 최대 물리 서브스텝 (고배속 안정성)
+    SUB_DT_TARGET: 0.05,         // 서브스텝 하나의 목표 시뮬레이션 시간
+    TRAIL_DEFAULT_LENGTH: 140,
+    VELOCITY_DRAG_SCALE: 1.0,    // 드래그 거리 → 발사 속도 변환 비율
+    COLLISION_BLACKHOLE_MULT: 3, // 블랙홀의 흡수(사건의 지평선) 반경 배율
+    MIN_ZOOM: 0.05,
+    MAX_ZOOM: 8,
+    PRESETS: {
+      planet:    { mass: 800,     density: 5.5,  label: 'Planet',     color: '#8fa6d9' },
+      star:      { mass: 200000,  density: 1.4,  label: 'Star',       color: '#ffcf7a' },
+      blackhole: { mass: 2000000, density: 240,  label: 'Black Hole', color: '#b98bff' }
+    }
+  };
+
+  // 속성 슬라이더 스펙 (로그 스케일 여부 / 범위)
+  const PROP_SPECS = {
+    mass:    { log:true,  min:50,   max:5000000 },
+    radius:  { log:true,  min:1,    max:300 },
+    density: { log:true,  min:0.2,  max:400 },
+    vx:      { log:false, min:-800, max:800 },
+    vy:      { log:false, min:-800, max:800 }
+  };
+
+  /* ==============================================================
+     1. 유틸리티 함수
+     ============================================================== */
+  const clamp = (v,a,b)=> Math.min(b, Math.max(a,v));
+  const dist2 = (p,q)=> Math.hypot(p.x-q.x, p.y-q.y);
+  const midpoint = (p,q)=> ({x:(p.x+q.x)/2, y:(p.y+q.y)/2});
+  const pad2 = n => String(Math.floor(n)).padStart(2,'0');
+
+  function formatNum(v){
+    if (!isFinite(v)) return '0';
+    const av = Math.abs(v);
+    if (av >= 100000) return (v/1000).toFixed(0)+'k';
+    if (av >= 1000)   return v.toFixed(0);
+    if (av >= 10)     return v.toFixed(1);
+    return v.toFixed(2);
+  }
+
+  function formatElapsed(sec){
+    sec = Math.max(0, sec);
+    const h = Math.floor(sec/3600);
+    const m = Math.floor((sec%3600)/60);
+    const s = sec%60;
+    return pad2(h)+':'+pad2(m)+':'+ (s<10?'0':'') + s.toFixed(1);
+  }
+
+  function hexToRgba(hex, alpha){
+    const h = hex.replace('#','');
+    const r = parseInt(h.substring(0,2),16);
+    const g = parseInt(h.substring(2,4),16);
+    const b = parseInt(h.substring(4,6),16);
+    return 'rgba('+r+','+g+','+b+','+alpha+')';
+  }
+
+  // 로그/선형 슬라이더 값 <-> 0~1000 위치 변환
+  function valueToSlider(spec, value){
+    value = clamp(value, spec.min, spec.max);
+    if (spec.log){
+      const lo = Math.log(spec.min), hi = Math.log(spec.max);
+      return Math.round(((Math.log(value)-lo)/(hi-lo))*1000);
+    }
+    return Math.round(((value-spec.min)/(spec.max-spec.min))*1000);
+  }
+  function sliderToValue(spec, pos){
+    const t = clamp(pos,0,1000)/1000;
+    if (spec.log){
+      const lo = Math.log(spec.min), hi = Math.log(spec.max);
+      return Math.exp(lo + t*(hi-lo));
+    }
+    return spec.min + t*(spec.max-spec.min);
+  }
+
+  /* ==============================================================
+     2. Body — 시뮬레이션 상의 천체 하나
+     ============================================================== */
+  class Body{
+    constructor({type, x, y, vx=0, vy=0, mass, density}){
+      this.id = ++Body._nextId;
+      this.type = type;           // 'planet' | 'star' | 'blackhole'
+      this.x = x; this.y = y;
+      this.vx = vx; this.vy = vy;
+      this.fx = 0; this.fy = 0;   // 이번 스텝에 누적되는 힘
+      this.mass = mass;
+      this.density = density;
+      this.radius = Body.radiusFromMassDensity(mass, density);
+      this.trail = [];            // 최근 위치 기록 (궤적 표시용)
+      this.ax0 = 0; this.ay0 = 0; // Velocity Verlet 적분용 임시 가속도 저장
+    }
+    static radiusFromMassDensity(mass, density){
+      const vol = mass / Math.max(density, 0.0001);
+      return Math.cbrt((3*vol) / (4*Math.PI));
+    }
+  }
+  Body._nextId = 0;
+
+  /* ==============================================================
+     3. PhysicsEngine — 뉴턴 중력 N-body 적분기
+     ============================================================== */
+  class PhysicsEngine{
+    constructor(){
+      this.bodies = [];
+      this.G = CONFIG.G;
+      this.timeScale = 1;
+      this.running = true;
+      this.elapsed = 0;
+      this.onMerge = null; // (survivor, loser) => void
+    }
+
+    step(dt){
+      if (!this.running || dt <= 0) return;
+      const simDt = dt * this.timeScale;
+      if (simDt <= 0) return;
+
+      // 고배속에서도 안정적인 적분을 위해 여러 서브스텝으로 나눈다
+      const subCount = clamp(Math.ceil(simDt / CONFIG.SUB_DT_TARGET), 1, CONFIG.MAX_SUBSTEPS);
+      const subDt = simDt / subCount;
+
+      // Velocity Verlet(leapfrog) 적분: 단순 Euler보다 훨씬 안정적이며
+      // 에너지가 장시간·고배속에서도 발산하지 않고 궤도를 잘 보존한다.
+      //   1) 현재 위치에서 가속도 a0 계산
+      //   2) a0 를 이용해 위치 갱신 (2차 정확도)
+      //   3) 새 위치에서 가속도 a1 계산
+      //   4) a0, a1 의 평균으로 속도 갱신
+      for (let s=0; s<subCount; s++){
+        this._computeForces();
+        for (const b of this.bodies){ b.ax0 = b.fx/b.mass; b.ay0 = b.fy/b.mass; }
+        for (const b of this.bodies){
+          b.x += b.vx*subDt + 0.5*b.ax0*subDt*subDt;
+          b.y += b.vy*subDt + 0.5*b.ay0*subDt*subDt;
+        }
+        this._computeForces();
+        for (const b of this.bodies){
+          const ax1 = b.fx/b.mass, ay1 = b.fy/b.mass;
+          b.vx += 0.5*(b.ax0+ax1)*subDt;
+          b.vy += 0.5*(b.ay0+ay1)*subDt;
+        }
+        this._resolveCollisions();
+        this.elapsed += subDt;
+      }
+    }
+
+    // 모든 쌍에 대해 만유인력 계산 (대칭성을 이용해 절반만 계산)
+    _computeForces(){
+      const bodies = this.bodies;
+      const n = bodies.length;
+      for (let i=0;i<n;i++){ bodies[i].fx = 0; bodies[i].fy = 0; }
+
+      const soft2 = CONFIG.SOFTENING * CONFIG.SOFTENING;
+      for (let i=0;i<n;i++){
+        const a = bodies[i];
+        for (let j=i+1;j<n;j++){
+          const b = bodies[j];
+          const dx = b.x-a.x, dy = b.y-a.y;
+          const distSq = dx*dx + dy*dy + soft2;
+          const dist = Math.sqrt(distSq);
+          // F = G * m1 * m2 / r^2
+          const f = (this.G * a.mass * b.mass) / distSq;
+          const fx = f * dx/dist, fy = f * dy/dist;
+          a.fx += fx; a.fy += fy;
+          b.fx -= fx; b.fy -= fy;
+        }
+      }
+    }
+
+    // 충돌 시 병합: 질량 보존 + 운동량 보존, 밀도는 부피 보존으로 계산
+    _resolveCollisions(){
+      const bodies = this.bodies;
+      const toRemove = new Set();
+
+      for (let i=0;i<bodies.length;i++){
+        const a = bodies[i];
+        if (toRemove.has(a)) continue;
+        for (let j=i+1;j<bodies.length;j++){
+          const b = bodies[j];
+          if (toRemove.has(b)) continue;
+          const dx=b.x-a.x, dy=b.y-a.y;
+          const d = Math.hypot(dx,dy);
+          const mult = (a.type==='blackhole' || b.type==='blackhole') ? CONFIG.COLLISION_BLACKHOLE_MULT : 1;
+          const collideDist = (a.radius + b.radius) * mult;
+
+          if (d < collideDist){
+            const survivor = this._chooseSurvivor(a,b);
+            const loser = (survivor===a) ? b : a;
+            this._merge(survivor, loser);
+            toRemove.add(loser);
+            if (this.onMerge) this.onMerge(survivor, loser);
+            if (loser === a) break; // a 자신이 흡수되었으면 더 이상 비교 불필요
+          }
+        }
+      }
+      if (toRemove.size){
+        this.bodies = bodies.filter(x=>!toRemove.has(x));
+      }
+    }
+
+    // 블랙홀은 항상 생존, 그 외에는 질량이 큰 쪽이 생존
+    _chooseSurvivor(a,b){
+      if (a.type==='blackhole' && b.type!=='blackhole') return a;
+      if (b.type==='blackhole' && a.type!=='blackhole') return b;
+      return a.mass >= b.mass ? a : b;
+    }
+
+    _merge(survivor, loser){
+      const m1=survivor.mass, m2=loser.mass, total=m1+m2;
+      const vol1 = m1/Math.max(survivor.density,0.0001);
+      const vol2 = m2/Math.max(loser.density,0.0001);
+      survivor.density = total / Math.max(vol1+vol2, 1e-6); // 부피 보존
+      survivor.x  = (survivor.x*m1 + loser.x*m2) / total;
+      survivor.y  = (survivor.y*m1 + loser.y*m2) / total;
+      survivor.vx = (survivor.vx*m1 + loser.vx*m2) / total; // 운동량 보존
+      survivor.vy = (survivor.vy*m1 + loser.vy*m2) / total;
+      survivor.mass = total;
+      survivor.radius = Body.radiusFromMassDensity(total, survivor.density);
+    }
+  }
+
+  /* ==============================================================
+     4. 안정성 분석 (근사 계산)
+     - 가장 강한 중력을 미치는 기준 천체를 찾아 이심률 기반으로 추정
+     ============================================================== */
+  function computeStability(body, bodies){
+    let dominant=null, maxPull=0;
+    const soft2 = CONFIG.SOFTENING*CONFIG.SOFTENING;
+    for (const other of bodies){
+      if (other===body) continue;
+      const dx=other.x-body.x, dy=other.y-body.y;
+      const distSq=dx*dx+dy*dy+soft2;
+      const pull = CONFIG.G*other.mass/distSq;
+      if (pull>maxPull){ maxPull=pull; dominant=other; }
+    }
+    if (!dominant) return { percent:null, label:'No reference body nearby.' };
+
+    const dx = body.x-dominant.x, dy = body.y-dominant.y;
+    const r = Math.hypot(dx,dy);
+    const rvx = body.vx-dominant.vx, rvy = body.vy-dominant.vy;
+    const v = Math.hypot(rvx,rvy);
+    const mu = CONFIG.G*(dominant.mass+body.mass);
+    if (r<1e-6 || mu<=0) return { percent:null, label:'Undefined reference frame.' };
+
+    const energy = (v*v)/2 - mu/r;
+    const h = dx*rvy - dy*rvx; // 2D 각운동량 (스칼라)
+
+    if (energy >= 0){
+      return { percent:0, label:'Escaping trajectory (unbound).' };
+    }
+
+    const a = -mu/(2*energy);
+    const e = Math.sqrt(Math.max(0, 1 - (h*h)/(mu*a)));
+    const periapsis = a*(1-e);
+    const collideDist = (body.radius+dominant.radius)*1.05;
+
+    let percent = clamp((1-e)*100, 0, 100);
+    let label;
+    if (periapsis < collideDist){
+      percent *= 0.15;
+      label = 'Collision-risk orbit — periapsis too low.';
+    } else if (e < 0.05){
+      label = 'Near-circular, highly stable orbit.';
+    } else if (e < 0.3){
+      label = 'Stable elliptical orbit.';
+    } else if (e < 0.7){
+      label = 'Moderately eccentric orbit.';
+    } else {
+      label = 'Highly eccentric, borderline orbit.';
+    }
+    return { percent, label, eccentricity:e, referenceType:dominant.type };
+  }
+
+  /* ==============================================================
+     5. 애플리케이션 (DOM / 입력 / 렌더링 / 상태)
+     ============================================================== */
+  const engine = new PhysicsEngine();
+
+  const canvas = document.getElementById('simCanvas');
+  const ctx = canvas.getContext('2d');
+  const canvasWrap = document.getElementById('canvasWrap');
+
+  let DPR = window.devicePixelRatio || 1;
+  let CSS_W = 0, CSS_H = 0;
+
+  const camera = { x:0, y:0, zoom:1 };
+
+  const state = {
+    placementType: null,
+    selectedBody: null,
+    showTrails: true,
+    trailMaxLen: CONFIG.TRAIL_DEFAULT_LENGTH
+  };
+  let followedBody = null;
+
+  /* -------------------- 좌표 변환 -------------------- */
+  function screenToWorld(px,py){
+    return { x: camera.x + (px - CSS_W/2)/camera.zoom, y: camera.y + (py - CSS_H/2)/camera.zoom };
+  }
+  function worldToScreen(wx,wy){
+    return { x: (wx-camera.x)*camera.zoom + CSS_W/2, y: (wy-camera.y)*camera.zoom + CSS_H/2 };
+  }
+
+  function resizeCanvas(){
+    const rect = canvasWrap.getBoundingClientRect();
+    CSS_W = rect.width; CSS_H = rect.height;
+    DPR = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(CSS_W*DPR));
+    canvas.height = Math.max(1, Math.round(CSS_H*DPR));
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  /* -------------------- 배경 별 (시차 효과) -------------------- */
+  const STAR_COUNT = 160;
+  let starField = [];
+  function initStarField(){
+    starField = [];
+    for (let i=0;i<STAR_COUNT;i++){
+      starField.push({
+        x: Math.random()*2000, y: Math.random()*2000,
+        r: Math.random()*1.3+0.3,
+        tw: Math.random()*Math.PI*2
+      });
+    }
+  }
+
+  /* -------------------- 토스트 알림 -------------------- */
+  const toastStack = document.getElementById('toastStack');
+  function showToast(msg, isError){
+    const el = document.createElement('div');
+    el.className = 'toast' + (isError ? ' error' : '');
+    el.textContent = msg;
+    toastStack.appendChild(el);
+    setTimeout(()=>{
+      el.classList.add('fading');
+      setTimeout(()=> el.remove(), 320);
+    }, 2400);
+  }
+
+  /* -------------------- 저장 / 불러오기 -------------------- */
+  const SAVE_KEY = 'project365.gravityLab.save.v1';
+
+  function saveSimulation(){
+    try{
+      const data = {
+        version: 1,
+        timeScale: engine.timeScale,
+        elapsed: engine.elapsed,
+        camera: { x:camera.x, y:camera.y, zoom:camera.zoom },
+        bodies: engine.bodies.map(b=>({ type:b.type, x:b.x, y:b.y, vx:b.vx, vy:b.vy, mass:b.mass, density:b.density }))
+      };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+      showToast('Simulation saved.');
+    }catch(e){
+      showToast('Save failed — local storage unavailable.', true);
+    }
+  }
+
+  function loadSimulation(silent){
+    try{
+      const raw = localStorage.getItem(SAVE_KEY);
+      if (!raw){ if(!silent) showToast('No saved simulation found.', true); return false; }
+      const data = JSON.parse(raw);
+      engine.bodies = data.bodies.map(d=> new Body(d));
+      engine.timeScale = data.timeScale || 1;
+      engine.elapsed = data.elapsed || 0;
+      camera.x = data.camera ? data.camera.x : 0;
+      camera.y = data.camera ? data.camera.y : 0;
+      camera.zoom = data.camera ? data.camera.zoom : 1;
+      clearSelectionAndFollow();
+      syncTimeScaleButtons();
+      if (!silent) showToast('Simulation loaded.');
+      return true;
+    }catch(e){
+      if (!silent) showToast('Load failed — save data corrupted.', true);
+      return false;
+    }
+  }
+
+  /* -------------------- 기본 데모 시나리오 -------------------- */
+  function seedDemoScenario(){
+    engine.bodies = [];
+    const star = new Body({ type:'star', x:0, y:0, vx:0, vy:0, mass:CONFIG.PRESETS.star.mass, density:CONFIG.PRESETS.star.density });
+    engine.bodies.push(star);
+
+    function addCircularPlanet(radius, mass, density, eccFactor){
+      const v = Math.sqrt(CONFIG.G*star.mass/radius) * eccFactor;
+      engine.bodies.push(new Body({ type:'planet', x:radius, y:0, vx:0, vy:v, mass, density }));
+    }
+    addCircularPlanet(220, 800, 5.5, 1.0);   // 거의 원형 궤도
+    addCircularPlanet(380, 1500, 4.0, 0.85); // 약간 타원인 궤도
+
+    camera.x = 0; camera.y = 0;
+    const fitR = 420;
+    camera.zoom = clamp(Math.min(CSS_W,CSS_H) / (fitR*2.6), CONFIG.MIN_ZOOM, CONFIG.MAX_ZOOM) || 1;
+    engine.elapsed = 0;
+  }
+
+  function resetSimulation(){
+    engine.bodies = [];
+    engine.elapsed = 0;
+    engine.timeScale = 1;
+    engine.running = true;
+    camera.x = 0; camera.y = 0; camera.zoom = 1;
+    clearSelectionAndFollow();
+    syncTimeScaleButtons();
+    syncRunPauseButtons();
+    showToast('Simulation reset.');
+  }
+
+  /* -------------------- 궤적 예측 (드래그 중 점선) -------------------- */
+  function predictTrajectory(ghost, bodies, steps, dt){
+    steps = steps || 100; dt = dt || 0.12;
+    let x=ghost.x, y=ghost.y, vx=ghost.vx, vy=ghost.vy;
+    const pts = [{x,y}];
+    const soft2 = CONFIG.SOFTENING*CONFIG.SOFTENING;
+    for (let s=0;s<steps;s++){
+      let ax=0, ay=0;
+      for (const b of bodies){
+        const dx=b.x-x, dy=b.y-y;
+        const distSq = dx*dx+dy*dy+soft2;
+        const dist = Math.sqrt(distSq);
+        const f = CONFIG.G*b.mass/distSq;
+        ax += f*dx/dist; ay += f*dy/dist;
+      }
+      vx += ax*dt; vy += ay*dt;
+      x += vx*dt; y += vy*dt;
+      pts.push({x,y});
+    }
+    return pts;
+  }
+
+  /* -------------------- 렌더링 -------------------- */
+  function drawBackground(){
+    const grad = ctx.createRadialGradient(CSS_W/2,CSS_H/2,0, CSS_W/2,CSS_H/2, Math.max(CSS_W,CSS_H)*0.8);
+    grad.addColorStop(0,'#0b1120');
+    grad.addColorStop(1,'#02040a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0,0,CSS_W,CSS_H);
+  }
+
+  function drawStars(t){
+    const offX = (-camera.x*0.12) % 2000;
+    const offY = (-camera.y*0.12) % 2000;
+    for (const s of starField){
+      let x = (s.x+offX+4000) % CSS_W;
+      let y = (s.y+offY+4000) % CSS_H;
+      const tw = 0.5+0.5*Math.sin(t*0.0016 + s.tw);
+      ctx.globalAlpha = 0.25 + 0.5*tw;
+      ctx.beginPath();
+      ctx.arc(x,y,s.r,0,Math.PI*2);
+      ctx.fillStyle = '#dfe8ff';
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawGrid(){
+    let spacing = 100;
+    while (spacing*camera.zoom < 55) spacing *= 2;
+    while (spacing*camera.zoom > 240) spacing /= 2;
+
+    const topLeft = screenToWorld(0,0);
+    const bottomRight = screenToWorld(CSS_W,CSS_H);
+    const startX = Math.floor(topLeft.x/spacing)*spacing;
+    const startY = Math.floor(topLeft.y/spacing)*spacing;
+
+    ctx.strokeStyle = 'rgba(120,170,255,0.055)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x=startX; x<bottomRight.x; x+=spacing){
+      const sx = worldToScreen(x,0).x;
+      ctx.moveTo(sx,0); ctx.lineTo(sx,CSS_H);
+    }
+    for (let y=startY; y<bottomRight.y; y+=spacing){
+      const sy = worldToScreen(0,y).y;
+      ctx.moveTo(0,sy); ctx.lineTo(CSS_W,sy);
+    }
+    ctx.stroke();
+
+    // 원점 기준선 (연구소 좌표계 기준)
+    const origin = worldToScreen(0,0);
+    ctx.strokeStyle = 'rgba(120,170,255,0.1)';
+    ctx.beginPath();
+    ctx.moveTo(origin.x,0); ctx.lineTo(origin.x,CSS_H);
+    ctx.moveTo(0,origin.y); ctx.lineTo(CSS_W,origin.y);
+    ctx.stroke();
+  }
+
+  function drawTrail(b){
+    const pts = b.trail;
+    if (pts.length < 2) return;
+    const color = CONFIG.PRESETS[b.type].color;
+
+    ctx.lineWidth = Math.max(1, 1.1*camera.zoom);
+    ctx.lineJoin = 'round';
+
+    // 전체 궤적 (낮은 투명도, 1번의 stroke 로 성능 확보)
+    ctx.strokeStyle = hexToRgba(color, 0.2);
+    ctx.beginPath();
+    for (let i=0;i<pts.length;i++){
+      const p = worldToScreen(pts[i].x, pts[i].y);
+      if (i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
+    }
+    ctx.stroke();
+
+    // 최근 구간만 밝게 (꼬리가 사라지는 느낌)
+    const tailStart = Math.max(0, pts.length - Math.ceil(pts.length*0.18));
+    ctx.strokeStyle = hexToRgba(color, 0.6);
+    ctx.beginPath();
+    for (let i=tailStart;i<pts.length;i++){
+      const p = worldToScreen(pts[i].x, pts[i].y);
+      if (i===tailStart) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
+    }
+    ctx.stroke();
+  }
+
+  function drawBody(b, t){
+    const p = worldToScreen(b.x,b.y);
+    const r = Math.max(b.radius*camera.zoom, 1.4);
+    if (p.x < -r-40 || p.x > CSS_W+r+40 || p.y < -r-40 || p.y > CSS_H+r+40) return; // 화면 밖 컬링
+
+    if (b.type === 'planet'){
+      const g = ctx.createRadialGradient(p.x-r*0.3,p.y-r*0.3,r*0.1, p.x,p.y,r);
+      g.addColorStop(0,'#b9c6e8'); g.addColorStop(0.55,'#7186ba'); g.addColorStop(1,'#212a48');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x,p.y,r,0,Math.PI*2); ctx.fill();
+    } else if (b.type === 'star'){
+      ctx.save();
+      ctx.shadowColor = 'rgba(255,190,90,0.85)';
+      ctx.shadowBlur = Math.max(12, r*1.3);
+      const g = ctx.createRadialGradient(p.x,p.y,0, p.x,p.y,r);
+      g.addColorStop(0,'#fff7de'); g.addColorStop(0.5,'#ffd27a'); g.addColorStop(1,'#ff9d3d');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x,p.y,r,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      // 은은한 코로나 펄스
+      const pulse = 0.5+0.5*Math.sin(t*0.0022 + b.id);
+      ctx.strokeStyle = 'rgba(255,190,110,'+(0.12+0.1*pulse)+')';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(p.x,p.y,r*1.35,0,Math.PI*2); ctx.stroke();
+    } else if (b.type === 'blackhole'){
+      const ringR = r*2.4;
+      const g = ctx.createRadialGradient(p.x,p.y,r*0.7, p.x,p.y,ringR);
+      g.addColorStop(0,'rgba(150,100,255,0.55)');
+      g.addColorStop(0.55,'rgba(90,60,180,0.16)');
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x,p.y,ringR,0,Math.PI*2); ctx.fill();
+
+      // 회전하는 강착원반 강조 아크
+      ctx.save();
+      ctx.translate(p.x,p.y);
+      ctx.rotate(t*0.0009);
+      ctx.strokeStyle = 'rgba(200,170,255,0.55)';
+      ctx.lineWidth = Math.max(1.4, r*0.16);
+      ctx.beginPath(); ctx.ellipse(0,0, r*1.9, r*0.7, 0, 0, Math.PI*1.15); ctx.stroke();
+      ctx.restore();
+
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(p.x,p.y,Math.max(r,3),0,Math.PI*2); ctx.fill();
+    }
+
+    if (b === state.selectedBody){
+      ctx.save();
+      ctx.setLineDash([5,4]);
+      ctx.lineDashOffset = -t*0.02;
+      ctx.strokeStyle = 'rgba(159,230,255,0.85)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.arc(p.x,p.y, r+7, 0, Math.PI*2); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  function drawPlacementGhost(ghost){
+    if (!ghost) return;
+    if (ghost.trajectoryPreview){
+      ctx.save();
+      ctx.setLineDash([4,5]);
+      ctx.strokeStyle = 'rgba(255,180,84,0.75)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      const pts = ghost.trajectoryPreview;
+      for (let i=0;i<pts.length;i++){
+        const p = worldToScreen(pts[i].x, pts[i].y);
+        if (i===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+    // 발사 방향 화살표 (드래그 반대 방향)
+    const start = worldToScreen(ghost.x, ghost.y);
+    const dirLen = Math.hypot(ghost.vx,ghost.vy);
+    if (dirLen > 0.5){
+      const tip = worldToScreen(ghost.x+ghost.vx*0.9, ghost.y+ghost.vy*0.9);
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255,180,84,0.9)';
+      ctx.fillStyle = 'rgba(255,180,84,0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(start.x,start.y); ctx.lineTo(tip.x,tip.y); ctx.stroke();
+      const ang = Math.atan2(tip.y-start.y, tip.x-start.x);
+      ctx.beginPath();
+      ctx.moveTo(tip.x,tip.y);
+      ctx.lineTo(tip.x-9*Math.cos(ang-0.4), tip.y-9*Math.sin(ang-0.4));
+      ctx.lineTo(tip.x-9*Math.cos(ang+0.4), tip.y-9*Math.sin(ang+0.4));
+      ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    // 미리보기 천체
+    ctx.save();
+    ctx.globalAlpha = 0.55;
+    const r = Math.max(ghost.radius*camera.zoom, 3);
+    ctx.fillStyle = CONFIG.PRESETS[ghost.type].color;
+    ctx.beginPath(); ctx.arc(start.x,start.y,r,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+
+  function render(t){
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    ctx.clearRect(0,0,CSS_W,CSS_H);
+
+    drawBackground();
+    drawStars(t);
+    drawGrid();
+
+    if (state.showTrails){
+      for (const b of engine.bodies) drawTrail(b);
+    }
+    for (const b of engine.bodies) drawBody(b, t);
+
+    if (dragMode === 'place' && placingGhost) drawPlacementGhost(placingGhost);
+  }
+
+  /* -------------------- 트레일 기록 -------------------- */
+  function recordTrails(){
+    for (const b of engine.bodies){
+      b.trail.push({x:b.x, y:b.y});
+      if (b.trail.length > state.trailMaxLen) b.trail.shift();
+    }
+  }
+
+  /* -------------------- 히트 테스트 -------------------- */
+  function findBodyAtWorld(world){
+    for (let i=engine.bodies.length-1; i>=0; i--){
+      const b = engine.bodies[i];
+      const dx = world.x-b.x, dy = world.y-b.y;
+      const hitR = Math.max(b.radius, 8) + 5/camera.zoom;
+      if (dx*dx+dy*dy <= hitR*hitR) return b;
+    }
+    return null;
+  }
+
+  /* -------------------- 선택 / 팔로우 -------------------- */
+  function selectBody(b){
+    state.selectedBody = b;
+    refreshPropertyPanel();
+  }
+  function clearSelectionAndFollow(){
+    state.selectedBody = null;
+    followedBody = null;
+    refreshPropertyPanel();
+    updateFollowBadge();
+  }
+
+  engine.onMerge = function(survivor, loser){
+    if (state.selectedBody === loser) state.selectedBody = survivor;
+    if (followedBody === loser) followedBody = survivor;
+    refreshPropertyPanel();
+    showToast('💥 Merged into ' + CONFIG.PRESETS[survivor.type].label + ' #' + survivor.id);
+  };
+
+  /* -------------------- 카메라 줌 (커서 기준) -------------------- */
+  function zoomCameraTo(newZoom, screenPoint){
+    newZoom = clamp(newZoom, CONFIG.MIN_ZOOM, CONFIG.MAX_ZOOM);
+    const before = screenToWorld(screenPoint.x, screenPoint.y);
+    camera.zoom = newZoom;
+    const after = screenToWorld(screenPoint.x, screenPoint.y);
+    camera.x += (before.x-after.x);
+    camera.y += (before.y-after.y);
+  }
+
+  /* ==============================================================
+     6. 입력 처리 (Pointer Events — 마우스/터치 통합)
+     ============================================================== */
+  const pointers = new Map();
+  let dragMode = null;          // 'maybe-empty' | 'maybe-select' | 'pan' | 'place' | 'pinch'
+  let dragStart = null;
+  let panStartCamera = null, panStartScreen = null;
+  let pointerDownOnBody = null;
+  let placingGhost = null;
+  let placingStartWorld = null;
+  let pinchStartDist = 0, pinchStartZoom = 1;
+
+  function getCanvasPos(e){
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX-rect.left, y: e.clientY-rect.top };
+  }
+
+  function updateCanvasCursorState(){
+    canvasWrap.classList.toggle('is-armed', !!state.placementType && dragMode!=='pan');
+    canvasWrap.classList.toggle('is-panning', dragMode==='pan');
+  }
+
+  canvas.addEventListener('pointerdown', function(e){
+    canvas.setPointerCapture(e.pointerId);
+    const pos = getCanvasPos(e);
+    pointers.set(e.pointerId, pos);
+
+    if (pointers.size === 2){
+      dragMode = 'pinch';
+      const pts = [...pointers.values()];
+      pinchStartDist = dist2(pts[0],pts[1]) || 1;
+      pinchStartZoom = camera.zoom;
+      updateCanvasCursorState();
+      return;
+    }
+    if (pointers.size > 2) return;
+
+    dragStart = pos;
+    const world = screenToWorld(pos.x,pos.y);
+
+    if (e.button === 2){
+      dragMode = 'pan';
+      panStartCamera = { x:camera.x, y:camera.y };
+      panStartScreen = pos;
+      updateCanvasCursorState();
+      return;
+    }
+
+    if (state.placementType){
+      dragMode = 'place';
+      placingStartWorld = world;
+      const preset = CONFIG.PRESETS[state.placementType];
+      placingGhost = {
+        type: state.placementType,
+        x: world.x, y: world.y, vx:0, vy:0,
+        mass: preset.mass, density: preset.density,
+        radius: Body.radiusFromMassDensity(preset.mass, preset.density)
+      };
+      updateCanvasCursorState();
+      return;
+    }
+
+    const hit = findBodyAtWorld(world);
+    if (hit){
+      pointerDownOnBody = hit;
+      dragMode = 'maybe-select';
+    } else {
+      dragMode = 'maybe-empty';
+    }
+    updateCanvasCursorState();
+  });
+
+  canvas.addEventListener('pointermove', function(e){
+    if (!pointers.has(e.pointerId)) return;
+    const pos = getCanvasPos(e);
+    pointers.set(e.pointerId, pos);
+
+    if (dragMode === 'pinch' && pointers.size >= 2){
+      const pts = [...pointers.values()];
+      const d = dist2(pts[0],pts[1]) || 1;
+      const mid = midpoint(pts[0],pts[1]);
+      zoomCameraTo(pinchStartZoom * (d/pinchStartDist), mid);
+      return;
+    }
+
+    if (dragMode === 'maybe-empty' || dragMode === 'maybe-select'){
+      if (dist2(pos,dragStart) > 6){
+        dragMode = 'pan';
+        panStartCamera = { x:camera.x, y:camera.y };
+        panStartScreen = dragStart;
+        pointerDownOnBody = null;
+        followedBody = null;
+        updateCanvasCursorState();
+      }
+      return;
+    }
+
+    if (dragMode === 'pan'){
+      camera.x = panStartCamera.x - (pos.x-panStartScreen.x)/camera.zoom;
+      camera.y = panStartCamera.y - (pos.y-panStartScreen.y)/camera.zoom;
+      return;
+    }
+
+    if (dragMode === 'place' && placingGhost){
+      const world = screenToWorld(pos.x,pos.y);
+      const dxv = world.x-placingStartWorld.x, dyv = world.y-placingStartWorld.y;
+      placingGhost.vx = -dxv * CONFIG.VELOCITY_DRAG_SCALE;
+      placingGhost.vy = -dyv * CONFIG.VELOCITY_DRAG_SCALE;
+    }
+  });
+
+  function endPointer(e){
+    if (!pointers.has(e.pointerId)) return;
+    pointers.delete(e.pointerId);
+
+    if (dragMode === 'pinch'){
+      if (pointers.size === 1){
+        dragMode = 'pan';
+        const remaining = [...pointers.values()][0];
+        panStartCamera = { x:camera.x, y:camera.y };
+        panStartScreen = remaining;
+      } else if (pointers.size === 0){
+        dragMode = null;
+      }
+      updateCanvasCursorState();
+      return;
+    }
+
+    if (dragMode === 'place' && placingGhost){
+      const body = new Body({ type:placingGhost.type, x:placingGhost.x, y:placingGhost.y, vx:placingGhost.vx, vy:placingGhost.vy, mass:placingGhost.mass, density:placingGhost.density });
+      engine.bodies.push(body);
+      selectBody(body);
+      placingGhost = null;
+      dragMode = null;
+      updateCanvasCursorState();
+      return;
+    }
+
+    if (dragMode === 'maybe-select'){
+      selectBody(pointerDownOnBody);
+      pointerDownOnBody = null;
+      dragMode = null;
+      updateCanvasCursorState();
+      return;
+    }
+
+    if (dragMode === 'maybe-empty'){
+      clearSelectionAndFollow();
+      dragMode = null;
+      updateCanvasCursorState();
+      return;
+    }
+
+    if (dragMode === 'pan' && pointers.size === 0){
+      dragMode = null;
+      updateCanvasCursorState();
+    }
+  }
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+
+  canvas.addEventListener('wheel', function(e){
+    e.preventDefault();
+    const pos = getCanvasPos(e);
+    const factor = Math.exp(-e.deltaY * 0.0012);
+    zoomCameraTo(camera.zoom*factor, pos);
+  }, { passive:false });
+
+  canvas.addEventListener('contextmenu', e=> e.preventDefault());
+
+  canvas.addEventListener('dblclick', function(e){
+    const pos = getCanvasPos(e);
+    const world = screenToWorld(pos.x,pos.y);
+    const hit = findBodyAtWorld(world);
+    if (hit){
+      followedBody = hit;
+      selectBody(hit);
+      showToast('Following ' + CONFIG.PRESETS[hit.type].label + ' #' + hit.id);
+    } else {
+      followedBody = null;
+    }
+    updateFollowBadge();
+  });
+
+  /* ==============================================================
+     7. UI 바인딩 — 툴바 / 사이드바 / 상태바
+     ============================================================== */
+  document.getElementById('exitBtn').addEventListener('click', function(){
+    location.href = '../';
+  });
+
+  const btnRun = document.getElementById('btnRun');
+  const btnPause = document.getElementById('btnPause');
+  function syncRunPauseButtons(){
+    btnRun.classList.toggle('is-active', engine.running);
+    btnPause.classList.toggle('is-active', !engine.running);
+  }
+  btnRun.addEventListener('click', function(){ engine.running = true; syncRunPauseButtons(); });
+  btnPause.addEventListener('click', function(){ engine.running = false; syncRunPauseButtons(); });
+  document.getElementById('btnReset').addEventListener('click', resetSimulation);
+  document.getElementById('btnSave').addEventListener('click', saveSimulation);
+  document.getElementById('btnLoad').addEventListener('click', function(){ loadSimulation(false); });
+
+  // Objects 패널 — 배치 도구 선택
+  const objectButtons = document.querySelectorAll('.object-btn');
+  objectButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const type = btn.dataset.type;
+      state.placementType = (state.placementType === type) ? null : type;
+      objectButtons.forEach(b=> b.classList.toggle('armed', b.dataset.type===state.placementType));
+      updateCanvasCursorState();
+    });
+  });
+
+  // Trail 토글 / 길이
+  const trailToggle = document.getElementById('trailToggle');
+  trailToggle.addEventListener('click', function(){
+    state.showTrails = !state.showTrails;
+    trailToggle.classList.toggle('on', state.showTrails);
+  });
+  const trailLenRange = document.getElementById('trailLenRange');
+  const trailLenLabel = document.getElementById('trailLenLabel');
+  trailLenRange.addEventListener('input', function(){
+    state.trailMaxLen = Number(trailLenRange.value);
+    trailLenLabel.textContent = state.trailMaxLen;
+    for (const b of engine.bodies){
+      while (b.trail.length > state.trailMaxLen) b.trail.shift();
+    }
+  });
+
+  // Time 배속 버튼
+  const tsButtons = document.querySelectorAll('.ts-btn');
+  function syncTimeScaleButtons(){
+    tsButtons.forEach(function(b){
+      b.classList.toggle('active', Number(b.dataset.scale) === engine.timeScale);
+    });
+  }
+  tsButtons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      engine.timeScale = Number(btn.dataset.scale);
+      syncTimeScaleButtons();
+    });
+  });
+
+  // Properties 패널
+  const propsEmpty = document.getElementById('propsEmpty');
+  const propsForm = document.getElementById('propsForm');
+  const propsTypeText = document.getElementById('propsTypeText');
+  const propsTypeDot = document.querySelector('#propsType .dot');
+  const stabValue = document.getElementById('stabValue');
+  const stabBar = document.getElementById('stabBar');
+  const stabLabel = document.getElementById('stabLabel');
+
+  const propRows = {};
+  document.querySelectorAll('[data-prop]').forEach(function(row){
+    const name = row.dataset.prop;
+    propRows[name] = {
+      range: row.querySelector('.prop-range'),
+      number: row.querySelector('.prop-number')
+    };
+  });
+
+  function applyPropChange(name, value){
+    const b = state.selectedBody;
+    if (!b) return;
+    if (name === 'mass'){
+      b.mass = clamp(value, PROP_SPECS.mass.min, PROP_SPECS.mass.max);
+      b.radius = Body.radiusFromMassDensity(b.mass, b.density);
+    } else if (name === 'density'){
+      b.density = clamp(value, PROP_SPECS.density.min, PROP_SPECS.density.max);
+      b.radius = Body.radiusFromMassDensity(b.mass, b.density);
+    } else if (name === 'radius'){
+      const r = clamp(value, PROP_SPECS.radius.min, PROP_SPECS.radius.max);
+      b.radius = r;
+      b.density = (3*b.mass) / (4*Math.PI*Math.pow(r,3));
+    } else if (name === 'vx'){
+      b.vx = clamp(value, PROP_SPECS.vx.min, PROP_SPECS.vx.max);
+    } else if (name === 'vy'){
+      b.vy = clamp(value, PROP_SPECS.vy.min, PROP_SPECS.vy.max);
+    }
+    refreshPropertyPanel();
+  }
+
+  Object.keys(propRows).forEach(function(name){
+    const spec = PROP_SPECS[name];
+    const row = propRows[name];
+    row.range.addEventListener('input', function(){
+      applyPropChange(name, sliderToValue(spec, Number(row.range.value)));
+    });
+    row.number.addEventListener('change', function(){
+      const v = Number(row.number.value);
+      if (!isFinite(v)) return;
+      applyPropChange(name, v);
+    });
+  });
+
+  function refreshPropertyPanel(){
+    const b = state.selectedBody;
+    propsEmpty.style.display = b ? 'none' : 'block';
+    propsForm.style.display = b ? 'block' : 'none';
+    if (!b) { updateStatusBar(); return; }
+
+    const preset = CONFIG.PRESETS[b.type];
+    propsTypeText.textContent = preset.label + ' #' + b.id;
+    propsTypeDot.style.color = preset.color;
+    propsTypeDot.style.background = preset.color;
+
+    Object.keys(propRows).forEach(function(name){
+      const spec = PROP_SPECS[name];
+      const val = b[name];
+      const row = propRows[name];
+      row.range.value = valueToSlider(spec, val);
+      row.number.value = formatNum(val);
+    });
+
+    updateStabilityOnly();
+    updateStatusBar();
+  }
+
+  function updateStabilityOnly(){
+    const b = state.selectedBody;
+    if (!b) return;
+    const stab = computeStability(b, engine.bodies);
+    if (stab.percent === null){
+      stabValue.textContent = '—';
+      stabBar.style.width = '0%';
+      stabLabel.textContent = stab.label;
+      return;
+    }
+    stabValue.textContent = stab.percent.toFixed(1) + '%';
+    stabBar.style.width = clamp(stab.percent,0,100).toFixed(1) + '%';
+    stabBar.style.background = stab.percent>66 ? 'var(--success)' : (stab.percent>33 ? 'var(--warn)' : 'var(--danger)');
+    stabLabel.textContent = stab.label;
+  }
+
+  document.getElementById('btnDelete').addEventListener('click', function(){
+    const b = state.selectedBody;
+    if (!b) return;
+    engine.bodies = engine.bodies.filter(x=>x!==b);
+    if (followedBody===b) followedBody=null;
+    clearSelectionAndFollow();
+  });
+
+  // 키보드: Delete=선택 삭제, Space=Run/Pause, Esc=배치 취소/선택 해제
+  window.addEventListener('keydown', function(e){
+    const tag = (document.activeElement && document.activeElement.tagName) || '';
+    if (tag === 'INPUT') return; // 입력창 편집 중에는 단축키 무시
+
+    if (e.key === 'Delete' || e.key === 'Backspace'){
+      if (state.selectedBody) document.getElementById('btnDelete').click();
+    } else if (e.code === 'Space'){
+      e.preventDefault();
+      engine.running = !engine.running;
+      syncRunPauseButtons();
+    } else if (e.key === 'Escape'){
+      state.placementType = null;
+      objectButtons.forEach(b=> b.classList.remove('armed'));
+      updateCanvasCursorState();
+      clearSelectionAndFollow();
+    }
+  });
+
+  function updateFollowBadge(){
+    const badge = document.getElementById('followBadge');
+    const nameEl = document.getElementById('followName');
+    if (followedBody && engine.bodies.includes(followedBody)){
+      badge.classList.add('show');
+      nameEl.textContent = CONFIG.PRESETS[followedBody.type].label + ' #' + followedBody.id;
+    } else {
+      badge.classList.remove('show');
+    }
+  }
+
+  /* -------------------- 상태바 -------------------- */
+  const statFps = document.getElementById('statFps');
+  const statSpeed = document.getElementById('statSpeed');
+  const statObjects = document.getElementById('statObjects');
+  const statG = document.getElementById('statG');
+  const statSelected = document.getElementById('statSelected');
+  const statTime = document.getElementById('statTime');
+
+  let fpsSmoothed = 60;
+  function updateStatusBar(){
+    statFps.textContent = Math.round(fpsSmoothed);
+    statSpeed.textContent = engine.timeScale + '×';
+    statObjects.textContent = engine.bodies.length;
+    statG.textContent = engine.G.toFixed(3);
+    statSelected.textContent = state.selectedBody ? (CONFIG.PRESETS[state.selectedBody.type].label + ' #' + state.selectedBody.id) : 'None';
+    statTime.textContent = 'T+' + formatElapsed(engine.elapsed);
+  }
+
+  /* ==============================================================
+     8. 메인 루프
+     ============================================================== */
+  let lastTime = performance.now();
+  function loop(now){
+    const dt = Math.min(0.05, (now-lastTime)/1000);
+    lastTime = now;
+
+    const instFps = dt>0 ? 1/dt : 60;
+    fpsSmoothed += (instFps-fpsSmoothed)*0.1;
+
+    if (engine.running){
+      engine.step(dt);
+      recordTrails();
+    }
+
+    if (followedBody){
+      if (engine.bodies.includes(followedBody)){
+        camera.x = followedBody.x;
+        camera.y = followedBody.y;
+      } else {
+        followedBody = null;
+      }
+    }
+    updateFollowBadge();
+
+    if (dragMode === 'place' && placingGhost){
+      placingGhost.trajectoryPreview = predictTrajectory(placingGhost, engine.bodies);
+    }
+
+    render(now);
+    updateStatusBar();
+    if (state.selectedBody) updateStabilityOnly();
+
+    requestAnimationFrame(loop);
+  }
+
+  /* ==============================================================
+     9. 초기화
+     ============================================================== */
+  function init(){
+    resizeCanvas();
+    initStarField();
+    if (!loadSimulation(true)){
+      seedDemoScenario();
+    }
+    syncRunPauseButtons();
+    syncTimeScaleButtons();
+    refreshPropertyPanel();
+    requestAnimationFrame(loop);
+  }
+
+  window.addEventListener('load', init);
+})();
+</script>
+</body>
+</html>
