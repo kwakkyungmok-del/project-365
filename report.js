@@ -76,6 +76,14 @@ AI 1~2페이즈 생성 중 클로드 무료한도 소진
     content:`
 AI 3~4페이즈 완성 중 클로드 무료한도 소진
 `
-}
+},
 
+{
+    day:9,
+    title:"Day 9",
+    content:`
+AI 커버리지 업그레이드-아직 사이트에 추가x
+메인 index.html과 dayreport 통교체
+`
+}
 ];
