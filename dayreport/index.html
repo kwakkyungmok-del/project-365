@@ -20,7 +20,8 @@ body{
 
     background:#0b0b0b;
     color:white;
-    font-family:Arial;
+
+    font-family:Arial, Helvetica, sans-serif;
 
     padding:40px;
 
@@ -29,9 +30,11 @@ body{
 h1{
 
     text-align:center;
+
     margin-bottom:35px;
 
 }
+
 .home{
 
     position:fixed;
@@ -40,6 +43,7 @@ h1{
     left:25px;
 
     background:#181818;
+
     color:white;
 
     border:1px solid #333;
@@ -59,6 +63,7 @@ h1{
     background:#2b2b2b;
 
 }
+
 .grid{
 
     display:grid;
@@ -117,6 +122,8 @@ h1{
 
     width:500px;
 
+    max-width:90%;
+
     background:#161616;
 
     border-radius:15px;
@@ -131,6 +138,16 @@ h1{
 
 }
 
+#content{
+
+    white-space:pre-line;
+
+    line-height:1.6;
+
+    color:#ddd;
+
+}
+
 .close{
 
     margin-top:25px;
@@ -141,157 +158,230 @@ h1{
 
 }
 
+
+/* ========================= */
+/* 모바일 최적화 */
+/* ========================= */
+
+@media(max-width:768px){
+
+    body{
+
+        padding:80px 20px 30px;
+
+    }
+
+    h1{
+
+        font-size:26px;
+
+        margin-bottom:25px;
+
+    }
+
+    .home{
+
+        top:18px;
+        left:18px;
+
+        padding:9px 13px;
+
+        font-size:13px;
+
+    }
+
+    .grid{
+
+        grid-template-columns:repeat(5,1fr);
+
+        gap:7px;
+
+        width:100%;
+
+    }
+
+    .day{
+
+        height:48px;
+
+        font-size:11px;
+
+        border-radius:6px;
+
+    }
+
+    .box{
+
+        padding:24px;
+
+    }
+
+}
+
+@media(max-width:480px){
+
+    .grid{
+
+        gap:5px;
+
+    }
+
+    .day{
+
+        height:44px;
+
+        font-size:9px;
+
+    }
+
+    h1{
+
+        font-size:22px;
+
+    }
+
+}
+
 </style>
 
 </head>
 
 <body>
-<button class="home" onclick="location.href='../'">
-🏠 메인 화면
+
+
+<!-- 메인 화면으로 -->
+
+<button
+    class="home"
+    onclick="location.href='../'"
+>
+    🏠 메인 화면
 </button>
+
+
 <h1>365 Day Report</h1>
 
-<div class="grid" id="grid"></div>
 
-<div class="modal" id="modal">
+<!-- 365개 버튼 -->
 
-<div class="box">
+<div
+    class="grid"
+    id="grid"
+></div>
 
-<h2 id="title"></h2>
 
-<p id="content"></p>
+<!-- 기록 표시창 -->
 
-<button class="close" onclick="closeModal()">닫기</button>
+<div
+    class="modal"
+    id="modal"
+>
+
+    <div class="box">
+
+        <h2 id="title"></h2>
+
+        <p id="content"></p>
+
+        <button
+            class="close"
+            onclick="closeModal()"
+        >
+            닫기
+        </button>
+
+    </div>
 
 </div>
 
-</div>
+
+<!-- ========================= -->
+<!-- 기록 데이터 불러오기 -->
+<!-- ========================= -->
+
+<script src="../report.js"></script>
+
 
 <script>
 
-const reports = [
+/* ========================= */
+/* 365개 Day 버튼 생성 */
+/* ========================= */
 
-{
-day:1,
-title:"Day 1",
-content:`
-메인 UI 제작
-깃허브 저장소 생성
-일별 활동 페이지 제작
-프로젝트 시작시 표시 화면 제작
-`
-},
+const grid =
+    document.getElementById("grid");
 
-{
-day:2,
-title:"Day 2",
-content:`
-프로그램 뼈대 완성
-컴퓨터 구현
-`
-},
-    
-{
-day:3,
-title:"Day 3",
-content:`
-모바일 화면 최적화
-컴퓨터 기능 한 개 추가
-Gravity Laboratory 개발 시작
-- 중력 시뮬레이션 엔진 구현
-- Newtonian gravity 적용
-- Velocity Verlet 적분 방식 적용
-- 고배속 궤도 안정성 테스트
-`
-},
 
-{
-day:4,
-title:"Day 4",
-content:`
-중력 시뮬 완성
-컴퓨터와 중력 시뮬 연결
-`
-},
+for(let i = 1; i <= 365; i++){
 
-{
-day:5,
-title:"Day 5",
-content:`
-책장을 일별 기록과 연결
-실험대 베타 완성
-`
-},
+    const btn =
+        document.createElement("button");
 
-{
-day:6,
-title:"Day 6",
-content:`
-AI 개발을 시작
-AI 개발 프롬프트를 클로드에게 넣으려다가 무료한도로 실패
-`
-},
+    btn.className = "day";
 
-{
-day:7,
-title:"Day 7",
-content:`
-AI 개발을 시작
-AI 1~2페이즈 생성 중 클로드 무료한도 소진
-`
-},
+    btn.textContent =
+        "DAY " + String(i).padStart(3,"0");
 
-{
-day:8,
-title:"Day 8",
-content:`
-AI 3~4페이즈 완성 중 클로드 무료한도 소진
-`
-}
-];
-const grid=document.getElementById("grid");
+    btn.onclick =
+        () => openReport(i);
 
-for(let i=1;i<=365;i++){
-
-const btn=document.createElement("button");
-
-btn.className="day";
-
-btn.textContent="DAY "+String(i).padStart(3,"0");
-
-btn.onclick=()=>openReport(i);
-
-grid.appendChild(btn);
+    grid.appendChild(btn);
 
 }
+
+
+/* ========================= */
+/* 기록 열기 */
+/* ========================= */
 
 function openReport(day){
 
-const data = reports.find(report => report.day === day);
+    const data =
+        reports.find(
+            report => report.day === day
+        );
 
-document.getElementById("modal").style.display="flex";
 
-if(data){
+    document.getElementById("modal")
+        .style.display = "flex";
 
-document.getElementById("title").innerText = data.title;
-document.getElementById("content").innerText = data.content.trim();
 
-}else{
+    if(data){
 
-document.getElementById("title").innerText = "Day " + day;
-document.getElementById("content").innerText = "??";
+        document.getElementById("title")
+            .innerText = data.title;
+
+        document.getElementById("content")
+            .innerText = data.content.trim();
+
+    }
+
+    else{
+
+        document.getElementById("title")
+            .innerText = "Day " + day;
+
+        document.getElementById("content")
+            .innerText = "??";
+
+    }
 
 }
 
-}
+
+/* ========================= */
+/* 닫기 */
+/* ========================= */
 
 function closeModal(){
 
-document.getElementById("modal").style.display="none";
+    document.getElementById("modal")
+        .style.display = "none";
 
 }
 
 </script>
+
 
 </body>
 
