@@ -556,17 +556,19 @@
                 <span>🌌 Gravity Simulator</span>
               </button>
 
-              <button class="program locked" disabled title="Coming soon">
-                <span>🧪 Chemical Lab</span><span class="lock">🔒</span>
+              <button class="program active" id="prog-chem" data-program="chem">
+                <span>🧪 Chemical Lab</span>
               </button>
-              <button class="program locked" disabled title="Coming soon">
-                <span>🤖 AI Assistant</span><span class="lock">🔒</span>
+
+              <button class="program active" id="prog-ai" data-program="ai">
+                <span>🤖 AI Assistant</span>
               </button>
+
               <button class="program locked" disabled title="Coming soon">
                 <span>📈 Graph Plotter</span><span class="lock">🔒</span>
               </button>
 
-              <div class="sidebar-footer">3 programs pending deployment…</div>
+              <div class="sidebar-footer">1 program pending deployment…</div>
             </aside>
 
             <!-- 우측: 실제 프로그램이 실행되는 작업 영역 -->
@@ -650,6 +652,43 @@
 
     setTimeout(function(){
       location.href = 'gravity/index.html';
+    }, 260);
+  });
+
+  /* ==========================================================
+     3-2) 프로그램 실행 (Chemical Lab)
+     - computer/ 폴더의 형제 폴더인 project/lab/ 로 이동한다.
+       (gravity/ 는 computer/ 안의 하위 폴더였지만, lab/ 은 그렇지 않다)
+     ========================================================== */
+  const progChemBtn = document.getElementById('prog-chem');
+
+  progChemBtn.addEventListener('click', function(){
+    if (progChemBtn.classList.contains('launching')) return;
+
+    progChemBtn.classList.add('selected', 'launching');
+    workspace.innerHTML =
+      '<div class="placeholder">Launching Chemical Lab<span class="blink">_</span></div>';
+
+    setTimeout(function(){
+      location.href = '../lab/index.html';
+    }, 260);
+  });
+
+  /* ==========================================================
+     3-3) 프로그램 실행 (AI Assistant)
+     - 마찬가지로 project/AIrobot/ 은 computer/ 의 형제 폴더다.
+     ========================================================== */
+  const progAiBtn = document.getElementById('prog-ai');
+
+  progAiBtn.addEventListener('click', function(){
+    if (progAiBtn.classList.contains('launching')) return;
+
+    progAiBtn.classList.add('selected', 'launching');
+    workspace.innerHTML =
+      '<div class="placeholder">Launching AI Assistant<span class="blink">_</span></div>';
+
+    setTimeout(function(){
+      location.href = '../AIrobot/index.html';
     }, 260);
   });
 
