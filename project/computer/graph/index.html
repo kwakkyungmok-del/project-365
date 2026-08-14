@@ -1,0 +1,1831 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Graph Lab</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    background:#080808;
+    color:white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    min-height:100vh;
+
+    padding:20px;
+
+}
+
+
+/* ========================= */
+/* 전체 화면 */
+/* ========================= */
+
+.app{
+
+    width:100%;
+    max-width:1200px;
+
+    margin:auto;
+
+}
+
+
+/* ========================= */
+/* 상단 */
+/* ========================= */
+
+.top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.title{
+
+    font-size:24px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+}
+
+.subtitle{
+
+    color:#666;
+
+    font-size:11px;
+
+    margin-top:5px;
+
+}
+
+.back{
+
+    background:#171717;
+
+    color:#ddd;
+
+    border:1px solid #303030;
+
+    padding:10px 15px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.back:hover{
+
+    background:#242424;
+
+}
+
+
+/* ========================= */
+/* 메인 레이아웃 */
+/* ========================= */
+
+.main{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 300px;
+
+    gap:15px;
+
+}
+
+
+/* ========================= */
+/* 그래프 카드 */
+/* ========================= */
+
+.graph-card{
+
+    background:#111;
+
+    border:1px solid #292929;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    position:relative;
+
+}
+
+canvas{
+
+    display:block;
+
+    width:100%;
+
+    height:600px;
+
+    background:#0d0d0d;
+
+    cursor:grab;
+
+}
+
+canvas.dragging{
+
+    cursor:grabbing;
+
+}
+
+
+/* ========================= */
+/* 그래프 상태 */
+/* ========================= */
+
+.graph-info{
+
+    position:absolute;
+
+    top:15px;
+
+    left:15px;
+
+    background:rgba(10,10,10,.85);
+
+    border:1px solid #292929;
+
+    border-radius:10px;
+
+    padding:10px 13px;
+
+    font-family:monospace;
+
+    font-size:12px;
+
+    color:#bbb;
+
+    pointer-events:none;
+
+}
+
+.graph-info span{
+
+    color:white;
+
+}
+
+
+/* ========================= */
+/* 컨트롤 */
+/* ========================= */
+
+.controls{
+
+    background:#111;
+
+    border:1px solid #292929;
+
+    border-radius:18px;
+
+    padding:20px;
+
+}
+
+.section{
+
+    margin-bottom:22px;
+
+}
+
+.section:last-child{
+
+    margin-bottom:0;
+
+}
+
+.label{
+
+    color:#777;
+
+    font-size:11px;
+
+    font-weight:bold;
+
+    letter-spacing:1px;
+
+    margin-bottom:8px;
+
+    text-transform:uppercase;
+
+}
+
+
+/* ========================= */
+/* 입력 */
+/* ========================= */
+
+.input-row{
+
+    display:flex;
+
+    gap:7px;
+
+}
+
+input{
+
+    width:100%;
+
+    background:#0b0b0b;
+
+    color:white;
+
+    border:1px solid #333;
+
+    border-radius:10px;
+
+    padding:12px;
+
+    outline:none;
+
+    font-family:monospace;
+
+    font-size:13px;
+
+}
+
+input:focus{
+
+    border-color:#777;
+
+}
+
+
+/* ========================= */
+/* 버튼 */
+/* ========================= */
+
+button{
+
+    font-family:inherit;
+
+}
+
+.primary{
+
+    background:white;
+
+    color:black;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:11px 15px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    white-space:nowrap;
+
+    transition:.2s;
+
+}
+
+.primary:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 5px 20px rgba(255,255,255,.12);
+
+}
+
+.secondary{
+
+    background:#1a1a1a;
+
+    color:#ddd;
+
+    border:1px solid #333;
+
+    border-radius:10px;
+
+    padding:10px 13px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.secondary:hover{
+
+    background:#252525;
+
+    border-color:#555;
+
+}
+
+
+/* ========================= */
+/* 버튼 그룹 */
+/* ========================= */
+
+.button-grid{
+
+    display:grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap:7px;
+
+}
+
+.button-grid button{
+
+    width:100%;
+
+}
+
+
+/* ========================= */
+/* 속도 */
+/* ========================= */
+
+.speed-row{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+input[type="range"]{
+
+    padding:0;
+
+    accent-color:white;
+
+}
+
+
+/* ========================= */
+/* 상태 메시지 */
+/* ========================= */
+
+.status{
+
+    min-height:20px;
+
+    margin-top:8px;
+
+    font-size:11px;
+
+    color:#777;
+
+}
+
+.status.error{
+
+    color:#d47777;
+
+}
+
+
+/* ========================= */
+/* 도움말 */
+/* ========================= */
+
+.help{
+
+    color:#555;
+
+    font-size:11px;
+
+    line-height:1.7;
+
+}
+
+.help code{
+
+    color:#aaa;
+
+}
+
+
+/* ========================= */
+/* 모바일 */
+/* ========================= */
+
+@media(max-width:850px){
+
+    body{
+
+        padding:12px;
+
+    }
+
+    .main{
+
+        grid-template-columns:1fr;
+
+    }
+
+    canvas{
+
+        height:55vh;
+
+        min-height:350px;
+
+    }
+
+}
+
+@media(max-width:500px){
+
+    .title{
+
+        font-size:20px;
+
+    }
+
+    .subtitle{
+
+        font-size:9px;
+
+    }
+
+    .back{
+
+        padding:8px 11px;
+
+        font-size:11px;
+
+    }
+
+    canvas{
+
+        height:52vh;
+
+        min-height:300px;
+
+    }
+
+    .controls{
+
+        padding:15px;
+
+    }
+
+    .button-grid{
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+<!-- ========================= -->
+<!-- 상단 -->
+<!-- ========================= -->
+
+<div class="top">
+
+    <div>
+
+        <div class="title">
+            GRAPH LAB
+        </div>
+
+        <div class="subtitle">
+            VISUALIZE · ANIMATE · EXPERIMENT
+        </div>
+
+    </div>
+
+
+    <button
+        class="back"
+        onclick="location.href='../'"
+    >
+        ← 컴퓨터
+    </button>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- 메인 -->
+<!-- ========================= -->
+
+<div class="main">
+
+
+    <!-- 그래프 -->
+
+    <div class="graph-card">
+
+        <canvas id="canvas"></canvas>
+
+        <div class="graph-info">
+
+            f(x) =
+            <span id="displayFunction">
+                sin(x + t)
+            </span>
+
+            <br>
+
+            t =
+            <span id="timeDisplay">
+                0.00
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <!-- 컨트롤 -->
+
+    <div class="controls">
+
+
+        <!-- 함수 -->
+
+        <div class="section">
+
+            <div class="label">
+                Function
+            </div>
+
+            <div class="input-row">
+
+                <input
+                    id="functionInput"
+                    value="sin(x + t)"
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+
+                <button
+                    class="primary"
+                    onclick="applyFunction()"
+                >
+                    적용
+                </button>
+
+            </div>
+
+            <div
+                id="status"
+                class="status"
+            ></div>
+
+        </div>
+
+
+        <!-- 애니메이션 -->
+
+        <div class="section">
+
+            <div class="label">
+                Animation
+            </div>
+
+            <div class="button-grid">
+
+                <button
+                    class="primary"
+                    onclick="play()"
+                >
+                    ▶ PLAY
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="pause()"
+                >
+                    ⏸ PAUSE
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="resetTime()"
+                >
+                    ↻ RESET
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="randomAnimation()"
+                >
+                    🎲 RANDOM
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- 속도 -->
+
+        <div class="section">
+
+            <div class="label">
+                Animation Speed
+            </div>
+
+            <div class="speed-row">
+
+                <input
+                    id="speed"
+                    type="range"
+                    min="0.1"
+                    max="5"
+                    step="0.1"
+                    value="1"
+                >
+
+                <span id="speedText">
+                    1.0×
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- 랜덤 그래프 -->
+
+        <div class="section">
+
+            <div class="label">
+                Random Generator
+            </div>
+
+            <div class="button-grid">
+
+                <button
+                    class="secondary"
+                    onclick="randomGraph()"
+                >
+                    🎲 RANDOM GRAPH
+                </button>
+
+                <button
+                    class="secondary"
+                    onclick="randomAnimation()"
+                >
+                    🌀 RANDOM MOVE
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- 도움말 -->
+
+        <div class="section">
+
+            <div class="label">
+                Controls
+            </div>
+
+            <div class="help">
+
+                마우스 드래그 → 그래프 이동<br>
+
+                마우스 휠 → 확대 / 축소<br>
+
+                <code>t</code> → 시간 변수<br>
+
+                <code>sin</code>, <code>cos</code>,
+                <code>tan</code> 사용 가능
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ================================================= */
+/* Canvas */
+/* ================================================= */
+
+const canvas =
+    document.getElementById("canvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+
+/* ================================================= */
+/* 상태 */
+/* ================================================= */
+
+let functionText =
+    "sin(x + t)";
+
+let time = 0;
+
+let playing = false;
+
+let animationId = null;
+
+let speed = 1;
+
+
+/*
+    scale = 1일 때
+    화면에 표시되는 x 범위
+*/
+
+let scale = 45;
+
+let offsetX = 0;
+
+let offsetY = 0;
+
+
+/* ================================================= */
+/* Canvas 크기 */
+/* ================================================= */
+
+function resizeCanvas(){
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const dpr =
+        window.devicePixelRatio || 1;
+
+    canvas.width =
+        rect.width * dpr;
+
+    canvas.height =
+        rect.height * dpr;
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+    draw();
+
+}
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+/* ================================================= */
+/* 함수 변환 */
+/* ================================================= */
+
+function evaluateFunction(expression, x, t){
+
+    let expr =
+        expression
+            .replace(/\^/g, "**")
+            .replace(/\bpi\b/gi, "Math.PI")
+            .replace(/\be\b/g, "Math.E")
+            .replace(/\bsin\b/g, "Math.sin")
+            .replace(/\bcos\b/g, "Math.cos")
+            .replace(/\btan\b/g, "Math.tan")
+            .replace(/\bsqrt\b/g, "Math.sqrt")
+            .replace(/\babs\b/g, "Math.abs")
+            .replace(/\blog\b/g, "Math.log10")
+            .replace(/\bln\b/g, "Math.log");
+
+    /*
+        Math.* 이외의 문자를 이용해
+        식을 계산한다.
+    */
+
+    try{
+
+        const fn =
+            new Function(
+                "x",
+                "t",
+                `"use strict"; return (${expr});`
+            );
+
+        const result =
+            fn(x,t);
+
+        if(
+            typeof result !== "number" ||
+            !Number.isFinite(result)
+        ){
+
+            return null;
+
+        }
+
+        return result;
+
+    }
+    catch{
+
+        return null;
+
+    }
+
+}
+
+
+/* ================================================= */
+/* 좌표 변환 */
+/* ================================================= */
+
+function screenToMathX(px){
+
+    const width =
+        canvas.clientWidth;
+
+    return (
+        px -
+        width / 2 -
+        offsetX
+    ) / scale;
+
+}
+
+
+function screenToMathY(py){
+
+    const height =
+        canvas.clientHeight;
+
+    return (
+        -(py -
+        height / 2 -
+        offsetY) / scale
+    );
+
+}
+
+
+/* ================================================= */
+/* 그래프 그리기 */
+/* ================================================= */
+
+function draw(){
+
+    const width =
+        canvas.clientWidth;
+
+    const height =
+        canvas.clientHeight;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /* ========================= */
+    /* 배경 */
+    /* ========================= */
+
+    ctx.fillStyle =
+        "#0d0d0d";
+
+    ctx.fillRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    /* ========================= */
+    /* 격자 */
+    /* ========================= */
+
+    drawGrid(
+        width,
+        height
+    );
+
+
+    /* ========================= */
+    /* 그래프 */
+    /* ========================= */
+
+    drawFunction(
+        width,
+        height
+    );
+
+}
+
+
+/* ================================================= */
+/* 격자 */
+/* ================================================= */
+
+function drawGrid(width,height){
+
+    ctx.lineWidth = 1;
+
+    ctx.strokeStyle =
+        "#181818";
+
+
+    /*
+        너무 확대되거나 축소되지 않도록
+        적당한 간격을 유지한다.
+    */
+
+    const gridSize =
+        scale >= 25
+            ? scale
+            : scale * 5;
+
+
+    const startX =
+        ((-width/2 - offsetX) %
+            gridSize) - gridSize;
+
+
+    for(
+        let x = startX;
+        x < width;
+        x += gridSize
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            x + width/2,
+            0
+        );
+
+        ctx.lineTo(
+            x + width/2,
+            height
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    const startY =
+        ((-height/2 - offsetY) %
+            gridSize) - gridSize;
+
+
+    for(
+        let y = startY;
+        y < height;
+        y += gridSize
+    ){
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            0,
+            y + height/2
+        );
+
+        ctx.lineTo(
+            width,
+            y + height/2
+        );
+
+        ctx.stroke();
+
+    }
+
+
+    /* ========================= */
+    /* 축 */
+    /* ========================= */
+
+    ctx.strokeStyle =
+        "#444";
+
+    ctx.lineWidth = 1.5;
+
+
+    /* X축 */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        height/2 + offsetY
+    );
+
+    ctx.lineTo(
+        width,
+        height/2 + offsetY
+    );
+
+    ctx.stroke();
+
+
+    /* Y축 */
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        width/2 + offsetX,
+        0
+    );
+
+    ctx.lineTo(
+        width/2 + offsetX,
+        height
+    );
+
+    ctx.stroke();
+
+}
+
+
+/* ================================================= */
+/* 함수 그래프 */
+/* ================================================= */
+
+function drawFunction(width,height){
+
+    const step = 1;
+
+    ctx.beginPath();
+
+    ctx.strokeStyle =
+        "#ffffff";
+
+    ctx.lineWidth = 2.5;
+
+
+    let started = false;
+
+    let previousY = null;
+
+
+    for(
+        let px = 0;
+        px <= width;
+        px += step
+    ){
+
+        const x =
+            screenToMathX(px);
+
+
+        const y =
+            evaluateFunction(
+                functionText,
+                x,
+                time
+            );
+
+
+        if(y === null){
+
+            started = false;
+
+            previousY = null;
+
+            continue;
+
+        }
+
+
+        /*
+            화면 밖으로 지나치게 튀는 값 방지
+        */
+
+        const py =
+            height/2
+            + offsetY
+            - y * scale;
+
+
+        if(
+            !Number.isFinite(py) ||
+            Math.abs(py) > height * 10
+        ){
+
+            started = false;
+
+            previousY = null;
+
+            continue;
+
+        }
+
+
+        /*
+            불연속점에서 선이 연결되지 않도록
+        */
+
+        if(
+            previousY !== null &&
+            Math.abs(py - previousY)
+                > height
+        ){
+
+            started = false;
+
+        }
+
+
+        if(!started){
+
+            ctx.moveTo(
+                px,
+                py
+            );
+
+            started = true;
+
+        }
+        else{
+
+            ctx.lineTo(
+                px,
+                py
+            );
+
+        }
+
+
+        previousY = py;
+
+    }
+
+
+    ctx.stroke();
+
+}
+
+
+/* ================================================= */
+/* 함수 적용 */
+/* ================================================= */
+
+function applyFunction(){
+
+    const input =
+        document
+            .getElementById(
+                "functionInput"
+            );
+
+    const expression =
+        input.value.trim();
+
+
+    if(!expression){
+
+        showError(
+            "함수를 입력해주세요."
+        );
+
+        return;
+
+    }
+
+
+    /*
+        실제 값을 몇 개 검사하여
+        잘못된 식인지 확인
+    */
+
+    const testPoints =
+        [-3,-1,0,1,3];
+
+
+    let valid = false;
+
+
+    for(
+        const x of testPoints
+    ){
+
+        const result =
+            evaluateFunction(
+                expression,
+                x,
+                time
+            );
+
+        if(result !== null){
+
+            valid = true;
+
+            break;
+
+        }
+
+    }
+
+
+    if(!valid){
+
+        showError(
+            "유효하지 않은 함수입니다."
+        );
+
+        return;
+
+    }
+
+
+    functionText =
+        expression;
+
+
+    document
+        .getElementById(
+            "displayFunction"
+        )
+        .textContent =
+            functionText;
+
+
+    clearError();
+
+    draw();
+
+}
+
+
+/* ================================================= */
+/* PLAY */
+/* ================================================= */
+
+function play(){
+
+    if(playing){
+
+        return;
+
+    }
+
+    playing = true;
+
+    animate();
+
+}
+
+
+/* ================================================= */
+/* PAUSE */
+/* ================================================= */
+
+function pause(){
+
+    playing = false;
+
+}
+
+
+/* ================================================= */
+/* 애니메이션 */
+/* ================================================= */
+
+function animate(){
+
+    if(!playing){
+
+        return;
+
+    }
+
+
+    time +=
+        0.02 * speed;
+
+
+    document
+        .getElementById(
+            "timeDisplay"
+        )
+        .textContent =
+            time.toFixed(2);
+
+
+    draw();
+
+
+    animationId =
+        requestAnimationFrame(
+            animate
+        );
+
+}
+
+
+/* ================================================= */
+/* 시간 초기화 */
+/* ================================================= */
+
+function resetTime(){
+
+    time = 0;
+
+    document
+        .getElementById(
+            "timeDisplay"
+        )
+        .textContent =
+            "0.00";
+
+    draw();
+
+}
+
+
+/* ================================================= */
+/* 속도 */
+/* ================================================= */
+
+document
+    .getElementById("speed")
+    .addEventListener(
+        "input",
+        function(){
+
+            speed =
+                Number(this.value);
+
+            document
+                .getElementById(
+                    "speedText"
+                )
+                .textContent =
+                    speed.toFixed(1) + "×";
+
+        }
+    );
+
+
+/* ================================================= */
+/* 랜덤 함수 */
+/* ================================================= */
+
+function randomGraph(){
+
+    const generators = [
+
+        () =>
+            `${randomNumber(0.5,3)}sin(${randomNumber(1,7)}x)`,
+
+        () =>
+            `${randomNumber(0.5,3)}cos(${randomNumber(1,7)}x)`,
+
+        () =>
+            `sin(${randomNumber(1,5)}x) + cos(${randomNumber(1,9)}x)`,
+
+        () =>
+            `${randomNumber(0.2,2)}x + sin(${randomNumber(1,7)}x)`,
+
+        () =>
+            `sin(x^2 / ${randomNumber(1,6)})`,
+
+        () =>
+            `cos(x) * sin(${randomNumber(1,5)}x)`,
+
+        () =>
+            `sin(${randomNumber(1,5)}x) * cos(${randomNumber(1,5)}x)`,
+
+        () =>
+            `${randomNumber(0.5,2)}sin(x) + ${randomNumber(0.2,1)}cos(${randomNumber(2,8)}x)`
+
+    ];
+
+
+    const expression =
+        generators[
+            Math.floor(
+                Math.random() *
+                generators.length
+            )
+        ]();
+
+
+    setFunction(
+        expression
+    );
+
+}
+
+
+/* ================================================= */
+/* 랜덤 애니메이션 */
+/* ================================================= */
+
+function randomAnimation(){
+
+    const generators = [
+
+        () =>
+            `sin(${randomNumber(1,5)}x + t)`,
+
+        () =>
+            `cos(x + ${randomNumber(1,5)}t)`,
+
+        () =>
+            `sin(x) * cos(${randomNumber(1,4)}t)`,
+
+        () =>
+            `sin(${randomNumber(1,4)}x + t) * cos(t)`,
+
+        () =>
+            `sin(x * cos(t))`,
+
+        () =>
+            `cos(x + t) * sin(x)`,
+
+        () =>
+            `sin(${randomNumber(1,4)}x + t) + cos(${randomNumber(1,5)}x - t)`
+
+    ];
+
+
+    const expression =
+        generators[
+            Math.floor(
+                Math.random() *
+                generators.length
+            )
+        ]();
+
+
+    setFunction(
+        expression
+    );
+
+
+    play();
+
+}
+
+
+/* ================================================= */
+/* 함수 설정 */
+/* ================================================= */
+
+function setFunction(expression){
+
+    document
+        .getElementById(
+            "functionInput"
+        )
+        .value =
+            expression;
+
+
+    functionText =
+        expression;
+
+
+    document
+        .getElementById(
+            "displayFunction"
+        )
+        .textContent =
+            expression;
+
+
+    clearError();
+
+    resetTime();
+
+}
+
+
+/* ================================================= */
+/* 랜덤 숫자 */
+/* ================================================= */
+
+function randomNumber(min,max){
+
+    const value =
+        min +
+        Math.random() *
+        (max - min);
+
+    return Number(
+        value.toFixed(1)
+    );
+
+}
+
+
+/* ================================================= */
+/* 에러 */
+/* ================================================= */
+
+function showError(message){
+
+    const status =
+        document
+            .getElementById(
+                "status"
+            );
+
+    status.textContent =
+        message;
+
+    status.classList.add(
+        "error"
+    );
+
+}
+
+
+function clearError(){
+
+    const status =
+        document
+            .getElementById(
+                "status"
+            );
+
+    status.textContent = "";
+
+    status.classList.remove(
+        "error"
+    );
+
+}
+
+
+/* ================================================= */
+/* 마우스 드래그 */
+/* ================================================= */
+
+let dragging = false;
+
+let dragStartX = 0;
+
+let dragStartY = 0;
+
+let startOffsetX = 0;
+
+let startOffsetY = 0;
+
+
+canvas.addEventListener(
+    "mousedown",
+    function(event){
+
+        dragging = true;
+
+        canvas.classList.add(
+            "dragging"
+        );
+
+
+        dragStartX =
+            event.clientX;
+
+        dragStartY =
+            event.clientY;
+
+
+        startOffsetX =
+            offsetX;
+
+        startOffsetY =
+            offsetY;
+
+    }
+);
+
+
+window.addEventListener(
+    "mouseup",
+    function(){
+
+        dragging = false;
+
+        canvas.classList.remove(
+            "dragging"
+        );
+
+    }
+);
+
+
+window.addEventListener(
+    "mousemove",
+    function(event){
+
+        if(!dragging){
+
+            return;
+
+        }
+
+
+        offsetX =
+            startOffsetX +
+            (event.clientX -
+            dragStartX);
+
+
+        offsetY =
+            startOffsetY +
+            (event.clientY -
+            dragStartY);
+
+
+        draw();
+
+    }
+);
+
+
+/* ================================================= */
+/* 확대 / 축소 */
+/* ================================================= */
+
+canvas.addEventListener(
+    "wheel",
+    function(event){
+
+        event.preventDefault();
+
+
+        const oldScale =
+            scale;
+
+
+        if(event.deltaY < 0){
+
+            scale *= 1.12;
+
+        }
+        else{
+
+            scale /= 1.12;
+
+        }
+
+
+        scale =
+            Math.max(
+                10,
+                Math.min(
+                    250,
+                    scale
+                )
+            );
+
+
+        /*
+            마우스 위치를 중심으로
+            확대/축소
+        */
+
+        const rect =
+            canvas.getBoundingClientRect();
+
+
+        const mouseX =
+            event.clientX -
+            rect.left;
+
+        const mouseY =
+            event.clientY -
+            rect.top;
+
+
+        const mathX =
+            screenToMathX(
+                mouseX
+            );
+
+        const mathY =
+            screenToMathY(
+                mouseY
+            );
+
+
+        offsetX =
+            mouseX -
+            rect.width / 2 -
+            mathX * scale;
+
+
+        offsetY =
+            -(mouseY -
+            rect.height / 2 +
+            mathY * scale);
+
+
+        draw();
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* ================================================= */
+/* 키보드 Enter */
+/* ================================================= */
+
+document
+    .getElementById(
+        "functionInput"
+    )
+    .addEventListener(
+        "keydown",
+        function(event){
+
+            if(
+                event.key === "Enter"
+            ){
+
+                applyFunction();
+
+            }
+
+        }
+    );
+
+
+/* ================================================= */
+/* 시작 */
+/* ================================================= */
+
+resizeCanvas();
+
+</script>
+
+
+</body>
+
+</html>
