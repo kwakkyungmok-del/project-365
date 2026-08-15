@@ -1,1 +1,2020 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
 
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<title>ASDF — Rhythm Walk</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+}
+
+html,
+body{
+
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+
+    background:#080808;
+    color:white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    touch-action:none;
+
+}
+
+
+/* ========================= */
+/* 전체 게임 */
+/* ========================= */
+
+#game{
+
+    position:relative;
+
+    width:100%;
+    height:100%;
+
+    overflow:hidden;
+
+}
+
+
+/* ========================= */
+/* 상단 UI */
+/* ========================= */
+
+.top{
+
+    position:absolute;
+
+    top:20px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:min(900px,90%);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    z-index:20;
+
+}
+
+.song-info{
+
+    display:flex;
+    flex-direction:column;
+
+    gap:5px;
+
+}
+
+.song-title{
+
+    font-size:18px;
+    font-weight:700;
+
+}
+
+.song-subtitle{
+
+    font-size:11px;
+
+    color:#666;
+
+    letter-spacing:2px;
+
+}
+
+.score-box{
+
+    text-align:right;
+
+}
+
+.score{
+
+    font-size:22px;
+    font-weight:700;
+
+}
+
+.combo{
+
+    margin-top:4px;
+
+    font-size:12px;
+
+    color:#888;
+
+}
+
+
+/* ========================= */
+/* 게임 영역 */
+/* ========================= */
+
+.playfield{
+
+    position:absolute;
+
+    left:50%;
+    top:0;
+
+    transform:translateX(-50%);
+
+    width:min(560px,100%);
+
+    height:100%;
+
+    display:flex;
+
+}
+
+
+/* ========================= */
+/* 레인 */
+/* ========================= */
+
+.lane{
+
+    position:relative;
+
+    flex:1;
+
+    height:100%;
+
+    border-left:1px solid #1b1b1b;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(255,255,255,.015),
+            rgba(255,255,255,.035)
+        );
+
+}
+
+.lane:last-child{
+
+    border-right:1px solid #1b1b1b;
+
+}
+
+
+/* 레인 키 */
+
+.key{
+
+    position:absolute;
+
+    bottom:18px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:72%;
+
+    height:52px;
+
+    border:1px solid #333;
+
+    border-radius:12px;
+
+    background:#141414;
+
+    color:#888;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:20px;
+
+    font-weight:700;
+
+    z-index:10;
+
+    transition:.08s;
+
+}
+
+.key.active{
+
+    background:#fff;
+
+    color:#000;
+
+    transform:
+        translateX(-50%)
+        scale(.92);
+
+}
+
+
+/* ========================= */
+/* 판정선 */
+/* ========================= */
+
+.judgement-line{
+
+    position:absolute;
+
+    left:0;
+    right:0;
+
+    bottom:88px;
+
+    height:2px;
+
+    background:#777;
+
+    box-shadow:
+        0 0 12px rgba(255,255,255,.15);
+
+    z-index:5;
+
+}
+
+
+/* ========================= */
+/* 노트 */
+/* ========================= */
+
+.note{
+
+    position:absolute;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:68%;
+
+    aspect-ratio:1 / 1;
+
+    max-width:34px;
+
+    min-width:20px;
+
+    border-radius:50%;
+
+    background:white;
+
+    box-shadow:
+        0 0 12px rgba(255,255,255,.35);
+
+    z-index:4;
+
+}
+
+
+/* ========================= */
+/* 판정 텍스트 */
+/* ========================= */
+
+.judgement{
+
+    position:absolute;
+
+    left:50%;
+
+    top:43%;
+
+    transform:
+        translate(-50%,-50%)
+        scale(.9);
+
+    opacity:0;
+
+    font-size:22px;
+
+    font-weight:800;
+
+    letter-spacing:2px;
+
+    z-index:30;
+
+    pointer-events:none;
+
+}
+
+.judgement.show{
+
+    animation:judgement .42s ease-out;
+
+}
+
+@keyframes judgement{
+
+    0%{
+
+        opacity:1;
+
+        transform:
+            translate(-50%,-50%)
+            scale(.9);
+
+    }
+
+    100%{
+
+        opacity:0;
+
+        transform:
+            translate(-50%,-70%)
+            scale(1.15);
+
+    }
+
+}
+
+
+/* ========================= */
+/* 시작 화면 */
+/* ========================= */
+
+.overlay{
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        rgba(5,5,5,.94);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-direction:column;
+
+    z-index:100;
+
+    text-align:center;
+
+    padding:25px;
+
+}
+
+.overlay.hidden{
+
+    display:none;
+
+}
+
+.overlay h1{
+
+    font-size:42px;
+
+    margin-bottom:10px;
+
+}
+
+.overlay p{
+
+    color:#888;
+
+    font-size:14px;
+
+    line-height:1.8;
+
+}
+
+.start-button{
+
+    margin-top:30px;
+
+    border:none;
+
+    background:white;
+
+    color:black;
+
+    padding:15px 35px;
+
+    border-radius:12px;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+
+/* ========================= */
+/* 결과 화면 */
+/* ========================= */
+
+.result{
+
+    position:absolute;
+
+    inset:0;
+
+    background:rgba(5,5,5,.96);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-direction:column;
+
+    z-index:200;
+
+    text-align:center;
+
+}
+
+.result.show{
+
+    display:flex;
+
+}
+
+.result h1{
+
+    font-size:42px;
+
+    margin-bottom:30px;
+
+}
+
+.result-score{
+
+    font-size:36px;
+
+    font-weight:800;
+
+}
+
+.result-info{
+
+    margin-top:18px;
+
+    color:#888;
+
+    line-height:2;
+
+}
+
+.retry{
+
+    margin-top:30px;
+
+    padding:14px 30px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:white;
+
+    color:black;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+}
+
+.back{
+
+    position:absolute;
+
+    top:20px;
+    right:20px;
+
+    padding:9px 14px;
+
+    border:1px solid #333;
+
+    border-radius:8px;
+
+    background:#111;
+
+    color:#aaa;
+
+    cursor:pointer;
+
+    z-index:250;
+
+}
+
+
+/* ========================= */
+/* 모바일 */
+/* ========================= */
+
+@media(max-width:600px){
+
+    .top{
+
+        top:12px;
+
+        width:92%;
+
+    }
+
+    .song-title{
+
+        font-size:14px;
+
+    }
+
+    .song-subtitle{
+
+        font-size:9px;
+
+    }
+
+    .score{
+
+        font-size:18px;
+
+    }
+
+    .combo{
+
+        font-size:10px;
+
+    }
+
+    .key{
+
+        bottom:14px;
+
+        height:45px;
+
+        border-radius:10px;
+
+        font-size:17px;
+
+    }
+
+    .judgement-line{
+
+        bottom:73px;
+
+    }
+
+    .overlay h1{
+
+        font-size:30px;
+
+    }
+
+    .overlay p{
+
+        font-size:13px;
+
+    }
+
+}
+
+
+/* 아주 작은 화면 */
+
+@media(max-width:380px){
+
+    .key{
+
+        height:40px;
+
+    }
+
+    .judgement-line{
+
+        bottom:66px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div id="game">
+
+
+<!-- ========================= -->
+<!-- 상단 -->
+<!-- ========================= -->
+
+<div class="top">
+
+    <div class="song-info">
+
+        <div class="song-title">
+            Rhythm Walk
+        </div>
+
+        <div class="song-subtitle">
+            TRACK 01 · 114 BPM
+        </div>
+
+    </div>
+
+    <div class="score-box">
+
+        <div
+            class="score"
+            id="score"
+        >
+            000000
+        </div>
+
+        <div
+            class="combo"
+            id="combo"
+        >
+            COMBO 0
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- 플레이필드 -->
+<!-- ========================= -->
+
+<div class="playfield">
+
+
+    <div
+        class="lane"
+        data-lane="0"
+    >
+
+        <div class="key">
+            A
+        </div>
+
+    </div>
+
+
+    <div
+        class="lane"
+        data-lane="1"
+    >
+
+        <div class="key">
+            S
+        </div>
+
+    </div>
+
+
+    <div
+        class="lane"
+        data-lane="2"
+    >
+
+        <div class="key">
+            D
+        </div>
+
+    </div>
+
+
+    <div
+        class="lane"
+        data-lane="3"
+    >
+
+        <div class="key">
+            F
+        </div>
+
+    </div>
+
+
+    <div class="judgement-line"></div>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- 판정 -->
+<!-- ========================= -->
+
+<div
+    class="judgement"
+    id="judgement"
+>
+</div>
+
+
+<!-- ========================= -->
+<!-- 시작 -->
+<!-- ========================= -->
+
+<div
+    class="overlay"
+    id="startOverlay"
+>
+
+    <h1>
+        Rhythm Walk
+    </h1>
+
+    <p>
+        A / S / D / F 키를 사용하세요.<br>
+        노트가 판정선에 들어오는 순간 누르세요.<br>
+        모바일에서는 해당 레인을 터치하세요.
+    </p>
+
+    <button
+        class="start-button"
+        id="startButton"
+    >
+        START
+    </button>
+
+</div>
+
+
+<!-- ========================= -->
+<!-- 결과 -->
+<!-- ========================= -->
+
+<div
+    class="result"
+    id="result"
+>
+
+    <button
+        class="back"
+        onclick="goHome()"
+    >
+        ESC
+    </button>
+
+    <h1>
+        RESULT
+    </h1>
+
+    <div
+        class="result-score"
+        id="resultScore"
+    >
+        0
+    </div>
+
+    <div
+        class="result-info"
+        id="resultInfo"
+    >
+    </div>
+
+    <button
+        class="retry"
+        onclick="location.reload()"
+    >
+        다시 플레이
+    </button>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/* ================================================= */
+/* ASDF RHYTHM GAME */
+/* ================================================= */
+
+
+/* ========================= */
+/* 기본 설정 */
+/* ========================= */
+
+const BPM = 114.84375;
+
+/*
+    실제 음악 분석에서 잡힌
+    첫 박자의 위치.
+
+    약 0.09초부터 첫 비트가 시작된다.
+*/
+
+const FIRST_BEAT = 0.0907;
+
+
+/*
+    노트가 판정선까지 내려오는 시간.
+
+    1.5초 정도로 설정해서
+    어느 정도 속도감이 있게 만든다.
+*/
+
+const NOTE_TRAVEL_TIME = 1.5;
+
+
+/*
+    판정 범위
+
+    Perfect : ±0.075초
+    Great   : ±0.14초
+    Good    : ±0.22초
+*/
+
+const PERFECT =
+    0.075;
+
+const GREAT =
+    0.14;
+
+const GOOD =
+    0.22;
+
+
+/* ========================= */
+/* 오디오 */
+/* ========================= */
+
+const audio =
+    new Audio(
+        "../track-1/rhythm-walk.mp3"
+    );
+
+audio.preload = "auto";
+
+audio.volume = 0.8;
+
+
+/* ========================= */
+/* DOM */
+/* ========================= */
+
+const lanes =
+    document.querySelectorAll(".lane");
+
+const keys =
+    document.querySelectorAll(".key");
+
+const scoreElement =
+    document.getElementById("score");
+
+const comboElement =
+    document.getElementById("combo");
+
+const judgementElement =
+    document.getElementById("judgement");
+
+const startOverlay =
+    document.getElementById("startOverlay");
+
+const startButton =
+    document.getElementById("startButton");
+
+const resultScreen =
+    document.getElementById("result");
+
+const resultScore =
+    document.getElementById("resultScore");
+
+const resultInfo =
+    document.getElementById("resultInfo");
+
+
+/* ========================= */
+/* 게임 상태 */
+/* ========================= */
+
+let playing =
+    false;
+
+let finished =
+    false;
+
+let animationFrame =
+    null;
+
+let startTime =
+    0;
+
+let audioStarted =
+    false;
+
+let score =
+    0;
+
+let combo =
+    0;
+
+let maxCombo =
+    0;
+
+let perfectCount =
+    0;
+
+let greatCount =
+    0;
+
+let goodCount =
+    0;
+
+let missCount =
+    0;
+
+
+/* ========================= */
+/* 노트 */
+/* ========================= */
+
+let notes = [];
+
+
+/*
+    실제 음악의 BPM을 기준으로
+    전체 곡에 노트를 생성한다.
+
+    한 박자마다 노트 하나.
+
+    가끔 박자를 반으로 쪼개서
+    조금 더 재미있게 만든다.
+*/
+
+function createNotes(){
+
+    notes = [];
+
+    const beat =
+        60 / BPM;
+
+
+    /*
+        음악 길이는 오디오에서
+        실제로 가져온다.
+    */
+
+    const duration =
+        audio.duration || 138;
+
+
+    let index = 0;
+
+
+    for(
+        let time = FIRST_BEAT;
+        time < duration - 1;
+        time += beat
+    ){
+
+        /*
+            기본적으로 한 박자마다 생성
+        */
+
+        let lane =
+            index % 4;
+
+
+        /*
+            일정 패턴만 반복되지 않도록
+            레인을 섞는다.
+        */
+
+        const patterns = [
+
+            [0,1,2,3],
+            [1,3,0,2],
+            [2,0,3,1],
+            [3,2,1,0]
+
+        ];
+
+        const pattern =
+            patterns[
+                Math.floor(index / 8)
+                % patterns.length
+            ];
+
+
+        lane =
+            pattern[
+                index % 4
+            ];
+
+
+        notes.push({
+
+            time:time,
+
+            lane:lane,
+
+            hit:false,
+
+            missed:false,
+
+            element:null
+
+        });
+
+
+        /*
+            곡 중간중간
+            반박 노트를 추가한다.
+
+            너무 많이 넣지 않아서
+            첫 곡의 난이도를 낮게 유지.
+        */
+
+        if(
+            index > 8 &&
+            index % 8 === 3
+        ){
+
+            notes.push({
+
+                time:time + beat / 2,
+
+                lane:(lane + 2) % 4,
+
+                hit:false,
+
+                missed:false,
+
+                element:null
+
+            });
+
+        }
+
+
+        index++;
+
+    }
+
+}
+
+
+/* ========================= */
+/* 노트 생성 */
+/* ========================= */
+
+function createNoteElement(note){
+
+    const element =
+        document.createElement("div");
+
+    element.className =
+        "note";
+
+
+    /*
+        레인 안에 넣는다.
+    */
+
+    lanes[note.lane]
+        .appendChild(element);
+
+
+    note.element =
+        element;
+
+}
+
+
+/* ========================= */
+/* 노트 위치 계산 */
+/* ========================= */
+
+function updateNotes(currentTime){
+
+    for(
+        const note of notes
+    ){
+
+        /*
+            이미 처리된 노트
+        */
+
+        if(
+            note.hit ||
+            note.missed
+        ){
+
+            continue;
+
+        }
+
+
+        /*
+            판정선까지 남은 시간
+        */
+
+        const difference =
+            note.time - currentTime;
+
+
+        /*
+            노트가 화면에 들어오는 시점
+        */
+
+        if(
+            difference <= NOTE_TRAVEL_TIME &&
+            difference > -GOOD
+        ){
+
+            if(
+                !note.element
+            ){
+
+                createNoteElement(note);
+
+            }
+
+
+            /*
+                0 = 화면 위
+                1 = 판정선
+
+                시간이 지나면서
+                0 → 1로 내려온다.
+            */
+
+            const progress =
+                1 -
+                (
+                    difference /
+                    NOTE_TRAVEL_TIME
+                );
+
+
+            /*
+                위쪽 0%
+                판정선 100%
+            */
+
+            const playfieldHeight =
+                document
+                    .querySelector(".playfield")
+                    .clientHeight;
+
+
+            const judgementY =
+                playfieldHeight - 88;
+
+
+            const startY =
+                -40;
+
+
+            const y =
+                startY +
+                (
+                    judgementY -
+                    startY
+                ) *
+                progress;
+
+
+            note.element.style.top =
+                y + "px";
+
+        }
+
+
+        /*
+            판정 범위를 지나갔다.
+        */
+
+        if(
+            difference < -GOOD
+        ){
+
+            miss(note);
+
+        }
+
+    }
+
+}
+
+
+/* ========================= */
+/* MISS */
+/* ========================= */
+
+function miss(note){
+
+    if(
+        note.hit ||
+        note.missed
+    ){
+
+        return;
+
+    }
+
+
+    note.missed =
+        true;
+
+    missCount++;
+
+    combo =
+        0;
+
+    updateUI();
+
+    showJudgement(
+        "MISS"
+    );
+
+
+    removeNote(
+        note
+    );
+
+}
+
+
+/* ========================= */
+/* 노트 제거 */
+/* ========================= */
+
+function removeNote(note){
+
+    if(
+        note.element
+    ){
+
+        note.element.remove();
+
+        note.element =
+            null;
+
+    }
+
+}
+
+
+/* ========================= */
+/* 키 입력 판정 */
+/* ========================= */
+
+function hitLane(lane){
+
+    if(
+        !playing ||
+        finished
+    ){
+
+        return;
+
+    }
+
+
+    const currentTime =
+        audio.currentTime;
+
+
+    let target =
+        null;
+
+    let smallestDifference =
+        Infinity;
+
+
+    /*
+        해당 레인에서
+        가장 가까운 노트를 찾는다.
+    */
+
+    for(
+        const note of notes
+    ){
+
+        if(
+            note.hit ||
+            note.missed ||
+            note.lane !== lane
+        ){
+
+            continue;
+
+        }
+
+
+        const difference =
+            Math.abs(
+                note.time -
+                currentTime
+            );
+
+
+        if(
+            difference <
+            smallestDifference
+        ){
+
+            smallestDifference =
+                difference;
+
+            target =
+                note;
+
+        }
+
+    }
+
+
+    /*
+        누를 노트가 없다.
+    */
+
+    if(
+        !target
+    ){
+
+        return;
+
+    }
+
+
+    /*
+        판정
+    */
+
+    if(
+        smallestDifference <= PERFECT
+    ){
+
+        hitNote(
+            target,
+            "PERFECT",
+            1000
+        );
+
+    }
+
+    else if(
+        smallestDifference <= GREAT
+    ){
+
+        hitNote(
+            target,
+            "GREAT",
+            700
+        );
+
+    }
+
+    else if(
+        smallestDifference <= GOOD
+    ){
+
+        hitNote(
+            target,
+            "GOOD",
+            400
+        );
+
+    }
+
+}
+
+
+/* ========================= */
+/* HIT 처리 */
+/* ========================= */
+
+function hitNote(
+    note,
+    judgement,
+    points
+){
+
+    if(
+        note.hit ||
+        note.missed
+    ){
+
+        return;
+
+    }
+
+
+    note.hit =
+        true;
+
+
+    if(
+        judgement === "PERFECT"
+    ){
+
+        perfectCount++;
+
+    }
+
+    else if(
+        judgement === "GREAT"
+    ){
+
+        greatCount++;
+
+    }
+
+    else{
+
+        goodCount++;
+
+    }
+
+
+    combo++;
+
+    maxCombo =
+        Math.max(
+            maxCombo,
+            combo
+        );
+
+
+    /*
+        콤보 보너스
+    */
+
+    const multiplier =
+        1 +
+        Math.min(
+            combo / 100,
+            1
+        );
+
+
+    score +=
+        Math.round(
+            points *
+            multiplier
+        );
+
+
+    updateUI();
+
+    showJudgement(
+        judgement
+    );
+
+
+    removeNote(
+        note
+    );
+
+}
+
+
+/* ========================= */
+/* UI 업데이트 */
+/* ========================= */
+
+function updateUI(){
+
+    scoreElement.textContent =
+        String(score)
+            .padStart(6,"0");
+
+
+    comboElement.textContent =
+        `COMBO ${combo}`;
+
+}
+
+
+/* ========================= */
+/* 판정 표시 */
+/* ========================= */
+
+function showJudgement(text){
+
+    judgementElement.textContent =
+        text;
+
+
+    judgementElement.classList.remove(
+        "show"
+    );
+
+
+    /*
+        애니메이션 재시작
+    */
+
+    void judgementElement.offsetWidth;
+
+
+    judgementElement.classList.add(
+        "show"
+    );
+
+}
+
+
+/* ========================= */
+/* 키 애니메이션 */
+/* ========================= */
+
+function pressKey(lane){
+
+    const key =
+        keys[lane];
+
+    key.classList.add(
+        "active"
+    );
+
+    setTimeout(
+        () => {
+
+            key.classList.remove(
+                "active"
+            );
+
+        },
+        90
+    );
+
+}
+
+
+/* ========================= */
+/* 게임 루프 */
+/* ========================= */
+
+function gameLoop(){
+
+    if(
+        !playing
+    ){
+
+        return;
+
+    }
+
+
+    const currentTime =
+        audio.currentTime;
+
+
+    updateNotes(
+        currentTime
+    );
+
+
+    /*
+        음악이 끝나면
+        남은 노트를 처리하고 종료.
+    */
+
+    if(
+        audio.ended ||
+        currentTime >=
+        audio.duration - 0.05
+    ){
+
+        finishGame();
+
+        return;
+
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(
+            gameLoop
+        );
+
+}
+
+
+/* ========================= */
+/* 게임 시작 */
+/* ========================= */
+
+async function startGame(){
+
+    if(
+        playing
+    ){
+
+        return;
+
+    }
+
+
+    /*
+        오디오가 준비될 때까지 대기
+    */
+
+    try{
+
+        await audio.play();
+
+    }
+
+    catch(error){
+
+        /*
+            브라우저 정책으로
+            자동 재생이 막힌 경우
+            사용자 클릭 후 다시 실행.
+        */
+
+        console.log(
+            "Audio playback waiting..."
+        );
+
+        return;
+
+    }
+
+
+    /*
+        노트 생성
+    */
+
+    createNotes();
+
+
+    /*
+        시작 상태 초기화
+    */
+
+    score =
+        0;
+
+    combo =
+        0;
+
+    maxCombo =
+        0;
+
+    perfectCount =
+        0;
+
+    greatCount =
+        0;
+
+    goodCount =
+        0;
+
+    missCount =
+        0;
+
+    finished =
+        false;
+
+    playing =
+        true;
+
+
+    updateUI();
+
+
+    startOverlay.classList.add(
+        "hidden"
+    );
+
+
+    gameLoop();
+
+}
+
+
+/* ========================= */
+/* 게임 종료 */
+/* ========================= */
+
+function finishGame(){
+
+    if(
+        finished
+    ){
+
+        return;
+
+    }
+
+
+    finished =
+        true;
+
+    playing =
+        false;
+
+
+    if(
+        animationFrame
+    ){
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+    }
+
+
+    audio.pause();
+
+
+    /*
+        남은 노트 제거
+    */
+
+    for(
+        const note of notes
+    ){
+
+        removeNote(
+            note
+        );
+
+    }
+
+
+    /*
+        결과 표시
+    */
+
+    resultScore.textContent =
+        score.toLocaleString();
+
+
+    resultInfo.innerHTML =
+
+        `PERFECT : ${perfectCount}<br>` +
+
+        `GREAT : ${greatCount}<br>` +
+
+        `GOOD : ${goodCount}<br>` +
+
+        `MISS : ${missCount}<br>` +
+
+        `MAX COMBO : ${maxCombo}`;
+
+
+    resultScreen.classList.add(
+        "show"
+    );
+
+}
+
+
+/* ========================= */
+/* 홈으로 */
+/* ========================= */
+
+function goHome(){
+
+    location.href =
+        "../";
+
+}
+
+
+/* ========================= */
+/* 키보드 */
+/* ========================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        /*
+            ESC
+        */
+
+        if(
+            event.key === "Escape"
+        ){
+
+            if(
+                playing
+            ){
+
+                finishGame();
+
+            }
+
+            else{
+
+                goHome();
+
+            }
+
+            return;
+
+        }
+
+
+        const key =
+            event.key.toLowerCase();
+
+
+        const keyMap = {
+
+            "a":0,
+            "s":1,
+            "d":2,
+            "f":3
+
+        };
+
+
+        if(
+            key in keyMap
+        ){
+
+            event.preventDefault();
+
+            const lane =
+                keyMap[key];
+
+
+            pressKey(
+                lane
+            );
+
+
+            hitLane(
+                lane
+            );
+
+        }
+
+    }
+);
+
+
+/* ========================= */
+/* 모바일 터치 */
+/* ========================= */
+
+lanes.forEach(
+    (lane,index) => {
+
+        /*
+            touchstart를 사용해서
+            최대한 즉각적으로 반응.
+        */
+
+        lane.addEventListener(
+            "touchstart",
+            event => {
+
+                event.preventDefault();
+
+                pressKey(
+                    index
+                );
+
+                hitLane(
+                    index
+                );
+
+            },
+            {
+                passive:false
+            }
+        );
+
+
+        /*
+            PC에서 마우스로도
+            클릭해서 플레이 가능.
+        */
+
+        lane.addEventListener(
+            "mousedown",
+            event => {
+
+                /*
+                    모바일에서
+                    중복 입력 방지
+                */
+
+                if(
+                    event.button !== 0
+                ){
+
+                    return;
+
+                }
+
+
+                pressKey(
+                    index
+                );
+
+                hitLane(
+                    index
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* ========================= */
+/* 시작 버튼 */
+/* ========================= */
+
+startButton.addEventListener(
+    "click",
+    () => {
+
+        startGame();
+
+    }
+);
+
+
+/* ========================= */
+/* 오디오 로딩 */
+/* ========================= */
+
+audio.addEventListener(
+    "loadedmetadata",
+    () => {
+
+        console.log(
+            "Rhythm Walk loaded:",
+            audio.duration,
+            "seconds"
+        );
+
+    }
+);
+
+
+/* ========================= */
+/* 오디오 오류 */
+/* ========================= */
+
+audio.addEventListener(
+    "error",
+    () => {
+
+        startButton.textContent =
+            "음악 파일을 찾을 수 없음";
+
+        startButton.disabled =
+            true;
+
+        alert(
+            "음악 파일을 찾을 수 없습니다.\n\n" +
+            "다음 위치를 확인하세요:\n" +
+            "project-365/asdf/track-1/rhythm-walk.mp3"
+        );
+
+    }
+);
+
+</script>
+
+</body>
+
+</html>
