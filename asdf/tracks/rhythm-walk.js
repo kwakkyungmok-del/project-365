@@ -1,20 +1,3 @@
-/*
-    ==========================================
-    RHYTHM WALK
-    Joyful Rhythm Walk Funk
-    ==========================================
-
-    음원 위치:
-    project-365/
-    ├─ lightbeatsmusic-joyful-rhythm-walk-funk-513936.mp3
-    └─ asdf/
-       └─ tracks/
-          └─ rhythm-walk.js
-
-    따라서 음원 경로:
-    ../../lightbeatsmusic-joyful-rhythm-walk-funk-513936.mp3
-*/
-
 
 const rhythmWalkBeats = [
 
@@ -60,23 +43,12 @@ const rhythmWalkBeats = [
 ];
 
 
-/*
-    ==========================================
-    노트 생성
-    ==========================================
 
-    0 = A
-    1 = S
-    2 = D
-    3 = F
-
-    단순히 한 레인만 반복하지 않고
-    4개 레인을 순환시킨다.
-*/
 
 const lanePattern = [
     0, 1, 2, 3,
-    1, 3, 2, 0
+    1, 3, 2, 0,
+    3, 2, 0, 1
 ];
 
 
@@ -97,11 +69,6 @@ const rhythmWalkNotes =
     });
 
 
-/*
-    ==========================================
-    게임에서 사용할 곡 데이터
-    ==========================================
-*/
 
 const rhythmWalk = {
 
