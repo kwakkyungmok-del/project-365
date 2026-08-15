@@ -2,6 +2,7 @@ const rhythmWalk = {
     id: "rhythm-walk",
 
     title: "Rhythm Walk",
+
     artist: "Joyful Rhythm Walk",
 
     audio: "../../lightbeatsmusic-joyful-rhythm-walk-funk-513936.mp3",
@@ -10,13 +11,11 @@ const rhythmWalk = {
 
     bpm: 100,
 
-    duration: 120,
+    volume: 1,
+
+    approachTime: 1200,
 
     notes: [
-
-        // 예시 노트
-        // time = 노트가 판정선에 도착해야 하는 시간(ms)
-        // lane = 0 ~ 3
 
         { time: 2000, lane: 0 },
         { time: 2500, lane: 1 },
@@ -40,3 +39,5 @@ const rhythmWalk = {
 
     ]
 };
+
+export default rhythmWalk;
