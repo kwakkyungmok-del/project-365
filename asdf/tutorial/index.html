@@ -4,11 +4,14 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0, user-scalable=no">
 
-<title>ASDF - Tutorial</title>
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>ASDF Tutorial</title>
 
 <style>
 
@@ -18,17 +21,25 @@
     box-sizing:border-box;
 }
 
+html,
 body{
 
-    background:#0b0b0b;
-    color:white;
-
-    width:100vw;
-    height:100vh;
+    width:100%;
+    height:100%;
 
     overflow:hidden;
 
-    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+
+    background:#080808;
+    color:white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 
     touch-action:none;
 
@@ -36,7 +47,7 @@ body{
 
 
 /* ========================= */
-/* 홈 버튼 */
+/* 홈 */
 /* ========================= */
 
 .home{
@@ -46,31 +57,31 @@ body{
     top:20px;
     left:20px;
 
-    padding:10px 16px;
+    z-index:100;
 
-    background:#181818;
+    padding:10px 16px;
 
     border:1px solid #333;
 
     border-radius:10px;
 
+    background:#151515;
+
     color:white;
 
     cursor:pointer;
-
-    z-index:100;
 
 }
 
 .home:hover{
 
-    background:#252525;
+    background:#222;
 
 }
 
 
 /* ========================= */
-/* 튜토리얼 안내 */
+/* 상단 정보 */
 /* ========================= */
 
 .info{
@@ -78,6 +89,7 @@ body{
     position:fixed;
 
     top:25px;
+
     left:50%;
 
     transform:translateX(-50%);
@@ -86,21 +98,25 @@ body{
 
     z-index:20;
 
+    pointer-events:none;
+
 }
 
 .info h1{
 
-    font-size:28px;
+    font-size:25px;
 
-    margin-bottom:10px;
+    letter-spacing:2px;
+
+    margin-bottom:8px;
 
 }
 
 .info p{
 
-    color:#888;
+    color:#777;
 
-    font-size:14px;
+    font-size:13px;
 
 }
 
@@ -116,16 +132,17 @@ body{
     left:50%;
     top:50%;
 
-    transform:translate(-50%,-50%);
+    transform:translate(-50%,-47%);
 
-    width:min(500px,90vw);
-    height:min(650px,75vh);
+    width:min(500px,92vw);
 
-    border:2px solid #444;
+    height:min(680px,76vh);
 
-    background:#101010;
+    background:#0d0d0d;
 
-    border-radius:16px;
+    border:2px solid #333;
+
+    border-radius:18px;
 
     overflow:hidden;
 
@@ -144,60 +161,90 @@ body{
 
     display:grid;
 
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:
+        repeat(4,1fr);
 
 }
 
 .lane{
 
-    border-left:1px solid #222;
+    position:relative;
+
+    border-left:1px solid #1c1c1c;
 
 }
 
 .lane:last-child{
 
-    border-right:1px solid #222;
+    border-right:1px solid #1c1c1c;
 
 }
 
 
 /* ========================= */
-/* 판정선 */
+/* 판정 영역 */
 /* ========================= */
 
-.judge{
+.judgement-line{
 
     position:absolute;
 
-    bottom:80px;
     left:0;
+
+    bottom:100px;
 
     width:100%;
 
-    height:4px;
+    height:2px;
 
-    background:white;
+    background:#666;
 
-    box-shadow:0 0 15px rgba(255,255,255,.5);
+    box-shadow:
+        0 0 12px
+        rgba(255,255,255,.25);
+
+    z-index:10;
+
+}
+
+.judgement-zone{
+
+    position:absolute;
+
+    left:0;
+
+    bottom:100px;
+
+    width:100%;
+
+    height:70px;
+
+    border-top:1px solid #222;
+
+    border-bottom:1px solid #222;
+
+    pointer-events:none;
+
+    z-index:5;
 
 }
 
 
 /* ========================= */
-/* 떨어지는 노트 */
+/* 원형 노트 */
 /* ========================= */
 
 .note{
 
     position:absolute;
 
-    width:25%;
+    width:24px;
 
-    height:55px;
+    height:24px;
 
-    border-radius:10px;
+    border-radius:50%;
 
-    background:white;
+    background:#fff;
 
     color:#111;
 
@@ -207,80 +254,103 @@ body{
 
     align-items:center;
 
-    font-size:20px;
+    font-size:11px;
 
     font-weight:bold;
 
-    transform:translateY(-70px);
+    z-index:8;
+
+    box-shadow:
+        0 0 12px
+        rgba(255,255,255,.45);
+
+    transform:
+        translate(-50%,-50%);
 
 }
 
 
 /* ========================= */
-/* 키 안내 */
+/* 레인 키 */
 /* ========================= */
 
-.keys{
+.key-area{
 
     position:absolute;
 
-    bottom:10px;
+    bottom:15px;
 
     left:0;
 
     width:100%;
 
+    padding:0 10px;
+
     display:grid;
 
-    grid-template-columns:repeat(4,1fr);
+    grid-template-columns:
+        repeat(4,1fr);
 
-    gap:6px;
+    gap:7px;
 
-    padding:0 8px;
+    z-index:30;
 
 }
 
 .key{
 
-    height:55px;
+    height:62px;
 
-    background:#181818;
+    border:1px solid #333;
 
-    border:1px solid #444;
+    border-radius:12px;
 
-    border-radius:10px;
+    background:#151515;
 
-    color:white;
+    color:#aaa;
 
-    font-size:18px;
+    font-size:19px;
 
     font-weight:bold;
 
+    cursor:pointer;
+
+    user-select:none;
+
+    -webkit-tap-highlight-color:
+        transparent;
+
 }
 
-.key:active{
+.key.active{
 
-    background:white;
+    background:#fff;
 
-    color:black;
+    color:#000;
+
+    transform:scale(.94);
 
 }
 
 
 /* ========================= */
-/* 성공 표시 */
+/* 판정 텍스트 */
 /* ========================= */
 
-.message{
+.judgement{
 
     position:absolute;
 
     left:50%;
-    top:45%;
 
-    transform:translate(-50%,-50%);
+    bottom:185px;
 
-    font-size:28px;
+    transform:
+        translateX(-50%);
+
+    z-index:40;
+
+    font-size:21px;
 
     font-weight:bold;
 
@@ -290,28 +360,63 @@ body{
 
 }
 
-.message.show{
+.judgement.show{
 
-    animation:pop .5s ease;
+    animation:
+        judgement .45s ease-out;
 
 }
 
-@keyframes pop{
+@keyframes judgement{
 
     0%{
+
         opacity:0;
-        transform:translate(-50%,-50%) scale(.7);
+
+        transform:
+            translateX(-50%)
+            translateY(8px)
+            scale(.8);
+
     }
 
-    50%{
+    25%{
+
         opacity:1;
-        transform:translate(-50%,-50%) scale(1.1);
+
     }
 
     100%{
+
         opacity:0;
-        transform:translate(-50%,-50%) scale(1);
+
+        transform:
+            translateX(-50%)
+            translateY(-8px)
+            scale(1);
+
     }
+
+}
+
+
+/* ========================= */
+/* 진행 표시 */
+/* ========================= */
+
+.counter{
+
+    position:absolute;
+
+    top:15px;
+
+    right:18px;
+
+    color:#555;
+
+    font-size:11px;
+
+    z-index:30;
 
 }
 
@@ -326,18 +431,18 @@ body{
 
     inset:0;
 
-    background:rgba(0,0,0,.9);
+    z-index:200;
 
     display:none;
 
     justify-content:center;
+
     align-items:center;
 
-    z-index:200;
+    background:
+        rgba(0,0,0,.92);
 
-    text-align:center;
-
-    padding:25px;
+    padding:20px;
 
 }
 
@@ -345,19 +450,21 @@ body{
 
     width:min(450px,90vw);
 
+    padding:35px 28px;
+
+    text-align:center;
+
     background:#151515;
 
-    border:1px solid #444;
+    border:1px solid #3a3a3a;
 
     border-radius:18px;
-
-    padding:35px;
 
 }
 
 .complete-box h2{
 
-    font-size:28px;
+    font-size:27px;
 
     margin-bottom:20px;
 
@@ -365,37 +472,33 @@ body{
 
 .complete-box p{
 
-    color:#aaa;
+    color:#999;
 
-    line-height:1.7;
+    line-height:1.8;
 
-    margin-bottom:25px;
+    font-size:14px;
+
+    margin-bottom:28px;
 
 }
 
 .confirm{
 
-    border:none;
+    border:0;
+
+    border-radius:11px;
 
     background:white;
 
-    color:black;
+    color:#111;
 
     padding:14px 28px;
 
-    border-radius:10px;
-
-    font-size:16px;
+    font-size:15px;
 
     font-weight:bold;
 
     cursor:pointer;
-
-}
-
-.confirm:hover{
-
-    transform:translateY(-2px);
 
 }
 
@@ -406,13 +509,30 @@ body{
 
 @media(max-width:600px){
 
+    .info{
+
+        top:18px;
+
+    }
+
     .info h1{
 
-        font-size:22px;
+        font-size:20px;
 
     }
 
     .info p{
+
+        font-size:11px;
+
+    }
+
+    .home{
+
+        top:15px;
+        left:15px;
+
+        padding:8px 12px;
 
         font-size:12px;
 
@@ -420,25 +540,58 @@ body{
 
     .game{
 
-        width:92vw;
+        width:94vw;
 
-        height:68vh;
+        height:70vh;
+
+        transform:
+            translate(-50%,-45%);
+
+        border-radius:14px;
 
     }
 
     .note{
 
-        height:48px;
+        width:22px;
+        height:22px;
 
-        font-size:17px;
+        font-size:10px;
 
     }
 
     .key{
 
-        height:60px;
+        height:58px;
 
-        font-size:18px;
+        font-size:17px;
+
+    }
+
+}
+
+
+/* ========================= */
+/* 아주 작은 화면 */
+/* ========================= */
+
+@media(max-height:650px){
+
+    .game{
+
+        height:67vh;
+
+    }
+
+    .info{
+
+        top:10px;
+
+    }
+
+    .info h1{
+
+        font-size:17px;
 
     }
 
@@ -452,6 +605,8 @@ body{
 <body>
 
 
+<!-- 홈 -->
+
 <button
     class="home"
     onclick="location.href='../'">
@@ -461,16 +616,20 @@ body{
 </button>
 
 
+<!-- 설명 -->
+
 <div class="info">
 
     <h1>ASDF TUTORIAL</h1>
 
     <p>
-        내려오는 글자와 같은 키를 눌러보세요
+        노트가 판정선에 도착하는 순간 눌러보세요
     </p>
 
 </div>
 
+
+<!-- 게임 -->
 
 <div class="game">
 
@@ -483,39 +642,82 @@ body{
 
     </div>
 
-    <div class="judge"></div>
 
     <div
-        class="message"
-        id="message">
+        class="judgement-zone">
     </div>
 
-    <div
-        class="keys"
-        id="keys">
 
-        <button class="key" data-key="a">A</button>
-        <button class="key" data-key="s">S</button>
-        <button class="key" data-key="d">D</button>
-        <button class="key" data-key="f">F</button>
+    <div
+        class="judgement-line">
+    </div>
+
+
+    <div
+        class="judgement"
+        id="judgement">
+    </div>
+
+
+    <div
+        class="counter"
+        id="counter">
+    </div>
+
+
+    <div
+        class="key-area">
+
+        <button
+            class="key"
+            data-key="a">
+            A
+        </button>
+
+        <button
+            class="key"
+            data-key="s">
+            S
+        </button>
+
+        <button
+            class="key"
+            data-key="d">
+            D
+        </button>
+
+        <button
+            class="key"
+            data-key="f">
+            F
+        </button>
 
     </div>
 
 </div>
 
 
-<div class="complete" id="complete">
+<!-- 완료 -->
+
+<div
+    class="complete"
+    id="complete">
 
     <div class="complete-box">
 
-        <h2>튜토리얼 완료</h2>
+        <h2>
+            튜토리얼 완료
+        </h2>
 
         <p>
-            기본적인 조작법을 익혔습니다.<br><br>
 
-            실제 곡을 플레이하는 동안에는
-            <strong>ESC</strong>를 눌러<br>
+            기본적인 플레이 방법을 익혔습니다.<br><br>
+
+            실제 곡을 플레이하는 동안에는<br>
+
+            <strong>ESC</strong>를 눌러
             게임에서 나갈 수 있습니다.
+
         </p>
 
         <button
@@ -537,15 +739,57 @@ body{
 /* 설정 */
 /* ========================= */
 
-const keys = ["a","s","d","f"];
+const KEYS =
+    ["a","s","d","f"];
 
-const requiredHits = 8;
+const TOTAL_NOTES =
+    12;
 
-let hits = 0;
 
-let currentKey = null;
+/*
+    판정선까지 도착하는 데 걸리는 시간.
 
-let note = null;
+    숫자가 작을수록
+    노트가 빠르게 내려옵니다.
+*/
+
+const NOTE_TRAVEL_TIME =
+    900;
+
+
+/*
+    판정 허용 오차.
+
+    ±80ms 안이면
+    PERFECT로 처리합니다.
+*/
+
+const PERFECT_WINDOW =
+    80;
+
+
+/*
+    ±170ms 안이면
+    GOOD으로 처리합니다.
+*/
+
+const GOOD_WINDOW =
+    170;
+
+
+/* ========================= */
+/* 상태 */
+/* ========================= */
+
+let noteIndex = 0;
+
+let currentNote = null;
+
+let noteStartTime = 0;
+
+let animationFrame = null;
+
+let finished = false;
 
 
 /* ========================= */
@@ -555,20 +799,34 @@ let note = null;
 const game =
     document.querySelector(".game");
 
-const message =
-    document.getElementById("message");
+const judgement =
+    document.getElementById("judgement");
+
+const counter =
+    document.getElementById("counter");
 
 const complete =
     document.getElementById("complete");
 
 
 /* ========================= */
-/* 새 노트 생성 */
+/* 레이아웃 계산 */
+/* ========================= */
+
+function getJudgeY(){
+
+    return game.clientHeight - 100;
+
+}
+
+
+/* ========================= */
+/* 노트 생성 */
 /* ========================= */
 
 function createNote(){
 
-    if(hits >= requiredHits){
+    if(noteIndex >= TOTAL_NOTES){
 
         finishTutorial();
 
@@ -576,148 +834,345 @@ function createNote(){
 
     }
 
+
     const key =
-        keys[Math.floor(Math.random()*keys.length)];
+        KEYS[
+            Math.floor(
+                Math.random()*KEYS.length
+            )
+        ];
 
-    currentKey = key;
 
-    note =
+    const lane =
+        KEYS.indexOf(key);
+
+
+    const note =
         document.createElement("div");
 
-    note.className = "note";
+    note.className =
+        "note";
 
     note.textContent =
         key.toUpperCase();
 
-    const lane =
-        keys.indexOf(key);
+
+    /*
+        레인 중앙에 배치
+    */
+
+    const laneWidth =
+        game.clientWidth / 4;
+
+
+    const x =
+        laneWidth * lane
+        + laneWidth / 2;
+
 
     note.style.left =
-        (lane * 25) + "%";
+        x + "px";
+
 
     game.appendChild(note);
 
-    animateNote();
+
+    currentNote = {
+
+        element:note,
+
+        key:key,
+
+        lane:lane,
+
+        spawnTime:
+            performance.now(),
+
+        targetTime:
+            performance.now()
+            + NOTE_TRAVEL_TIME
+
+    };
+
+
+    noteStartTime =
+        currentNote.spawnTime;
+
+
+    noteIndex++;
+
+
+    updateCounter();
+
+
+    animationFrame =
+        requestAnimationFrame(
+            updateNote
+        );
 
 }
 
 
 /* ========================= */
-/* 노트 이동 */
+/* 노트 움직임 */
 /* ========================= */
 
-function animateNote(){
+function updateNote(time){
 
-    const start = -70;
-
-    const end =
-        game.clientHeight - 145;
-
-    const duration = 2200;
-
-    const startTime = performance.now();
+    if(!currentNote)
+        return;
 
 
-    function frame(time){
-
-        if(!note) return;
-
-        const progress =
-            Math.min(
-                (time-startTime)/duration,
-                1
-            );
-
-        const y =
-            start + (end-start)*progress;
-
-        note.style.transform =
-            `translateY(${y}px)`;
+    const note =
+        currentNote;
 
 
-        if(progress < 1){
+    const elapsed =
+        time - note.spawnTime;
 
-            requestAnimationFrame(frame);
 
-        }else{
+    const progress =
+        elapsed /
+        NOTE_TRAVEL_TIME;
 
-            miss();
 
-        }
+    /*
+        판정선 위쪽에서 시작해서
+        판정선까지 내려옵니다.
+    */
+
+    const startY =
+        -30;
+
+
+    const targetY =
+        getJudgeY();
+
+
+    const y =
+        startY
+        + (targetY-startY)
+        * progress;
+
+
+    note.element.style.top =
+        y + "px";
+
+
+    /*
+        판정 시간을 넘기면 MISS
+    */
+
+    if(progress >= 1){
+
+        judge(
+            note.key,
+            "MISS"
+        );
+
+        return;
 
     }
 
-    requestAnimationFrame(frame);
+
+    animationFrame =
+        requestAnimationFrame(
+            updateNote
+        );
 
 }
 
 
 /* ========================= */
-/* 성공 */
+/* 입력 */
 /* ========================= */
 
-function hit(key){
+function pressKey(key){
 
-    if(!note) return;
-
-    if(key !== currentKey) return;
-
-
-    note.remove();
-
-    note = null;
-
-    hits++;
+    if(finished)
+        return;
 
 
-    message.textContent =
-        "GOOD!";
-
-    message.classList.remove("show");
-
-    void message.offsetWidth;
-
-    message.classList.add("show");
+    animateKey(key);
 
 
-    setTimeout(()=>{
+    if(!currentNote)
+        return;
 
-        createNote();
 
-    },250);
+    if(
+        key !== currentNote.key
+    ){
+
+        return;
+
+    }
+
+
+    const now =
+        performance.now();
+
+
+    const difference =
+        now -
+        currentNote.targetTime;
+
+
+    const absolute =
+        Math.abs(difference);
+
+
+    if(
+        absolute <=
+        PERFECT_WINDOW
+    ){
+
+        judge(
+            key,
+            "PERFECT"
+        );
+
+    }
+
+    else if(
+        absolute <=
+        GOOD_WINDOW
+    ){
+
+        judge(
+            key,
+            difference < 0
+                ? "EARLY"
+                : "LATE"
+        );
+
+    }
 
 }
 
 
 /* ========================= */
-/* 실패 */
+/* 판정 */
 /* ========================= */
 
-function miss(){
+function judge(
+    key,
+    result
+){
 
-    if(!note) return;
-
-    note.remove();
-
-    note = null;
-
-
-    message.textContent =
-        "MISS";
+    if(!currentNote)
+        return;
 
 
-    message.classList.remove("show");
+    if(animationFrame){
 
-    void message.offsetWidth;
+        cancelAnimationFrame(
+            animationFrame
+        );
 
-    message.classList.add("show");
+    }
 
 
-    setTimeout(()=>{
+    currentNote.element.remove();
 
-        createNote();
+    currentNote = null;
 
-    },300);
+
+    showJudgement(
+        result
+    );
+
+
+    /*
+        다음 노트.
+
+        뒤로 갈수록
+        조금씩 빨라집니다.
+    */
+
+    const delay =
+        Math.max(
+            180,
+            500 - noteIndex*20
+        );
+
+
+    setTimeout(
+        createNote,
+        delay
+    );
+
+}
+
+
+/* ========================= */
+/* 판정 표시 */
+/* ========================= */
+
+function showJudgement(
+    text
+){
+
+    judgement.textContent =
+        text;
+
+
+    judgement.classList.remove(
+        "show"
+    );
+
+
+    void judgement.offsetWidth;
+
+
+    judgement.classList.add(
+        "show"
+    );
+
+}
+
+
+/* ========================= */
+/* 키 애니메이션 */
+/* ========================= */
+
+function animateKey(key){
+
+    const button =
+        document.querySelector(
+            `.key[data-key="${key}"]`
+        );
+
+
+    if(!button)
+        return;
+
+
+    button.classList.add(
+        "active"
+    );
+
+
+    setTimeout(
+        ()=>{
+            button.classList.remove(
+                "active"
+            );
+        },
+        100
+    );
+
+}
+
+
+/* ========================= */
+/* 진행 표시 */
+/* ========================= */
+
+function updateCounter(){
+
+    counter.textContent =
+        `${noteIndex} / ${TOTAL_NOTES}`;
 
 }
 
@@ -733,11 +1188,14 @@ document.addEventListener(
         const key =
             event.key.toLowerCase();
 
-        if(keys.includes(key)){
+
+        if(
+            KEYS.includes(key)
+        ){
 
             event.preventDefault();
 
-            hit(key);
+            pressKey(key);
 
         }
 
@@ -751,23 +1209,24 @@ document.addEventListener(
 
 document
     .querySelectorAll(".key")
-    .forEach(button => {
+    .forEach(
+        button => {
 
-        button.addEventListener(
-            "pointerdown",
-            function(event){
+            button.addEventListener(
+                "pointerdown",
+                function(event){
 
-                event.preventDefault();
+                    event.preventDefault();
 
-                const key =
-                    button.dataset.key;
+                    pressKey(
+                        button.dataset.key
+                    );
 
-                hit(key);
+                }
+            );
 
-            }
-        );
-
-    });
+        }
+    );
 
 
 /* ========================= */
@@ -775,6 +1234,8 @@ document
 /* ========================= */
 
 function finishTutorial(){
+
+    finished = true;
 
     complete.style.display =
         "flex";
@@ -786,11 +1247,10 @@ function finishTutorial(){
 /* 시작 */
 /* ========================= */
 
-setTimeout(()=>{
-
-    createNote();
-
-},800);
+setTimeout(
+    createNote,
+    500
+);
 
 </script>
 
