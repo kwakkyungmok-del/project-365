@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0, user-scalable=no">
 
-<title>ASDF — Rhythm Walk</title>
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>ASDF — Track Select</title>
 
 <style>
 
@@ -15,6 +19,7 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
+
     -webkit-tap-highlight-color:transparent;
     user-select:none;
 }
@@ -36,15 +41,20 @@ body{
         sans-serif;
 
     touch-action:none;
+}
+
+button{
+
+    font-family:inherit;
 
 }
 
 
-/* ========================= */
-/* 전체 게임 */
-/* ========================= */
+/* ================================================= */
+/* 전체 */
+/* ================================================= */
 
-#game{
+#app{
 
     position:relative;
 
@@ -56,9 +66,261 @@ body{
 }
 
 
-/* ========================= */
-/* 상단 UI */
-/* ========================= */
+/* ================================================= */
+/* 화면 */
+/* ================================================= */
+
+.screen{
+
+    position:absolute;
+
+    inset:0;
+
+    display:none;
+
+}
+
+.screen.active{
+
+    display:block;
+
+}
+
+
+/* ================================================= */
+/* 트랙 선택 화면 */
+/* ================================================= */
+
+#trackScreen{
+
+    background:#080808;
+
+    overflow-y:auto;
+
+    padding:40px 25px;
+
+}
+
+
+.track-container{
+
+    width:min(850px,100%);
+
+    margin:0 auto;
+
+}
+
+
+.track-header{
+
+    margin-bottom:35px;
+
+}
+
+
+.small-title{
+
+    font-size:11px;
+
+    color:#666;
+
+    letter-spacing:4px;
+
+    margin-bottom:10px;
+
+}
+
+
+.track-header h1{
+
+    font-size:42px;
+
+    letter-spacing:-2px;
+
+}
+
+
+.track-header p{
+
+    margin-top:10px;
+
+    color:#666;
+
+    font-size:14px;
+
+}
+
+
+/* ================================================= */
+/* 홈 버튼 */
+/* ================================================= */
+
+.home-button{
+
+    position:fixed;
+
+    top:20px;
+    left:20px;
+
+    z-index:100;
+
+    padding:9px 14px;
+
+    border:1px solid #333;
+
+    border-radius:9px;
+
+    background:#111;
+
+    color:#aaa;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.home-button:hover{
+
+    background:#1c1c1c;
+
+    color:white;
+
+}
+
+
+/* ================================================= */
+/* 트랙 리스트 */
+/* ================================================= */
+
+.track-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+
+.track{
+
+    position:relative;
+
+    width:100%;
+
+    min-height:100px;
+
+    padding:20px 24px;
+
+    border:1px solid #292929;
+
+    border-radius:16px;
+
+    background:#111;
+
+    color:white;
+
+    text-align:left;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+.track:hover{
+
+    background:#181818;
+
+    border-color:#555;
+
+    transform:translateY(-2px);
+
+}
+
+
+.track-number{
+
+    position:absolute;
+
+    top:20px;
+    right:22px;
+
+    font-size:12px;
+
+    color:#555;
+
+}
+
+
+.track-title{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    margin-bottom:9px;
+
+}
+
+
+.track-info{
+
+    display:flex;
+
+    gap:14px;
+
+    color:#777;
+
+    font-size:12px;
+
+}
+
+
+.track-difficulty{
+
+    color:#aaa;
+
+}
+
+
+.track.locked{
+
+    opacity:.35;
+
+    cursor:not-allowed;
+
+}
+
+
+.track.locked:hover{
+
+    transform:none;
+
+    background:#111;
+
+    border-color:#292929;
+
+}
+
+
+/* ================================================= */
+/* 게임 화면 */
+/* ================================================= */
+
+#gameScreen{
+
+    background:#080808;
+
+}
+
+
+/* ================================================= */
+/* 상단 */
+/* ================================================= */
 
 .top{
 
@@ -81,21 +343,26 @@ body{
 
 }
 
+
 .song-info{
 
     display:flex;
+
     flex-direction:column;
 
     gap:5px;
 
 }
 
+
 .song-title{
 
     font-size:18px;
+
     font-weight:700;
 
 }
+
 
 .song-subtitle{
 
@@ -107,18 +374,22 @@ body{
 
 }
 
+
 .score-box{
 
     text-align:right;
 
 }
 
+
 .score{
 
     font-size:22px;
+
     font-weight:700;
 
 }
+
 
 .combo{
 
@@ -131,9 +402,9 @@ body{
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 게임 영역 */
-/* ========================= */
+/* ================================================= */
 
 .playfield{
 
@@ -153,9 +424,9 @@ body{
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 레인 */
-/* ========================= */
+/* ================================================= */
 
 .lane{
 
@@ -176,6 +447,7 @@ body{
 
 }
 
+
 .lane:last-child{
 
     border-right:1px solid #1b1b1b;
@@ -183,7 +455,9 @@ body{
 }
 
 
-/* 레인 키 */
+/* ================================================= */
+/* 키 */
+/* ================================================= */
 
 .key{
 
@@ -223,11 +497,12 @@ body{
 
 }
 
+
 .key.active{
 
-    background:#fff;
+    background:white;
 
-    color:#000;
+    color:black;
 
     transform:
         translateX(-50%)
@@ -236,9 +511,9 @@ body{
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 판정선 */
-/* ========================= */
+/* ================================================= */
 
 .judgement-line{
 
@@ -261,9 +536,9 @@ body{
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 노트 */
-/* ========================= */
+/* ================================================= */
 
 .note{
 
@@ -293,16 +568,15 @@ body{
 }
 
 
-/* ========================= */
-/* 판정 텍스트 */
-/* ========================= */
+/* ================================================= */
+/* 판정 */
+/* ================================================= */
 
 .judgement{
 
     position:absolute;
 
     left:50%;
-
     top:43%;
 
     transform:
@@ -323,11 +597,14 @@ body{
 
 }
 
+
 .judgement.show{
 
-    animation:judgement .42s ease-out;
+    animation:
+        judgement .42s ease-out;
 
 }
+
 
 @keyframes judgement{
 
@@ -354,9 +631,9 @@ body{
 }
 
 
-/* ========================= */
-/* 시작 화면 */
-/* ========================= */
+/* ================================================= */
+/* 시작 오버레이 */
+/* ================================================= */
 
 .overlay{
 
@@ -364,8 +641,7 @@ body{
 
     inset:0;
 
-    background:
-        rgba(5,5,5,.94);
+    background:rgba(5,5,5,.94);
 
     display:flex;
 
@@ -383,11 +659,13 @@ body{
 
 }
 
+
 .overlay.hidden{
 
     display:none;
 
 }
+
 
 .overlay h1{
 
@@ -396,6 +674,7 @@ body{
     margin-bottom:10px;
 
 }
+
 
 .overlay p{
 
@@ -406,6 +685,7 @@ body{
     line-height:1.8;
 
 }
+
 
 .start-button{
 
@@ -430,9 +710,9 @@ body{
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 결과 화면 */
-/* ========================= */
+/* ================================================= */
 
 .result{
 
@@ -456,11 +736,13 @@ body{
 
 }
 
+
 .result.show{
 
     display:flex;
 
 }
+
 
 .result h1{
 
@@ -470,6 +752,7 @@ body{
 
 }
 
+
 .result-score{
 
     font-size:36px;
@@ -477,6 +760,7 @@ body{
     font-weight:800;
 
 }
+
 
 .result-info{
 
@@ -488,11 +772,21 @@ body{
 
 }
 
-.retry{
+
+.result-buttons{
+
+    display:flex;
+
+    gap:10px;
 
     margin-top:30px;
 
-    padding:14px 30px;
+}
+
+
+.result-button{
+
+    padding:14px 25px;
 
     border:none;
 
@@ -508,7 +802,23 @@ body{
 
 }
 
-.back{
+
+.result-button.secondary{
+
+    background:#181818;
+
+    color:white;
+
+    border:1px solid #333;
+
+}
+
+
+/* ================================================= */
+/* ESC / 뒤로가기 */
+/* ================================================= */
+
+.back-button{
 
     position:absolute;
 
@@ -532,11 +842,69 @@ body{
 }
 
 
-/* ========================= */
+.back-button:hover{
+
+    color:white;
+
+    background:#1b1b1b;
+
+}
+
+
+/* ================================================= */
 /* 모바일 */
-/* ========================= */
+/* ================================================= */
 
 @media(max-width:600px){
+
+    #trackScreen{
+
+        padding:
+            75px
+            18px
+            30px;
+
+    }
+
+
+    .track-header h1{
+
+        font-size:32px;
+
+    }
+
+
+    .track-header p{
+
+        font-size:13px;
+
+    }
+
+
+    .track{
+
+        min-height:92px;
+
+        padding:18px;
+
+        border-radius:14px;
+
+    }
+
+
+    .track-title{
+
+        font-size:18px;
+
+    }
+
+
+    .track-number{
+
+        right:18px;
+
+    }
+
 
     .top{
 
@@ -546,11 +914,13 @@ body{
 
     }
 
+
     .song-title{
 
         font-size:14px;
 
     }
+
 
     .song-subtitle{
 
@@ -558,17 +928,20 @@ body{
 
     }
 
+
     .score{
 
         font-size:18px;
 
     }
 
+
     .combo{
 
         font-size:10px;
 
     }
+
 
     .key{
 
@@ -582,11 +955,13 @@ body{
 
     }
 
+
     .judgement-line{
 
         bottom:73px;
 
     }
+
 
     .overlay h1{
 
@@ -594,16 +969,42 @@ body{
 
     }
 
+
     .overlay p{
 
         font-size:13px;
 
     }
 
+
+    .result h1{
+
+        font-size:34px;
+
+    }
+
+
+    .result-buttons{
+
+        flex-direction:column;
+
+        width:80%;
+
+    }
+
+
+    .result-button{
+
+        width:100%;
+
+    }
+
 }
 
 
-/* 아주 작은 화면 */
+/* ================================================= */
+/* 작은 스마트폰 */
+/* ================================================= */
 
 @media(max-width:380px){
 
@@ -612,6 +1013,7 @@ body{
         height:40px;
 
     }
+
 
     .judgement-line{
 
@@ -629,167 +1031,233 @@ body{
 <body>
 
 
-<div id="game">
+<div id="app">
 
 
-<!-- ========================= -->
-<!-- 상단 -->
-<!-- ========================= -->
+<!-- ================================================= -->
+<!-- 트랙 선택 -->
+<!-- ================================================= -->
 
-<div class="top">
-
-    <div class="song-info">
-
-        <div class="song-title">
-            Rhythm Walk
-        </div>
-
-        <div class="song-subtitle">
-            TRACK 01 · 114 BPM
-        </div>
-
-    </div>
-
-    <div class="score-box">
-
-        <div
-            class="score"
-            id="score"
-        >
-            000000
-        </div>
-
-        <div
-            class="combo"
-            id="combo"
-        >
-            COMBO 0
-        </div>
-
-    </div>
-
-</div>
-
-
-<!-- ========================= -->
-<!-- 플레이필드 -->
-<!-- ========================= -->
-
-<div class="playfield">
-
-
-    <div
-        class="lane"
-        data-lane="0"
-    >
-
-        <div class="key">
-            A
-        </div>
-
-    </div>
-
-
-    <div
-        class="lane"
-        data-lane="1"
-    >
-
-        <div class="key">
-            S
-        </div>
-
-    </div>
-
-
-    <div
-        class="lane"
-        data-lane="2"
-    >
-
-        <div class="key">
-            D
-        </div>
-
-    </div>
-
-
-    <div
-        class="lane"
-        data-lane="3"
-    >
-
-        <div class="key">
-            F
-        </div>
-
-    </div>
-
-
-    <div class="judgement-line"></div>
-
-</div>
-
-
-<!-- ========================= -->
-<!-- 판정 -->
-<!-- ========================= -->
-
-<div
-    class="judgement"
-    id="judgement"
->
-</div>
-
-
-<!-- ========================= -->
-<!-- 시작 -->
-<!-- ========================= -->
-
-<div
-    class="overlay"
-    id="startOverlay"
+<section
+    id="trackScreen"
+    class="screen active"
 >
 
-    <h1>
-        Rhythm Walk
-    </h1>
-
-    <p>
-        A / S / D / F 키를 사용하세요.<br>
-        노트가 판정선에 들어오는 순간 누르세요.<br>
-        모바일에서는 해당 레인을 터치하세요.
-    </p>
 
     <button
-        class="start-button"
-        id="startButton"
+        class="home-button"
+        onclick="goHome()"
     >
-        START
+        ← 나가기
     </button>
 
-</div>
+
+    <div class="track-container">
 
 
-<!-- ========================= -->
-<!-- 결과 -->
-<!-- ========================= -->
+        <div class="track-header">
 
-<div
-    class="result"
-    id="result"
+            <div class="small-title">
+                ASDF
+            </div>
+
+            <h1>
+                SELECT TRACK
+            </h1>
+
+            <p>
+                플레이할 곡을 선택하세요.
+            </p>
+
+        </div>
+
+
+        <div
+            class="track-list"
+            id="trackList"
+        ></div>
+
+
+    </div>
+
+</section>
+
+
+<!-- ================================================= -->
+<!-- 게임 -->
+<!-- ================================================= -->
+
+<section
+    id="gameScreen"
+    class="screen"
 >
 
+
     <button
-        class="back"
-        onclick="goHome()"
+        class="back-button"
+        onclick="leaveGame()"
     >
         ESC
     </button>
 
+
+    <div class="top">
+
+
+        <div class="song-info">
+
+            <div
+                class="song-title"
+                id="songTitle"
+            >
+                Rhythm Walk
+            </div>
+
+            <div
+                class="song-subtitle"
+                id="songSubtitle"
+            >
+                TRACK 01 · 114 BPM
+            </div>
+
+        </div>
+
+
+        <div class="score-box">
+
+            <div
+                class="score"
+                id="score"
+            >
+                000000
+            </div>
+
+            <div
+                class="combo"
+                id="combo"
+            >
+                COMBO 0
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="playfield">
+
+
+        <div
+            class="lane"
+            data-lane="0"
+        >
+
+            <div class="key">
+                A
+            </div>
+
+        </div>
+
+
+        <div
+            class="lane"
+            data-lane="1"
+        >
+
+            <div class="key">
+                S
+            </div>
+
+        </div>
+
+
+        <div
+            class="lane"
+            data-lane="2"
+        >
+
+            <div class="key">
+                D
+            </div>
+
+        </div>
+
+
+        <div
+            class="lane"
+            data-lane="3"
+        >
+
+            <div class="key">
+                F
+            </div>
+
+        </div>
+
+
+        <div class="judgement-line"></div>
+
+
+    </div>
+
+
+    <div
+        class="judgement"
+        id="judgement"
+    ></div>
+
+
+    <div
+        class="overlay"
+        id="startOverlay"
+    >
+
+        <h1 id="startTitle">
+            Rhythm Walk
+        </h1>
+
+        <p>
+            A / S / D / F 키를 사용하세요.<br>
+            노트가 판정선에 들어오는 순간 누르세요.<br>
+            모바일에서는 해당 레인을 터치하세요.
+        </p>
+
+        <button
+            class="start-button"
+            id="startButton"
+        >
+            START
+        </button>
+
+    </div>
+
+
+</section>
+
+
+<!-- ================================================= -->
+<!-- 결과 -->
+<!-- ================================================= -->
+
+<section
+    class="result"
+    id="result"
+>
+
+
+    <button
+        class="back-button"
+        onclick="showTrackSelect()"
+    >
+        ← 곡 선택
+    </button>
+
+
     <h1>
         RESULT
     </h1>
+
 
     <div
         class="result-score"
@@ -798,20 +1266,36 @@ body{
         0
     </div>
 
+
     <div
         class="result-info"
         id="resultInfo"
-    >
+    ></div>
+
+
+    <div class="result-buttons">
+
+
+        <button
+            class="result-button"
+            onclick="retryTrack()"
+        >
+            다시 플레이
+        </button>
+
+
+        <button
+            class="result-button secondary"
+            onclick="showTrackSelect()"
+        >
+            곡 선택
+        </button>
+
+
     </div>
 
-    <button
-        class="retry"
-        onclick="location.reload()"
-    >
-        다시 플레이
-    </button>
 
-</div>
+</section>
 
 
 </div>
@@ -819,209 +1303,520 @@ body{
 
 <script>
 
+
 /* ================================================= */
-/* ASDF RHYTHM GAME */
+/* TRACK DATA */
 /* ================================================= */
 
 
-/* ========================= */
-/* 기본 설정 */
-/* ========================= */
-
-const BPM = 114.84375;
-
 /*
-    실제 음악 분석에서 잡힌
-    첫 박자의 위치.
-
-    약 0.09초부터 첫 비트가 시작된다.
+    새로운 곡을 추가할 때는
+    이 배열에 하나씩 추가하면 된다.
 */
 
-const FIRST_BEAT = 0.0907;
+const tracks = [
+
+    {
+
+        id:1,
+
+        title:"Rhythm Walk",
+
+        artist:"Joyful Rhythm Walk Funk",
+
+        difficulty:"EASY",
+
+        bpm:114.84,
+
+        audio:
+            "../../project/lightbeatsmusic-joyful-rhythm-walk-funk-513936.mp3"
+
+    },
 
 
-/*
-    노트가 판정선까지 내려오는 시간.
+    /*
+        앞으로 곡이 추가되면
+        아래와 같은 형식으로 추가.
 
-    1.5초 정도로 설정해서
-    어느 정도 속도감이 있게 만든다.
-*/
+        {
+            id:2,
+            title:"곡 이름",
+            artist:"아티스트",
+            difficulty:"NORMAL",
+            bpm:120,
+            audio:"../../project/곡파일.mp3"
+        }
+    */
 
-const NOTE_TRAVEL_TIME = 1.5;
+];
 
 
-/*
-    판정 범위
+/* ================================================= */
+/* 현재 트랙 */
+/* ================================================= */
 
-    Perfect : ±0.075초
-    Great   : ±0.14초
-    Good    : ±0.22초
-*/
+let currentTrack =
+    null;
+
+
+/* ================================================= */
+/* DOM */
+/* ================================================= */
+
+const trackScreen =
+    document.getElementById(
+        "trackScreen"
+    );
+
+
+const gameScreen =
+    document.getElementById(
+        "gameScreen"
+    );
+
+
+const resultScreen =
+    document.getElementById(
+        "result"
+    );
+
+
+const trackList =
+    document.getElementById(
+        "trackList"
+    );
+
+
+const songTitle =
+    document.getElementById(
+        "songTitle"
+    );
+
+
+const songSubtitle =
+    document.getElementById(
+        "songSubtitle"
+    );
+
+
+const startTitle =
+    document.getElementById(
+        "startTitle"
+    );
+
+
+const startOverlay =
+    document.getElementById(
+        "startOverlay"
+    );
+
+
+const startButton =
+    document.getElementById(
+        "startButton"
+    );
+
+
+const lanes =
+    document.querySelectorAll(
+        ".lane"
+    );
+
+
+const keys =
+    document.querySelectorAll(
+        ".key"
+    );
+
+
+const scoreElement =
+    document.getElementById(
+        "score"
+    );
+
+
+const comboElement =
+    document.getElementById(
+        "combo"
+    );
+
+
+const judgementElement =
+    document.getElementById(
+        "judgement"
+    );
+
+
+const resultScore =
+    document.getElementById(
+        "resultScore"
+    );
+
+
+const resultInfo =
+    document.getElementById(
+        "resultInfo"
+    );
+
+
+/* ================================================= */
+/* AUDIO */
+/* ================================================= */
+
+let audio =
+    new Audio();
+
+audio.preload =
+    "auto";
+
+audio.volume =
+    0.8;
+
+
+/* ================================================= */
+/* 게임 설정 */
+/* ================================================= */
+
+const NOTE_TRAVEL_TIME =
+    1.5;
+
 
 const PERFECT =
     0.075;
 
+
 const GREAT =
     0.14;
+
 
 const GOOD =
     0.22;
 
 
-/* ========================= */
-/* 오디오 */
-/* ========================= */
-
-const audio =
-    new Audio(
-        "../../lightbeatsmusic-joyful-rhythm-walk-funk-513936.mp3"
-    );
-
-audio.preload = "auto";
-
-audio.volume = 0.8;
-
-
-/* ========================= */
-/* DOM */
-/* ========================= */
-
-const lanes =
-    document.querySelectorAll(".lane");
-
-const keys =
-    document.querySelectorAll(".key");
-
-const scoreElement =
-    document.getElementById("score");
-
-const comboElement =
-    document.getElementById("combo");
-
-const judgementElement =
-    document.getElementById("judgement");
-
-const startOverlay =
-    document.getElementById("startOverlay");
-
-const startButton =
-    document.getElementById("startButton");
-
-const resultScreen =
-    document.getElementById("result");
-
-const resultScore =
-    document.getElementById("resultScore");
-
-const resultInfo =
-    document.getElementById("resultInfo");
-
-
-/* ========================= */
+/* ================================================= */
 /* 게임 상태 */
-/* ========================= */
+/* ================================================= */
 
 let playing =
     false;
 
+
 let finished =
     false;
+
 
 let animationFrame =
     null;
 
-let startTime =
-    0;
-
-let audioStarted =
-    false;
 
 let score =
     0;
 
+
 let combo =
     0;
+
 
 let maxCombo =
     0;
 
+
 let perfectCount =
     0;
+
 
 let greatCount =
     0;
 
+
 let goodCount =
     0;
+
 
 let missCount =
     0;
 
 
-/* ========================= */
-/* 노트 */
-/* ========================= */
-
-let notes = [];
+let notes =
+    [];
 
 
-/*
-    실제 음악의 BPM을 기준으로
-    전체 곡에 노트를 생성한다.
+/* ================================================= */
+/* 트랙 선택 화면 생성 */
+/* ================================================= */
 
-    한 박자마다 노트 하나.
+function buildTrackList(){
 
-    가끔 박자를 반으로 쪼개서
-    조금 더 재미있게 만든다.
-*/
+    trackList.innerHTML =
+        "";
 
-function createNotes(){
 
-    notes = [];
+    tracks.forEach(
+        track => {
 
-    const beat =
-        60 / BPM;
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "track";
+
+
+            button.innerHTML = `
+
+                <div class="track-number">
+                    ${String(track.id).padStart(2,"0")}
+                </div>
+
+                <div class="track-title">
+                    ${track.title}
+                </div>
+
+                <div class="track-info">
+
+                    <span>
+                        ${track.artist}
+                    </span>
+
+                    <span class="track-difficulty">
+                        ${track.difficulty}
+                    </span>
+
+                    <span>
+                        ${track.bpm} BPM
+                    </span>
+
+                </div>
+
+            `;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    selectTrack(
+                        track
+                    );
+
+                }
+            );
+
+
+            trackList.appendChild(
+                button
+            );
+
+        }
+    );
+
+}
+
+
+/* ================================================= */
+/* 트랙 선택 */
+/* ================================================= */
+
+function selectTrack(track){
+
+    currentTrack =
+        track;
 
 
     /*
-        음악 길이는 오디오에서
-        실제로 가져온다.
+        기존 오디오 정리
     */
 
+    audio.pause();
+
+    audio.currentTime =
+        0;
+
+
+    audio =
+        new Audio(
+            track.audio
+        );
+
+
+    audio.preload =
+        "auto";
+
+    audio.volume =
+        0.8;
+
+
+    /*
+        화면 변경
+    */
+
+    trackScreen.classList.remove(
+        "active"
+    );
+
+
+    resultScreen.classList.remove(
+        "show"
+    );
+
+
+    gameScreen.classList.add(
+        "active"
+    );
+
+
+    /*
+        곡 정보
+    */
+
+    songTitle.textContent =
+        track.title;
+
+
+    songSubtitle.textContent =
+        `TRACK ${String(track.id).padStart(2,"0")} · ${track.bpm} BPM`;
+
+
+    startTitle.textContent =
+        track.title;
+
+
+    /*
+        초기화
+    */
+
+    resetGame();
+
+
+    startOverlay.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* ================================================= */
+/* 게임 초기화 */
+/* ================================================= */
+
+function resetGame(){
+
+    playing =
+        false;
+
+    finished =
+        false;
+
+
+    if(
+        animationFrame
+    ){
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+    }
+
+
+    score =
+        0;
+
+    combo =
+        0;
+
+    maxCombo =
+        0;
+
+    perfectCount =
+        0;
+
+    greatCount =
+        0;
+
+    goodCount =
+        0;
+
+    missCount =
+        0;
+
+
+    notes =
+        [];
+
+
+    /*
+        화면에 남은 노트 제거
+    */
+
+    document
+        .querySelectorAll(".note")
+        .forEach(
+            note => note.remove()
+        );
+
+
+    updateUI();
+
+}
+
+
+/* ================================================= */
+/* 노트 생성 */
+/* ================================================= */
+
+function createNotes(){
+
+    notes =
+        [];
+
+
+    const bpm =
+        currentTrack.bpm;
+
+
+    const beat =
+        60 / bpm;
+
+
     const duration =
-        audio.duration || 138;
+        audio.duration ||
+        138;
 
 
-    let index = 0;
+    /*
+        첫 박자
+    */
+
+    const firstBeat =
+        0.0907;
+
+
+    let index =
+        0;
 
 
     for(
-        let time = FIRST_BEAT;
+        let time = firstBeat;
         time < duration - 1;
         time += beat
     ){
 
-        /*
-            기본적으로 한 박자마다 생성
-        */
-
-        let lane =
-            index % 4;
-
-
-        /*
-            일정 패턴만 반복되지 않도록
-            레인을 섞는다.
-        */
-
         const patterns = [
 
             [0,1,2,3],
+
             [1,3,0,2],
+
             [2,0,3,1],
+
             [3,2,1,0]
 
         ];
+
 
         const pattern =
             patterns[
@@ -1030,7 +1825,7 @@ function createNotes(){
             ];
 
 
-        lane =
+        const lane =
             pattern[
                 index % 4
             ];
@@ -1052,11 +1847,8 @@ function createNotes(){
 
 
         /*
-            곡 중간중간
-            반박 노트를 추가한다.
-
-            너무 많이 넣지 않아서
-            첫 곡의 난이도를 낮게 유지.
+            일부 박자에는
+            반박 노트 추가
         */
 
         if(
@@ -1066,9 +1858,12 @@ function createNotes(){
 
             notes.push({
 
-                time:time + beat / 2,
+                time:
+                    time +
+                    beat / 2,
 
-                lane:(lane + 2) % 4,
+                lane:
+                    (lane + 2) % 4,
 
                 hit:false,
 
@@ -1088,25 +1883,26 @@ function createNotes(){
 }
 
 
-/* ========================= */
-/* 노트 생성 */
-/* ========================= */
+/* ================================================= */
+/* 노트 DOM */
+/* ================================================= */
 
 function createNoteElement(note){
 
     const element =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     element.className =
         "note";
 
 
-    /*
-        레인 안에 넣는다.
-    */
-
     lanes[note.lane]
-        .appendChild(element);
+        .appendChild(
+            element
+        );
 
 
     note.element =
@@ -1115,19 +1911,35 @@ function createNoteElement(note){
 }
 
 
-/* ========================= */
-/* 노트 위치 계산 */
-/* ========================= */
+/* ================================================= */
+/* 노트 위치 */
+/* ================================================= */
 
-function updateNotes(currentTime){
+function updateNotes(
+    currentTime
+){
+
+    const playfield =
+        document.querySelector(
+            ".playfield"
+        );
+
+
+    const playfieldHeight =
+        playfield.clientHeight;
+
+
+    const judgementY =
+        playfieldHeight - 88;
+
+
+    const startY =
+        -40;
+
 
     for(
         const note of notes
     ){
-
-        /*
-            이미 처리된 노트
-        */
 
         if(
             note.hit ||
@@ -1139,39 +1951,33 @@ function updateNotes(currentTime){
         }
 
 
-        /*
-            판정선까지 남은 시간
-        */
-
         const difference =
-            note.time - currentTime;
+            note.time -
+            currentTime;
 
 
         /*
-            노트가 화면에 들어오는 시점
+            화면에 진입
         */
 
         if(
-            difference <= NOTE_TRAVEL_TIME &&
-            difference > -GOOD
+            difference <=
+                NOTE_TRAVEL_TIME
+            &&
+            difference >
+                -GOOD
         ){
 
             if(
                 !note.element
             ){
 
-                createNoteElement(note);
+                createNoteElement(
+                    note
+                );
 
             }
 
-
-            /*
-                0 = 화면 위
-                1 = 판정선
-
-                시간이 지나면서
-                0 → 1로 내려온다.
-            */
 
             const progress =
                 1 -
@@ -1179,25 +1985,6 @@ function updateNotes(currentTime){
                     difference /
                     NOTE_TRAVEL_TIME
                 );
-
-
-            /*
-                위쪽 0%
-                판정선 100%
-            */
-
-            const playfieldHeight =
-                document
-                    .querySelector(".playfield")
-                    .clientHeight;
-
-
-            const judgementY =
-                playfieldHeight - 88;
-
-
-            const startY =
-                -40;
 
 
             const y =
@@ -1216,14 +2003,17 @@ function updateNotes(currentTime){
 
 
         /*
-            판정 범위를 지나갔다.
+            판정선 통과
         */
 
         if(
-            difference < -GOOD
+            difference <
+            -GOOD
         ){
 
-            miss(note);
+            miss(
+                note
+            );
 
         }
 
@@ -1232,9 +2022,9 @@ function updateNotes(currentTime){
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* MISS */
-/* ========================= */
+/* ================================================= */
 
 function miss(note){
 
@@ -1251,12 +2041,16 @@ function miss(note){
     note.missed =
         true;
 
+
     missCount++;
+
 
     combo =
         0;
 
+
     updateUI();
+
 
     showJudgement(
         "MISS"
@@ -1270,9 +2064,9 @@ function miss(note){
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 노트 제거 */
-/* ========================= */
+/* ================================================= */
 
 function removeNote(note){
 
@@ -1290,9 +2084,9 @@ function removeNote(note){
 }
 
 
-/* ========================= */
-/* 키 입력 판정 */
-/* ========================= */
+/* ================================================= */
+/* 레인 입력 */
+/* ================================================= */
 
 function hitLane(lane){
 
@@ -1313,14 +2107,10 @@ function hitLane(lane){
     let target =
         null;
 
+
     let smallestDifference =
         Infinity;
 
-
-    /*
-        해당 레인에서
-        가장 가까운 노트를 찾는다.
-    */
 
     for(
         const note of notes
@@ -1360,10 +2150,6 @@ function hitLane(lane){
     }
 
 
-    /*
-        누를 노트가 없다.
-    */
-
     if(
         !target
     ){
@@ -1373,12 +2159,9 @@ function hitLane(lane){
     }
 
 
-    /*
-        판정
-    */
-
     if(
-        smallestDifference <= PERFECT
+        smallestDifference <=
+        PERFECT
     ){
 
         hitNote(
@@ -1390,7 +2173,8 @@ function hitLane(lane){
     }
 
     else if(
-        smallestDifference <= GREAT
+        smallestDifference <=
+        GREAT
     ){
 
         hitNote(
@@ -1402,7 +2186,8 @@ function hitLane(lane){
     }
 
     else if(
-        smallestDifference <= GOOD
+        smallestDifference <=
+        GOOD
     ){
 
         hitNote(
@@ -1416,9 +2201,9 @@ function hitLane(lane){
 }
 
 
-/* ========================= */
-/* HIT 처리 */
-/* ========================= */
+/* ================================================= */
+/* HIT */
+/* ================================================= */
 
 function hitNote(
     note,
@@ -1441,7 +2226,8 @@ function hitNote(
 
 
     if(
-        judgement === "PERFECT"
+        judgement ===
+        "PERFECT"
     ){
 
         perfectCount++;
@@ -1449,7 +2235,8 @@ function hitNote(
     }
 
     else if(
-        judgement === "GREAT"
+        judgement ===
+        "GREAT"
     ){
 
         greatCount++;
@@ -1465,16 +2252,13 @@ function hitNote(
 
     combo++;
 
+
     maxCombo =
         Math.max(
             maxCombo,
             combo
         );
 
-
-    /*
-        콤보 보너스
-    */
 
     const multiplier =
         1 +
@@ -1493,6 +2277,7 @@ function hitNote(
 
     updateUI();
 
+
     showJudgement(
         judgement
     );
@@ -1505,15 +2290,18 @@ function hitNote(
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* UI 업데이트 */
-/* ========================= */
+/* ================================================= */
 
 function updateUI(){
 
     scoreElement.textContent =
         String(score)
-            .padStart(6,"0");
+            .padStart(
+                6,
+                "0"
+            );
 
 
     comboElement.textContent =
@@ -1522,11 +2310,13 @@ function updateUI(){
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 판정 표시 */
-/* ========================= */
+/* ================================================= */
 
-function showJudgement(text){
+function showJudgement(
+    text
+){
 
     judgementElement.textContent =
         text;
@@ -1536,10 +2326,6 @@ function showJudgement(text){
         "show"
     );
 
-
-    /*
-        애니메이션 재시작
-    */
 
     void judgementElement.offsetWidth;
 
@@ -1551,18 +2337,20 @@ function showJudgement(text){
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 키 애니메이션 */
-/* ========================= */
+/* ================================================= */
 
 function pressKey(lane){
 
     const key =
         keys[lane];
 
+
     key.classList.add(
         "active"
     );
+
 
     setTimeout(
         () => {
@@ -1578,9 +2366,9 @@ function pressKey(lane){
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 게임 루프 */
-/* ========================= */
+/* ================================================= */
 
 function gameLoop(){
 
@@ -1602,13 +2390,9 @@ function gameLoop(){
     );
 
 
-    /*
-        음악이 끝나면
-        남은 노트를 처리하고 종료.
-    */
-
     if(
-        audio.ended ||
+        audio.ended
+        ||
         currentTime >=
         audio.duration - 0.05
     ){
@@ -1628,14 +2412,15 @@ function gameLoop(){
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 게임 시작 */
-/* ========================= */
+/* ================================================= */
 
 async function startGame(){
 
     if(
-        playing
+        playing ||
+        !currentTrack
     ){
 
         return;
@@ -1643,11 +2428,13 @@ async function startGame(){
     }
 
 
-    /*
-        오디오가 준비될 때까지 대기
-    */
-
     try{
+
+        /*
+            사용자가 START 버튼을 눌렀기 때문에
+            모바일 브라우저에서도
+            오디오 재생 가능.
+        */
 
         await audio.play();
 
@@ -1655,14 +2442,12 @@ async function startGame(){
 
     catch(error){
 
-        /*
-            브라우저 정책으로
-            자동 재생이 막힌 경우
-            사용자 클릭 후 다시 실행.
-        */
+        console.error(
+            error
+        );
 
-        console.log(
-            "Audio playback waiting..."
+        alert(
+            "음악을 재생할 수 없습니다."
         );
 
         return;
@@ -1670,16 +2455,8 @@ async function startGame(){
     }
 
 
-    /*
-        노트 생성
-    */
-
     createNotes();
 
-
-    /*
-        시작 상태 초기화
-    */
 
     score =
         0;
@@ -1702,6 +2479,7 @@ async function startGame(){
     missCount =
         0;
 
+
     finished =
         false;
 
@@ -1722,9 +2500,9 @@ async function startGame(){
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 게임 종료 */
-/* ========================= */
+/* ================================================= */
 
 function finishGame(){
 
@@ -1762,20 +2540,16 @@ function finishGame(){
         남은 노트 제거
     */
 
-    for(
-        const note of notes
-    ){
+    notes.forEach(
+        note => {
 
-        removeNote(
-            note
-        );
+            removeNote(
+                note
+            );
 
-    }
+        }
+    );
 
-
-    /*
-        결과 표시
-    */
 
     resultScore.textContent =
         score.toLocaleString();
@@ -1801,9 +2575,152 @@ function finishGame(){
 }
 
 
-/* ========================= */
-/* 홈으로 */
-/* ========================= */
+/* ================================================= */
+/* 다시 플레이 */
+/* ================================================= */
+
+function retryTrack(){
+
+    resultScreen.classList.remove(
+        "show"
+    );
+
+
+    gameScreen.classList.add(
+        "active"
+    );
+
+
+    audio.pause();
+
+
+    audio.currentTime =
+        0;
+
+
+    resetGame();
+
+
+    startOverlay.classList.remove(
+        "hidden"
+    );
+
+}
+
+
+/* ================================================= */
+/* 곡 선택으로 */
+/* ================================================= */
+
+function showTrackSelect(){
+
+    /*
+        게임 정지
+    */
+
+    playing =
+        false;
+
+
+    finished =
+        true;
+
+
+    if(
+        animationFrame
+    ){
+
+        cancelAnimationFrame(
+            animationFrame
+        );
+
+    }
+
+
+    audio.pause();
+
+
+    audio.currentTime =
+        0;
+
+
+    /*
+        노트 제거
+    */
+
+    document
+        .querySelectorAll(".note")
+        .forEach(
+            note => note.remove()
+        );
+
+
+    resultScreen.classList.remove(
+        "show"
+    );
+
+
+    gameScreen.classList.remove(
+        "active"
+    );
+
+
+    trackScreen.classList.add(
+        "active"
+    );
+
+}
+
+
+/* ================================================= */
+/* 게임에서 나가기 */
+/* ================================================= */
+
+function leaveGame(){
+
+    /*
+        게임 중이면
+        곡 선택 화면으로
+    */
+
+    if(
+        playing
+    ){
+
+        playing =
+            false;
+
+        finished =
+            true;
+
+
+        if(
+            animationFrame
+        ){
+
+            cancelAnimationFrame(
+                animationFrame
+            );
+
+        }
+
+
+        audio.pause();
+
+        audio.currentTime =
+            0;
+
+    }
+
+
+    showTrackSelect();
+
+}
+
+
+/* ================================================= */
+/* 홈 */
+/* ================================================= */
 
 function goHome(){
 
@@ -1813,9 +2730,9 @@ function goHome(){
 }
 
 
-/* ========================= */
+/* ================================================= */
 /* 키보드 */
-/* ========================= */
+/* ================================================= */
 
 document.addEventListener(
     "keydown",
@@ -1826,14 +2743,29 @@ document.addEventListener(
         */
 
         if(
-            event.key === "Escape"
+            event.key ===
+            "Escape"
         ){
 
+            event.preventDefault();
+
             if(
-                playing
+                resultScreen.classList.contains(
+                    "show"
+                )
             ){
 
-                finishGame();
+                showTrackSelect();
+
+            }
+
+            else if(
+                gameScreen.classList.contains(
+                    "active"
+                )
+            ){
+
+                leaveGame();
 
             }
 
@@ -1848,6 +2780,15 @@ document.addEventListener(
         }
 
 
+        if(
+            !playing
+        ){
+
+            return;
+
+        }
+
+
         const key =
             event.key.toLowerCase();
 
@@ -1855,8 +2796,11 @@ document.addEventListener(
         const keyMap = {
 
             "a":0,
+
             "s":1,
+
             "d":2,
+
             "f":3
 
         };
@@ -1867,6 +2811,7 @@ document.addEventListener(
         ){
 
             event.preventDefault();
+
 
             const lane =
                 keyMap[key];
@@ -1887,17 +2832,13 @@ document.addEventListener(
 );
 
 
-/* ========================= */
+/* ================================================= */
 /* 모바일 터치 */
-/* ========================= */
+/* ================================================= */
 
 lanes.forEach(
     (lane,index) => {
 
-        /*
-            touchstart를 사용해서
-            최대한 즉각적으로 반응.
-        */
 
         lane.addEventListener(
             "touchstart",
@@ -1905,9 +2846,20 @@ lanes.forEach(
 
                 event.preventDefault();
 
+
+                if(
+                    !playing
+                ){
+
+                    return;
+
+                }
+
+
                 pressKey(
                     index
                 );
+
 
                 hitLane(
                     index
@@ -1921,18 +2873,12 @@ lanes.forEach(
 
 
         /*
-            PC에서 마우스로도
-            클릭해서 플레이 가능.
+            PC 마우스도 가능
         */
 
         lane.addEventListener(
             "mousedown",
             event => {
-
-                /*
-                    모바일에서
-                    중복 입력 방지
-                */
 
                 if(
                     event.button !== 0
@@ -1943,9 +2889,19 @@ lanes.forEach(
                 }
 
 
+                if(
+                    !playing
+                ){
+
+                    return;
+
+                }
+
+
                 pressKey(
                     index
                 );
+
 
                 hitLane(
                     index
@@ -1958,9 +2914,9 @@ lanes.forEach(
 );
 
 
-/* ========================= */
-/* 시작 버튼 */
-/* ========================= */
+/* ================================================= */
+/* START 버튼 */
+/* ================================================= */
 
 startButton.addEventListener(
     "click",
@@ -1972,46 +2928,34 @@ startButton.addEventListener(
 );
 
 
-/* ========================= */
-/* 오디오 로딩 */
-/* ========================= */
-
-audio.addEventListener(
-    "loadedmetadata",
-    () => {
-
-        console.log(
-            "Rhythm Walk loaded:",
-            audio.duration,
-            "seconds"
-        );
-
-    }
-);
-
-
-/* ========================= */
+/* ================================================= */
 /* 오디오 오류 */
-/* ========================= */
+/* ================================================= */
 
 audio.addEventListener(
     "error",
     () => {
 
-        startButton.textContent =
-            "음악 파일을 찾을 수 없음";
+        if(
+            currentTrack
+        ){
 
-        startButton.disabled =
-            true;
+            alert(
+                "음원 파일을 찾을 수 없습니다.\n\n" +
+                currentTrack.audio
+            );
 
-        alert(
-            "음악 파일을 찾을 수 없습니다.\n\n" +
-            "다음 위치를 확인하세요:\n" +
-            "project-365/asdf/track-1/rhythm-walk.mp3"
-        );
+        }
 
     }
 );
+
+
+/* ================================================= */
+/* 초기화 */
+/* ================================================= */
+
+buildTrackList();
 
 </script>
 
