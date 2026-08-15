@@ -1,1 +1,799 @@
+<!DOCTYPE html>
+<html lang="ko">
 
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0,
+               maximum-scale=1.0, user-scalable=no">
+
+<title>ASDF - Tutorial</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    background:#0b0b0b;
+    color:white;
+
+    width:100vw;
+    height:100vh;
+
+    overflow:hidden;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+    touch-action:none;
+
+}
+
+
+/* ========================= */
+/* 홈 버튼 */
+/* ========================= */
+
+.home{
+
+    position:fixed;
+
+    top:20px;
+    left:20px;
+
+    padding:10px 16px;
+
+    background:#181818;
+
+    border:1px solid #333;
+
+    border-radius:10px;
+
+    color:white;
+
+    cursor:pointer;
+
+    z-index:100;
+
+}
+
+.home:hover{
+
+    background:#252525;
+
+}
+
+
+/* ========================= */
+/* 튜토리얼 안내 */
+/* ========================= */
+
+.info{
+
+    position:fixed;
+
+    top:25px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    text-align:center;
+
+    z-index:20;
+
+}
+
+.info h1{
+
+    font-size:28px;
+
+    margin-bottom:10px;
+
+}
+
+.info p{
+
+    color:#888;
+
+    font-size:14px;
+
+}
+
+
+/* ========================= */
+/* 게임 영역 */
+/* ========================= */
+
+.game{
+
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:translate(-50%,-50%);
+
+    width:min(500px,90vw);
+    height:min(650px,75vh);
+
+    border:2px solid #444;
+
+    background:#101010;
+
+    border-radius:16px;
+
+    overflow:hidden;
+
+}
+
+
+/* ========================= */
+/* 레인 */
+/* ========================= */
+
+.lanes{
+
+    position:absolute;
+
+    inset:0;
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+}
+
+.lane{
+
+    border-left:1px solid #222;
+
+}
+
+.lane:last-child{
+
+    border-right:1px solid #222;
+
+}
+
+
+/* ========================= */
+/* 판정선 */
+/* ========================= */
+
+.judge{
+
+    position:absolute;
+
+    bottom:80px;
+    left:0;
+
+    width:100%;
+
+    height:4px;
+
+    background:white;
+
+    box-shadow:0 0 15px rgba(255,255,255,.5);
+
+}
+
+
+/* ========================= */
+/* 떨어지는 노트 */
+/* ========================= */
+
+.note{
+
+    position:absolute;
+
+    width:25%;
+
+    height:55px;
+
+    border-radius:10px;
+
+    background:white;
+
+    color:#111;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    transform:translateY(-70px);
+
+}
+
+
+/* ========================= */
+/* 키 안내 */
+/* ========================= */
+
+.keys{
+
+    position:absolute;
+
+    bottom:10px;
+
+    left:0;
+
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:6px;
+
+    padding:0 8px;
+
+}
+
+.key{
+
+    height:55px;
+
+    background:#181818;
+
+    border:1px solid #444;
+
+    border-radius:10px;
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+}
+
+.key:active{
+
+    background:white;
+
+    color:black;
+
+}
+
+
+/* ========================= */
+/* 성공 표시 */
+/* ========================= */
+
+.message{
+
+    position:absolute;
+
+    left:50%;
+    top:45%;
+
+    transform:translate(-50%,-50%);
+
+    font-size:28px;
+
+    font-weight:bold;
+
+    opacity:0;
+
+    pointer-events:none;
+
+}
+
+.message.show{
+
+    animation:pop .5s ease;
+
+}
+
+@keyframes pop{
+
+    0%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(.7);
+    }
+
+    50%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1.1);
+    }
+
+    100%{
+        opacity:0;
+        transform:translate(-50%,-50%) scale(1);
+    }
+
+}
+
+
+/* ========================= */
+/* 완료 화면 */
+/* ========================= */
+
+.complete{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.9);
+
+    display:none;
+
+    justify-content:center;
+    align-items:center;
+
+    z-index:200;
+
+    text-align:center;
+
+    padding:25px;
+
+}
+
+.complete-box{
+
+    width:min(450px,90vw);
+
+    background:#151515;
+
+    border:1px solid #444;
+
+    border-radius:18px;
+
+    padding:35px;
+
+}
+
+.complete-box h2{
+
+    font-size:28px;
+
+    margin-bottom:20px;
+
+}
+
+.complete-box p{
+
+    color:#aaa;
+
+    line-height:1.7;
+
+    margin-bottom:25px;
+
+}
+
+.confirm{
+
+    border:none;
+
+    background:white;
+
+    color:black;
+
+    padding:14px 28px;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+}
+
+.confirm:hover{
+
+    transform:translateY(-2px);
+
+}
+
+
+/* ========================= */
+/* 모바일 */
+/* ========================= */
+
+@media(max-width:600px){
+
+    .info h1{
+
+        font-size:22px;
+
+    }
+
+    .info p{
+
+        font-size:12px;
+
+    }
+
+    .game{
+
+        width:92vw;
+
+        height:68vh;
+
+    }
+
+    .note{
+
+        height:48px;
+
+        font-size:17px;
+
+    }
+
+    .key{
+
+        height:60px;
+
+        font-size:18px;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<button
+    class="home"
+    onclick="location.href='../'">
+
+    🏠 홈
+
+</button>
+
+
+<div class="info">
+
+    <h1>ASDF TUTORIAL</h1>
+
+    <p>
+        내려오는 글자와 같은 키를 눌러보세요
+    </p>
+
+</div>
+
+
+<div class="game">
+
+    <div class="lanes">
+
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+        <div class="lane"></div>
+
+    </div>
+
+    <div class="judge"></div>
+
+    <div
+        class="message"
+        id="message">
+    </div>
+
+    <div
+        class="keys"
+        id="keys">
+
+        <button class="key" data-key="a">A</button>
+        <button class="key" data-key="s">S</button>
+        <button class="key" data-key="d">D</button>
+        <button class="key" data-key="f">F</button>
+
+    </div>
+
+</div>
+
+
+<div class="complete" id="complete">
+
+    <div class="complete-box">
+
+        <h2>튜토리얼 완료</h2>
+
+        <p>
+            기본적인 조작법을 익혔습니다.<br><br>
+
+            실제 곡을 플레이하는 동안에는
+            <strong>ESC</strong>를 눌러<br>
+            게임에서 나갈 수 있습니다.
+        </p>
+
+        <button
+            class="confirm"
+            onclick="location.href='../game/'">
+
+            확인했어요
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ========================= */
+/* 설정 */
+/* ========================= */
+
+const keys = ["a","s","d","f"];
+
+const requiredHits = 8;
+
+let hits = 0;
+
+let currentKey = null;
+
+let note = null;
+
+
+/* ========================= */
+/* DOM */
+/* ========================= */
+
+const game =
+    document.querySelector(".game");
+
+const message =
+    document.getElementById("message");
+
+const complete =
+    document.getElementById("complete");
+
+
+/* ========================= */
+/* 새 노트 생성 */
+/* ========================= */
+
+function createNote(){
+
+    if(hits >= requiredHits){
+
+        finishTutorial();
+
+        return;
+
+    }
+
+    const key =
+        keys[Math.floor(Math.random()*keys.length)];
+
+    currentKey = key;
+
+    note =
+        document.createElement("div");
+
+    note.className = "note";
+
+    note.textContent =
+        key.toUpperCase();
+
+    const lane =
+        keys.indexOf(key);
+
+    note.style.left =
+        (lane * 25) + "%";
+
+    game.appendChild(note);
+
+    animateNote();
+
+}
+
+
+/* ========================= */
+/* 노트 이동 */
+/* ========================= */
+
+function animateNote(){
+
+    const start = -70;
+
+    const end =
+        game.clientHeight - 145;
+
+    const duration = 2200;
+
+    const startTime = performance.now();
+
+
+    function frame(time){
+
+        if(!note) return;
+
+        const progress =
+            Math.min(
+                (time-startTime)/duration,
+                1
+            );
+
+        const y =
+            start + (end-start)*progress;
+
+        note.style.transform =
+            `translateY(${y}px)`;
+
+
+        if(progress < 1){
+
+            requestAnimationFrame(frame);
+
+        }else{
+
+            miss();
+
+        }
+
+    }
+
+    requestAnimationFrame(frame);
+
+}
+
+
+/* ========================= */
+/* 성공 */
+/* ========================= */
+
+function hit(key){
+
+    if(!note) return;
+
+    if(key !== currentKey) return;
+
+
+    note.remove();
+
+    note = null;
+
+    hits++;
+
+
+    message.textContent =
+        "GOOD!";
+
+    message.classList.remove("show");
+
+    void message.offsetWidth;
+
+    message.classList.add("show");
+
+
+    setTimeout(()=>{
+
+        createNote();
+
+    },250);
+
+}
+
+
+/* ========================= */
+/* 실패 */
+/* ========================= */
+
+function miss(){
+
+    if(!note) return;
+
+    note.remove();
+
+    note = null;
+
+
+    message.textContent =
+        "MISS";
+
+
+    message.classList.remove("show");
+
+    void message.offsetWidth;
+
+    message.classList.add("show");
+
+
+    setTimeout(()=>{
+
+        createNote();
+
+    },300);
+
+}
+
+
+/* ========================= */
+/* 키보드 */
+/* ========================= */
+
+document.addEventListener(
+    "keydown",
+    function(event){
+
+        const key =
+            event.key.toLowerCase();
+
+        if(keys.includes(key)){
+
+            event.preventDefault();
+
+            hit(key);
+
+        }
+
+    }
+);
+
+
+/* ========================= */
+/* 모바일 터치 */
+/* ========================= */
+
+document
+    .querySelectorAll(".key")
+    .forEach(button => {
+
+        button.addEventListener(
+            "pointerdown",
+            function(event){
+
+                event.preventDefault();
+
+                const key =
+                    button.dataset.key;
+
+                hit(key);
+
+            }
+        );
+
+    });
+
+
+/* ========================= */
+/* 튜토리얼 완료 */
+/* ========================= */
+
+function finishTutorial(){
+
+    complete.style.display =
+        "flex";
+
+}
+
+
+/* ========================= */
+/* 시작 */
+/* ========================= */
+
+setTimeout(()=>{
+
+    createNote();
+
+},800);
+
+</script>
+
+</body>
+
+</html>
