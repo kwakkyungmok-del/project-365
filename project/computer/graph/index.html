@@ -1,1831 +1,784 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Graph Lab</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Graph Lab v1.0 — Project 365</title>
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-
-    background:#080808;
-    color:white;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-
-    min-height:100vh;
-
-    padding:20px;
-
-}
-
-
-/* ========================= */
-/* 전체 화면 */
-/* ========================= */
-
-.app{
-
-    width:100%;
-    max-width:1200px;
-
-    margin:auto;
-
-}
-
-
-/* ========================= */
-/* 상단 */
-/* ========================= */
-
-.top{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:20px;
-
-}
-
-.title{
-
-    font-size:24px;
-
-    font-weight:700;
-
-    letter-spacing:1px;
-
-}
-
-.subtitle{
-
-    color:#666;
-
-    font-size:11px;
-
-    margin-top:5px;
-
-}
-
-.back{
-
-    background:#171717;
-
-    color:#ddd;
-
-    border:1px solid #303030;
-
-    padding:10px 15px;
-
-    border-radius:10px;
-
-    cursor:pointer;
-
-    transition:.2s;
-
-}
-
-.back:hover{
-
-    background:#242424;
-
-}
-
-
-/* ========================= */
-/* 메인 레이아웃 */
-/* ========================= */
-
-.main{
-
-    display:grid;
-
-    grid-template-columns:
-        1fr 300px;
-
-    gap:15px;
-
-}
-
-
-/* ========================= */
-/* 그래프 카드 */
-/* ========================= */
-
-.graph-card{
-
-    background:#111;
-
-    border:1px solid #292929;
-
-    border-radius:18px;
-
-    overflow:hidden;
-
-    position:relative;
-
-}
-
-canvas{
-
-    display:block;
-
-    width:100%;
-
-    height:600px;
-
-    background:#0d0d0d;
-
-    cursor:grab;
-
-}
-
-canvas.dragging{
-
-    cursor:grabbing;
-
-}
-
-
-/* ========================= */
-/* 그래프 상태 */
-/* ========================= */
-
-.graph-info{
-
-    position:absolute;
-
-    top:15px;
-
-    left:15px;
-
-    background:rgba(10,10,10,.85);
-
-    border:1px solid #292929;
-
-    border-radius:10px;
-
-    padding:10px 13px;
-
-    font-family:monospace;
-
-    font-size:12px;
-
-    color:#bbb;
-
+  /* ============================================================
+     폰트: Space Grotesk(디스플레이) + IBM Plex Mono(수치/데이터)
+     — 다른 연구소 프로그램들과 같은 폰트 조합으로 제품군 톤 유지
+     ============================================================ */
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg-deep:#050609;
+    --bg-panel:rgba(14,15,22,0.68);
+    --bg-input:rgba(255,255,255,0.04);
+    --border-soft:rgba(255,255,255,0.09);
+    --border-strong:rgba(255,255,255,0.18);
+    --accent:#ff5ec4;       /* Graph Lab 고유 색 (핑크/마젠타) — 버튼/타이틀 */
+    --accent-strong:#ffa3e0;
+    --trace:#4de8ff;        /* 그래프 궤적 색 (시안) — 오실로스코프 느낌 */
+    --trace-glow: rgba(77,232,255,0.65);
+    --grid-line: rgba(130,170,255,0.08);
+    --axis-line: rgba(160,190,255,0.22);
+    --success:#38e1c6;
+    --warn:#ffb454;
+    --danger:#ff5d7a;
+    --text:#c7cede;
+    --text-dim:#636b7d;
+    --text-bright:#eef1fa;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --radius-lg:16px; --radius-md:10px; --radius-sm:6px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg-deep); color:var(--text); font-family:var(--font-mono);
+    overflow:hidden; -webkit-tap-highlight-color:transparent;
+  }
+  button, input{ font-family:inherit; }
+  ::-webkit-scrollbar{ width:6px; height:6px; }
+  ::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.14); border-radius:3px; }
+
+  .app{ display:grid; grid-template-rows:auto auto 1fr auto; width:100%; height:100%; }
+
+  /* ------------------------------------------------------------
+     상단 툴바
+     ------------------------------------------------------------ */
+  .toolbar{
+    display:flex; align-items:center; gap:10px; padding:0 16px; height:54px;
+    background:linear-gradient(180deg, rgba(20,16,24,0.92), rgba(9,7,12,0.92));
+    border-bottom:1px solid var(--border-soft); box-shadow:0 4px 24px rgba(0,0,0,0.35);
+    flex-shrink:0; z-index:30;
+  }
+  .exit-btn{
+    display:flex; align-items:center; gap:6px; background:transparent; border:1px solid var(--border-soft);
+    color:var(--text); padding:8px 12px; border-radius:var(--radius-sm); cursor:pointer; font-size:12.5px;
+    transition:background .18s ease, border-color .18s ease, color .18s ease, transform .12s ease;
+  }
+  .exit-btn:hover{ background:rgba(255,255,255,0.06); border-color:var(--border-strong); color:var(--text-bright); }
+  .exit-btn:active{ transform:scale(0.96); }
+
+  .toolbar-title{ display:flex; flex-direction:column; line-height:1.1; padding-left:14px; border-left:1px solid var(--border-soft); min-width:0; }
+  .toolbar-title .name{ font-family:var(--font-display); font-weight:700; font-size:15px; color:var(--text-bright); letter-spacing:0.02em; white-space:nowrap; }
+  .toolbar-title .sub{ font-size:10.5px; color:var(--accent-strong); letter-spacing:0.05em; white-space:nowrap; }
+
+  /* ------------------------------------------------------------
+     컨트롤 패널
+     ------------------------------------------------------------ */
+  .controls{
+    display:flex; flex-wrap:wrap; align-items:center; gap:10px;
+    padding:12px 16px; background:var(--bg-panel); backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--border-soft); z-index:25;
+  }
+  .fn-row{ display:flex; align-items:center; gap:8px; flex:1 1 320px; min-width:240px; }
+  .fn-label{ font-size:11px; color:var(--text-dim); letter-spacing:0.08em; text-transform:uppercase; flex-shrink:0; }
+  .fn-prefix{ color:var(--accent-strong); font-size:13px; flex-shrink:0; }
+  .fn-input{
+    flex:1; background:var(--bg-input); border:1px solid var(--border-soft); color:var(--text-bright);
+    padding:9px 12px; border-radius:var(--radius-sm); font-size:13.5px; min-width:0;
+  }
+  .fn-input:focus{ outline:none; border-color:var(--accent); }
+  .fn-input.error{ border-color:var(--danger); box-shadow:0 0 10px rgba(255,93,122,0.25); }
+
+  .btn-row{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .ctrl-btn{
+    display:flex; align-items:center; gap:5px;
+    background:rgba(255,255,255,0.03); border:1px solid var(--border-soft); color:var(--text);
+    padding:8px 13px; border-radius:var(--radius-sm); cursor:pointer; font-size:12px;
+    transition:background .16s ease, border-color .16s ease, color .16s ease, transform .1s ease;
+  }
+  .ctrl-btn:hover{ background:rgba(255,255,255,0.08); border-color:var(--border-strong); }
+  .ctrl-btn:active{ transform:scale(0.95); }
+  .ctrl-btn.primary{ color:var(--accent-strong); border-color:rgba(255,94,196,0.35); }
+  .ctrl-btn.primary.is-active{ background:rgba(255,94,196,0.14); box-shadow:0 0 14px rgba(255,94,196,0.2) inset; }
+  .ctrl-btn.random{
+    color:#111; background:linear-gradient(160deg, var(--accent-strong), var(--accent));
+    border:none; font-weight:700; box-shadow:0 0 16px rgba(255,94,196,0.25);
+  }
+  .ctrl-btn.random:hover{ box-shadow:0 0 22px rgba(255,94,196,0.4); }
+  .ctrl-btn.random.alt{ background:linear-gradient(160deg, #9be8ff, var(--trace)); box-shadow:0 0 16px rgba(77,232,255,0.25); }
+  .ctrl-btn.random.alt:hover{ box-shadow:0 0 22px rgba(77,232,255,0.4); }
+
+  .speed-row{ display:flex; align-items:center; gap:8px; }
+  .speed-label{ font-size:11px; color:var(--text-dim); white-space:nowrap; }
+  .speed-value{ font-size:11px; color:var(--accent-strong); width:34px; text-align:right; }
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none; width:110px; height:4px; border-radius:3px;
+    background:rgba(255,255,255,0.12); outline:none; cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none; width:14px; height:14px; border-radius:50%;
+    background:var(--accent-strong); box-shadow:0 0 8px rgba(255,94,196,0.7);
+    border:2px solid #0a0a0f; cursor:pointer; transition:transform .1s ease;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover{ transform:scale(1.15); }
+  input[type="range"]::-moz-range-thumb{
+    width:12px; height:12px; border-radius:50%; background:var(--accent-strong); border:2px solid #0a0a0f; cursor:pointer;
+  }
+
+  .error-text{ font-size:11px; color:var(--danger); flex-basis:100%; min-height:14px; }
+  .generated-text{ font-size:11px; color:var(--trace); flex-basis:100%; min-height:14px; }
+
+  /* ------------------------------------------------------------
+     캔버스 영역
+     ------------------------------------------------------------ */
+  .canvas-wrap{ position:relative; min-height:0; overflow:hidden; }
+  canvas{ display:block; width:100%; height:100%; touch-action:none; cursor:grab; }
+  .canvas-wrap.is-panning canvas{ cursor:grabbing; }
+
+  .canvas-hint{
+    position:absolute; left:14px; bottom:12px; font-size:10px; color:var(--text-dim);
+    background:rgba(6,7,11,0.5); padding:5px 10px; border-radius:20px; border:1px solid var(--border-soft);
     pointer-events:none;
-
-}
-
-.graph-info span{
-
-    color:white;
-
-}
-
-
-/* ========================= */
-/* 컨트롤 */
-/* ========================= */
-
-.controls{
-
-    background:#111;
-
-    border:1px solid #292929;
-
-    border-radius:18px;
-
-    padding:20px;
-
-}
-
-.section{
-
-    margin-bottom:22px;
-
-}
-
-.section:last-child{
-
-    margin-bottom:0;
-
-}
-
-.label{
-
-    color:#777;
-
-    font-size:11px;
-
-    font-weight:bold;
-
-    letter-spacing:1px;
-
-    margin-bottom:8px;
-
-    text-transform:uppercase;
-
-}
-
-
-/* ========================= */
-/* 입력 */
-/* ========================= */
-
-.input-row{
-
-    display:flex;
-
-    gap:7px;
-
-}
-
-input{
-
-    width:100%;
-
-    background:#0b0b0b;
-
-    color:white;
-
-    border:1px solid #333;
-
-    border-radius:10px;
-
-    padding:12px;
-
-    outline:none;
-
-    font-family:monospace;
-
-    font-size:13px;
-
-}
-
-input:focus{
-
-    border-color:#777;
-
-}
-
-
-/* ========================= */
-/* 버튼 */
-/* ========================= */
-
-button{
-
-    font-family:inherit;
-
-}
-
-.primary{
-
-    background:white;
-
-    color:black;
-
-    border:none;
-
-    border-radius:10px;
-
-    padding:11px 15px;
-
-    cursor:pointer;
-
-    font-weight:bold;
-
-    white-space:nowrap;
-
-    transition:.2s;
-
-}
-
-.primary:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 5px 20px rgba(255,255,255,.12);
-
-}
-
-.secondary{
-
-    background:#1a1a1a;
-
-    color:#ddd;
-
-    border:1px solid #333;
-
-    border-radius:10px;
-
-    padding:10px 13px;
-
-    cursor:pointer;
-
-    transition:.2s;
-
-}
-
-.secondary:hover{
-
-    background:#252525;
-
-    border-color:#555;
-
-}
-
-
-/* ========================= */
-/* 버튼 그룹 */
-/* ========================= */
-
-.button-grid{
-
-    display:grid;
-
-    grid-template-columns:
-        1fr 1fr;
-
-    gap:7px;
-
-}
-
-.button-grid button{
-
-    width:100%;
-
-}
-
-
-/* ========================= */
-/* 속도 */
-/* ========================= */
-
-.speed-row{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:10px;
-
-}
-
-input[type="range"]{
-
-    padding:0;
-
-    accent-color:white;
-
-}
-
-
-/* ========================= */
-/* 상태 메시지 */
-/* ========================= */
-
-.status{
-
-    min-height:20px;
-
-    margin-top:8px;
-
-    font-size:11px;
-
-    color:#777;
-
-}
-
-.status.error{
-
-    color:#d47777;
-
-}
-
-
-/* ========================= */
-/* 도움말 */
-/* ========================= */
-
-.help{
-
-    color:#555;
-
-    font-size:11px;
-
-    line-height:1.7;
-
-}
-
-.help code{
-
-    color:#aaa;
-
-}
-
-
-/* ========================= */
-/* 모바일 */
-/* ========================= */
-
-@media(max-width:850px){
-
-    body{
-
-        padding:12px;
-
-    }
-
-    .main{
-
-        grid-template-columns:1fr;
-
-    }
-
-    canvas{
-
-        height:55vh;
-
-        min-height:350px;
-
-    }
-
-}
-
-@media(max-width:500px){
-
-    .title{
-
-        font-size:20px;
-
-    }
-
-    .subtitle{
-
-        font-size:9px;
-
-    }
-
-    .back{
-
-        padding:8px 11px;
-
-        font-size:11px;
-
-    }
-
-    canvas{
-
-        height:52vh;
-
-        min-height:300px;
-
-    }
-
-    .controls{
-
-        padding:15px;
-
-    }
-
-    .button-grid{
-
-        grid-template-columns:
-            1fr 1fr;
-
-    }
-
-}
-
+  }
+  .readout{
+    position:absolute; top:12px; right:14px; text-align:right;
+    background:rgba(6,7,11,0.55); border:1px solid var(--border-soft); border-radius:var(--radius-md);
+    padding:8px 12px; font-size:10.5px; color:var(--text-dim); pointer-events:none;
+  }
+  .readout .r1{ color:var(--trace); font-size:12px; margin-bottom:2px; }
+
+  /* ------------------------------------------------------------
+     하단 상태바
+     ------------------------------------------------------------ */
+  .statusbar{
+    display:flex; flex-wrap:wrap; align-items:center; height:32px;
+    background:linear-gradient(0deg, rgba(20,16,24,0.92), rgba(9,7,12,0.92));
+    border-top:1px solid var(--border-soft); padding:0 14px; font-size:11px;
+    flex-shrink:0; z-index:30; overflow-x:auto; white-space:nowrap;
+  }
+  .stat-item{ display:flex; align-items:center; gap:6px; padding:0 14px; border-right:1px solid var(--border-soft); color:var(--text-dim); }
+  .stat-item:last-child{ border-right:none; }
+  .stat-item span.val{ color:var(--accent-strong); font-weight:600; }
+  .stat-item span.val.ok{ color:var(--success); }
+  .stat-item span.val.bad{ color:var(--danger); }
+
+  @media (max-width: 720px){
+    .controls{ padding:10px 12px; }
+    .fn-row{ flex-basis:100%; }
+    .readout{ font-size:9.5px; padding:6px 9px; }
+    .canvas-hint{ display:none; }
+  }
 </style>
-
 </head>
-
-
 <body>
-
-
 <div class="app">
 
+  <!-- ============================================================
+       상단 툴바
+       ============================================================ -->
+  <header class="toolbar">
+    <button class="exit-btn" id="exitBtn">← Exit Research Computer</button>
+    <div class="toolbar-title">
+      <span class="name">GRAPH LAB</span>
+      <span class="sub">Visualize. Animate. Experiment.</span>
+    </div>
+  </header>
 
-<!-- ========================= -->
-<!-- 상단 -->
-<!-- ========================= -->
-
-<div class="top">
-
-    <div>
-
-        <div class="title">
-            GRAPH LAB
-        </div>
-
-        <div class="subtitle">
-            VISUALIZE · ANIMATE · EXPERIMENT
-        </div>
-
+  <!-- ============================================================
+       컨트롤 패널
+       ============================================================ -->
+  <div class="controls">
+    <div class="fn-row">
+      <span class="fn-label">Function</span>
+      <span class="fn-prefix">y =</span>
+      <input type="text" class="fn-input" id="fnInput" value="sin(x + t)" spellcheck="false" autocomplete="off">
     </div>
 
-
-    <button
-        class="back"
-        onclick="location.href='../'"
-    >
-        ← 컴퓨터
-    </button>
-
-</div>
-
-
-<!-- ========================= -->
-<!-- 메인 -->
-<!-- ========================= -->
-
-<div class="main">
-
-
-    <!-- 그래프 -->
-
-    <div class="graph-card">
-
-        <canvas id="canvas"></canvas>
-
-        <div class="graph-info">
-
-            f(x) =
-            <span id="displayFunction">
-                sin(x + t)
-            </span>
-
-            <br>
-
-            t =
-            <span id="timeDisplay">
-                0.00
-            </span>
-
-        </div>
-
+    <div class="btn-row">
+      <button class="ctrl-btn primary is-active" id="playBtn">▶ PLAY</button>
+      <button class="ctrl-btn primary" id="pauseBtn">⏸ PAUSE</button>
+      <button class="ctrl-btn" id="resetBtn">↻ RESET</button>
     </div>
 
-
-    <!-- 컨트롤 -->
-
-    <div class="controls">
-
-
-        <!-- 함수 -->
-
-        <div class="section">
-
-            <div class="label">
-                Function
-            </div>
-
-            <div class="input-row">
-
-                <input
-                    id="functionInput"
-                    value="sin(x + t)"
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-
-                <button
-                    class="primary"
-                    onclick="applyFunction()"
-                >
-                    적용
-                </button>
-
-            </div>
-
-            <div
-                id="status"
-                class="status"
-            ></div>
-
-        </div>
-
-
-        <!-- 애니메이션 -->
-
-        <div class="section">
-
-            <div class="label">
-                Animation
-            </div>
-
-            <div class="button-grid">
-
-                <button
-                    class="primary"
-                    onclick="play()"
-                >
-                    ▶ PLAY
-                </button>
-
-                <button
-                    class="secondary"
-                    onclick="pause()"
-                >
-                    ⏸ PAUSE
-                </button>
-
-                <button
-                    class="secondary"
-                    onclick="resetTime()"
-                >
-                    ↻ RESET
-                </button>
-
-                <button
-                    class="secondary"
-                    onclick="randomAnimation()"
-                >
-                    🎲 RANDOM
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- 속도 -->
-
-        <div class="section">
-
-            <div class="label">
-                Animation Speed
-            </div>
-
-            <div class="speed-row">
-
-                <input
-                    id="speed"
-                    type="range"
-                    min="0.1"
-                    max="5"
-                    step="0.1"
-                    value="1"
-                >
-
-                <span id="speedText">
-                    1.0×
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <!-- 랜덤 그래프 -->
-
-        <div class="section">
-
-            <div class="label">
-                Random Generator
-            </div>
-
-            <div class="button-grid">
-
-                <button
-                    class="secondary"
-                    onclick="randomGraph()"
-                >
-                    🎲 RANDOM GRAPH
-                </button>
-
-                <button
-                    class="secondary"
-                    onclick="randomAnimation()"
-                >
-                    🌀 RANDOM MOVE
-                </button>
-
-            </div>
-
-        </div>
-
-
-        <!-- 도움말 -->
-
-        <div class="section">
-
-            <div class="label">
-                Controls
-            </div>
-
-            <div class="help">
-
-                마우스 드래그 → 그래프 이동<br>
-
-                마우스 휠 → 확대 / 축소<br>
-
-                <code>t</code> → 시간 변수<br>
-
-                <code>sin</code>, <code>cos</code>,
-                <code>tan</code> 사용 가능
-
-            </div>
-
-        </div>
-
-
+    <div class="speed-row">
+      <span class="speed-label">SPEED</span>
+      <input type="range" id="speedSlider" min="0" max="100" value="50">
+      <span class="speed-value" id="speedValue">1.0×</span>
     </div>
 
-</div>
+    <div class="btn-row">
+      <button class="ctrl-btn random" id="randomGraphBtn">🎲 RANDOM GRAPH</button>
+      <button class="ctrl-btn random alt" id="randomAnimBtn">🎲 RANDOM ANIMATION</button>
+    </div>
 
-</div>
+    <div class="error-text" id="errorText"></div>
+    <div class="generated-text" id="generatedText"></div>
+  </div>
 
+  <!-- ============================================================
+       캔버스
+       ============================================================ -->
+  <div class="canvas-wrap" id="canvasWrap">
+    <canvas id="graphCanvas"></canvas>
+    <div class="readout" id="readout">
+      <div class="r1" id="readoutFn">y = sin(x + t)</div>
+      <div>t = <span id="readoutT">0.00</span></div>
+      <div>zoom = <span id="readoutZoom">60px/unit</span></div>
+    </div>
+    <div class="canvas-hint">Scroll to zoom · Drag to pan · Double-click to recenter</div>
+  </div>
+
+  <!-- ============================================================
+       하단 상태바
+       ============================================================ -->
+  <footer class="statusbar">
+    <div class="stat-item">Function <span class="val ok" id="statStatus">OK</span></div>
+    <div class="stat-item">FPS <span class="val" id="statFps">60</span></div>
+    <div class="stat-item">t <span class="val" id="statT">0.00</span></div>
+    <div class="stat-item">Speed <span class="val" id="statSpeed">1.0×</span></div>
+    <div class="stat-item">Zoom <span class="val" id="statZoom">60px/u</span></div>
+    <div class="stat-item">Samples <span class="val" id="statSamples">0</span></div>
+  </footer>
+</div>
 
 <script>
+(function(){
+  "use strict";
 
-/* ================================================= */
-/* Canvas */
-/* ================================================= */
+  /* ==============================================================
+     1. 수식 파서 / 컴파일러
+     문자열 -> AST -> (x,t) => number|null 로 변환하는 순수 함수형 엔진.
+     외부 라이브러리나 eval() 없이 직접 구현했다.
+     ============================================================== */
+  const FUNC_NAMES = ["asin","acos","atan","sin","cos","tan","sqrt","abs","exp","ln","log","floor","ceil","round","min","max","pow"]
+    .sort((a,b)=>b.length-a.length); // 긴 이름부터 매칭 (asin이 sin보다 먼저)
+  const TOKEN_RE = new RegExp("\\s+|(\\d+\\.?\\d*)|(" + FUNC_NAMES.join("|") + ")|(pi|e|x|t)|([+\\-*/^(),])", "g");
 
-const canvas =
-    document.getElementById("canvas");
+  function preprocessFormula(input){
+    let s = String(input).trim();
+    s = s.replace(/^y\s*=\s*/i, "");
+    s = s.replace(/[×]/g, "*").replace(/[÷]/g, "/").replace(/[−–—]/g, "-");
+    const SUP = {"⁰":"0","¹":"1","²":"2","³":"3","⁴":"4","⁵":"5","⁶":"6","⁷":"7","⁸":"8","⁹":"9"};
+    s = s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, ch => "^" + SUP[ch]);
+    return s.toLowerCase();
+  }
 
-const ctx =
-    canvas.getContext("2d");
-
-
-/* ================================================= */
-/* 상태 */
-/* ================================================= */
-
-let functionText =
-    "sin(x + t)";
-
-let time = 0;
-
-let playing = false;
-
-let animationId = null;
-
-let speed = 1;
-
-
-/*
-    scale = 1일 때
-    화면에 표시되는 x 범위
-*/
-
-let scale = 45;
-
-let offsetX = 0;
-
-let offsetY = 0;
-
-
-/* ================================================= */
-/* Canvas 크기 */
-/* ================================================= */
-
-function resizeCanvas(){
-
-    const rect =
-        canvas.getBoundingClientRect();
-
-    const dpr =
-        window.devicePixelRatio || 1;
-
-    canvas.width =
-        rect.width * dpr;
-
-    canvas.height =
-        rect.height * dpr;
-
-    ctx.setTransform(
-        dpr,
-        0,
-        0,
-        dpr,
-        0,
-        0
-    );
-
-    draw();
-
-}
-
-window.addEventListener(
-    "resize",
-    resizeCanvas
-);
-
-
-/* ================================================= */
-/* 함수 변환 */
-/* ================================================= */
-
-function evaluateFunction(expression, x, t){
-
-    let expr =
-        expression
-            .replace(/\^/g, "**")
-            .replace(/\bpi\b/gi, "Math.PI")
-            .replace(/\be\b/g, "Math.E")
-            .replace(/\bsin\b/g, "Math.sin")
-            .replace(/\bcos\b/g, "Math.cos")
-            .replace(/\btan\b/g, "Math.tan")
-            .replace(/\bsqrt\b/g, "Math.sqrt")
-            .replace(/\babs\b/g, "Math.abs")
-            .replace(/\blog\b/g, "Math.log10")
-            .replace(/\bln\b/g, "Math.log");
-
-    /*
-        Math.* 이외의 문자를 이용해
-        식을 계산한다.
-    */
-
-    try{
-
-        const fn =
-            new Function(
-                "x",
-                "t",
-                `"use strict"; return (${expr});`
-            );
-
-        const result =
-            fn(x,t);
-
-        if(
-            typeof result !== "number" ||
-            !Number.isFinite(result)
-        ){
-
-            return null;
-
-        }
-
-        return result;
-
+  function tokenize(raw){
+    const s = preprocessFormula(raw);
+    const tokens = [];
+    let idx = 0;
+    TOKEN_RE.lastIndex = 0;
+    let m;
+    while ((m = TOKEN_RE.exec(s)) !== null){
+      if (m.index !== idx) throw new Error("Unexpected character near '" + s.slice(idx, m.index) + "'");
+      idx = TOKEN_RE.lastIndex;
+      const whole = m[0];
+      if (/^\s+$/.test(whole)) continue;
+      if (m[1] !== undefined) tokens.push({ type:"NUM", value: parseFloat(m[1]) });
+      else if (m[2] !== undefined) tokens.push({ type:"FUNC", name: m[2] });
+      else if (m[3] !== undefined) tokens.push({ type:"IDENT", name: m[3] });
+      else tokens.push({ type:"SYM", value: m[4] });
     }
-    catch{
+    if (idx !== s.length) throw new Error("Unexpected character near '" + s.slice(idx) + "'");
+    return tokens;
+  }
 
+  function parseFormula(tokens){
+    let pos = 0;
+    const peek = () => tokens[pos];
+    const next = () => tokens[pos++];
+    const atomStarter = tok => !!tok && (tok.type === "NUM" || tok.type === "FUNC" || tok.type === "IDENT" || (tok.type === "SYM" && tok.value === "("));
+
+    function parseExpr(){
+      let node = parseTerm();
+      while (peek() && peek().type === "SYM" && (peek().value === "+" || peek().value === "-")){
+        const op = next().value;
+        node = { type:"bin", op, left:node, right:parseTerm() };
+      }
+      return node;
+    }
+    function parseTerm(){
+      let node = parseUnary();
+      while (true){
+        const tok = peek();
+        if (tok && tok.type === "SYM" && (tok.value === "*" || tok.value === "/")){
+          const op = next().value;
+          node = { type:"bin", op, left:node, right:parseUnary() };
+        } else if (atomStarter(tok)){
+          node = { type:"bin", op:"*", left:node, right:parseUnary() }; // 암시적 곱셈 (2x, cos(x)sin(x))
+        } else break;
+      }
+      return node;
+    }
+    function parseUnary(){
+      const tok = peek();
+      if (tok && tok.type === "SYM" && tok.value === "-"){ next(); return { type:"neg", arg: parseUnary() }; }
+      if (tok && tok.type === "SYM" && tok.value === "+"){ next(); return parseUnary(); }
+      return parsePower();
+    }
+    function parsePower(){
+      let node = parseAtom();
+      const tok = peek();
+      if (tok && tok.type === "SYM" && tok.value === "^"){ next(); node = { type:"bin", op:"^", left:node, right:parseUnary() }; }
+      return node;
+    }
+    function parseAtom(){
+      const tok = next();
+      if (!tok) throw new Error("Unexpected end of expression");
+      if (tok.type === "NUM") return { type:"num", value: tok.value };
+      if (tok.type === "IDENT") return { type:"var", name: tok.name };
+      if (tok.type === "FUNC"){
+        const open = next();
+        if (!open || open.type !== "SYM" || open.value !== "(") throw new Error("Expected '(' after " + tok.name);
+        const args = [parseExpr()];
+        while (peek() && peek().type === "SYM" && peek().value === ","){ next(); args.push(parseExpr()); }
+        const close = next();
+        if (!close || close.type !== "SYM" || close.value !== ")") throw new Error("Missing closing parenthesis");
+        return { type:"call", name: tok.name, args };
+      }
+      if (tok.type === "SYM" && tok.value === "("){
+        const inner = parseExpr();
+        const close = next();
+        if (!close || close.type !== "SYM" || close.value !== ")") throw new Error("Missing closing parenthesis");
+        return inner;
+      }
+      throw new Error("Unexpected token");
+    }
+
+    if (!tokens.length) throw new Error("Empty expression");
+    const result = parseExpr();
+    if (pos !== tokens.length) throw new Error("Unexpected trailing input");
+    return result;
+  }
+
+  const FUNCS = {
+    sin: Math.sin, cos: Math.cos, tan: Math.tan,
+    asin: Math.asin, acos: Math.acos, atan: Math.atan,
+    sqrt: Math.sqrt, abs: Math.abs, exp: Math.exp,
+    ln: Math.log, log: Math.log10,
+    floor: Math.floor, ceil: Math.ceil, round: Math.round,
+    min: (...a) => Math.min(...a), max: (...a) => Math.max(...a),
+    pow: (a,b) => Math.pow(a,b)
+  };
+
+  function evalNode(node, x, t){
+    switch(node.type){
+      case "num": return node.value;
+      case "var":
+        if (node.name === "x") return x;
+        if (node.name === "t") return t;
+        if (node.name === "pi") return Math.PI;
+        if (node.name === "e") return Math.E;
+        return NaN;
+      case "neg": return -evalNode(node.arg, x, t);
+      case "bin": {
+        const a = evalNode(node.left, x, t), b = evalNode(node.right, x, t);
+        if (node.op === "+") return a+b;
+        if (node.op === "-") return a-b;
+        if (node.op === "*") return a*b;
+        if (node.op === "/") return a/b;
+        if (node.op === "^") return Math.pow(a,b);
+        throw new Error("Unknown operator");
+      }
+      case "call": {
+        const fn = FUNCS[node.name];
+        if (!fn) throw new Error("Unknown function " + node.name);
+        return fn(...node.args.map(a => evalNode(a, x, t)));
+      }
+    }
+    throw new Error("Unknown node");
+  }
+
+  // 문자열 -> { evalAt(x,t): number|null } 로 컴파일. 파싱 오류는 여기서 던져진다.
+  function compileFormula(raw){
+    const ast = parseFormula(tokenize(raw));
+    return function evalAt(x, t){
+      try{
+        const v = evalNode(ast, x, t);
+        return isFinite(v) ? v : null;
+      }catch(e){
         return null;
+      }
+    };
+  }
 
+  /* ==============================================================
+     2. 랜덤 그래프 생성기
+     ============================================================== */
+  const rnd = (a,b) => a + Math.random()*(b-a);
+  const rndInt = (a,b) => Math.floor(rnd(a,b+1));
+  const rndCoef = () => Math.round(rnd(0.3, 2.6) * 10) / 10;
+
+  function termToString(coef, body){
+    if (Math.random() < 0.35 && Math.abs(coef-1) < 1e-9) return body; // 계수 1은 가끔 생략
+    return coef + body;
+  }
+
+  const STATIC_TEMPLATES = [
+    () => termToString(rndCoef(), "sin(" + rndInt(1,6) + "x)"),
+    () => termToString(rndCoef(), "cos(" + rndInt(1,6) + "x)"),
+    () => termToString(rndCoef(), "sin(x^2/" + rndInt(2,6) + ")"),
+    () => termToString(Math.round(rnd(0.2,0.7)*10)/10, "x"),
+    () => "cos(x)*sin(" + rndInt(2,6) + "x)",
+    () => termToString(Math.round(rnd(0.2,0.5)*10)/10, "tan(x/" + rndInt(3,6) + ")"),
+    () => termToString(rndCoef(), "sin(" + rndInt(1,5) + "x)*cos(" + rndInt(1,5) + "x)")
+  ];
+
+  const ANIM_TEMPLATES = [
+    () => termToString(rndCoef(), "sin(" + rndInt(1,6) + "x + t)"),
+    () => "cos(x)*sin(" + rndInt(1,5) + "t)",
+    () => "sin(x + t)*cos(t)",
+    () => "sin(x*cos(t))",
+    () => termToString(rndCoef(), "sin(" + rndInt(1,5) + "x + " + rndInt(1,4) + "t)"),
+    () => termToString(rndCoef(), "cos(" + rndInt(1,5) + "x - t)"),
+    () => termToString(rndCoef(), "sin(x + " + rndInt(1,4) + "t)")
+  ];
+
+  function generateFormula(animated){
+    const pool = animated ? ANIM_TEMPLATES : STATIC_TEMPLATES;
+    const count = animated ? rndInt(1,2) : rndInt(1,3);
+    let formula = pool[rndInt(0,pool.length-1)]();
+    for (let i=1;i<count;i++){
+      const sign = Math.random() < 0.7 ? " + " : " - ";
+      formula += sign + pool[rndInt(0,pool.length-1)]();
     }
+    return formula;
+  }
 
-}
+  /* ==============================================================
+     3. 애플리케이션 (카메라 / 렌더링 / 입력 / 상태)
+     ============================================================== */
+  const canvas = document.getElementById("graphCanvas");
+  const ctx = canvas.getContext("2d");
+  const canvasWrap = document.getElementById("canvasWrap");
+  let DPR = window.devicePixelRatio || 1;
+  let CSS_W = 0, CSS_H = 0;
 
+  const camera = { x:0, y:0, scale:60 }; // scale = 화면 픽셀 / 수학적 1단위
+  const MIN_SCALE = 4, MAX_SCALE = 2000;
 
-/* ================================================= */
-/* 좌표 변환 */
-/* ================================================= */
+  const state = {
+    formulaText: "sin(x + t)",
+    evalAt: null,
+    compileError: null,
+    t: 0,
+    playing: true,
+    speed: 1.0
+  };
 
-function screenToMathX(px){
+  function screenToWorld(sx, sy){
+    return { x: camera.x + (sx - CSS_W/2)/camera.scale, y: camera.y - (sy - CSS_H/2)/camera.scale };
+  }
+  function worldToScreen(wx, wy){
+    return { x: (wx - camera.x)*camera.scale + CSS_W/2, y: CSS_H/2 - (wy - camera.y)*camera.scale };
+  }
 
-    const width =
-        canvas.clientWidth;
+  function resizeCanvas(){
+    const rect = canvasWrap.getBoundingClientRect();
+    CSS_W = rect.width; CSS_H = rect.height;
+    DPR = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(CSS_W*DPR));
+    canvas.height = Math.max(1, Math.round(CSS_H*DPR));
+  }
+  window.addEventListener("resize", resizeCanvas);
 
-    return (
-        px -
-        width / 2 -
-        offsetX
-    ) / scale;
+  /* -------------------- 함수 컴파일 -------------------- */
+  const fnInput = document.getElementById("fnInput");
+  const errorText = document.getElementById("errorText");
+  const generatedText = document.getElementById("generatedText");
+  const statStatus = document.getElementById("statStatus");
+  const readoutFn = document.getElementById("readoutFn");
 
-}
+  function applyFormula(text, opts){
+    opts = opts || {};
+    state.formulaText = text;
+    try{
+      state.evalAt = compileFormula(text);
+      state.compileError = null;
+      fnInput.classList.remove("error");
+      errorText.textContent = "";
+      statStatus.textContent = "OK";
+      statStatus.className = "val ok";
+    }catch(e){
+      state.compileError = e.message;
+      fnInput.classList.add("error");
+      errorText.textContent = "Invalid Function";
+      statStatus.textContent = "ERROR";
+      statStatus.className = "val bad";
+      // 잘못된 입력이어도 이전에 유효했던 그래프는 그대로 유지한다 (프로그램이 죽지 않음)
+    }
+    readoutFn.textContent = "y = " + text;
+    if (!opts.silent) fnInput.value = text;
+  }
 
+  fnInput.addEventListener("input", () => applyFormula(fnInput.value, { silent:true }));
+  fnInput.addEventListener("keydown", e => { if (e.key === "Enter") fnInput.blur(); });
 
-function screenToMathY(py){
+  /* -------------------- 재생 컨트롤 -------------------- */
+  const playBtn = document.getElementById("playBtn");
+  const pauseBtn = document.getElementById("pauseBtn");
+  const resetBtn = document.getElementById("resetBtn");
 
-    const height =
-        canvas.clientHeight;
+  function syncPlayButtons(){
+    playBtn.classList.toggle("is-active", state.playing);
+    pauseBtn.classList.toggle("is-active", !state.playing);
+  }
+  playBtn.addEventListener("click", () => { state.playing = true; syncPlayButtons(); });
+  pauseBtn.addEventListener("click", () => { state.playing = false; syncPlayButtons(); });
+  resetBtn.addEventListener("click", () => { state.t = 0; });
 
-    return (
-        -(py -
-        height / 2 -
-        offsetY) / scale
-    );
+  const speedSlider = document.getElementById("speedSlider");
+  const speedValue = document.getElementById("speedValue");
+  function sliderToSpeed(v){ return Math.round((0.1 + (v/100)*4.9) * 10) / 10; } // 0.1x ~ 5.0x
+  speedSlider.addEventListener("input", () => {
+    state.speed = sliderToSpeed(Number(speedSlider.value));
+    speedValue.textContent = state.speed.toFixed(1) + "×";
+  });
+  speedValue.textContent = state.speed.toFixed(1) + "×";
 
-}
+  /* -------------------- RANDOM GRAPH / ANIMATION -------------------- */
+  document.getElementById("randomGraphBtn").addEventListener("click", () => {
+    const f = generateFormula(false);
+    applyFormula(f);
+    generatedText.textContent = "Generated: y = " + f;
+  });
+  document.getElementById("randomAnimBtn").addEventListener("click", () => {
+    const f = generateFormula(true);
+    applyFormula(f);
+    state.playing = true; syncPlayButtons();
+    generatedText.textContent = "Generated: y = " + f;
+  });
 
+  /* -------------------- 카메라 : 줌 (커서 기준) / 팬 -------------------- */
+  function zoomTo(newScale, screenPoint){
+    newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, newScale));
+    const before = screenToWorld(screenPoint.x, screenPoint.y);
+    camera.scale = newScale;
+    const after = screenToWorld(screenPoint.x, screenPoint.y);
+    camera.x += (before.x - after.x);
+    camera.y += (before.y - after.y);
+  }
 
-/* ================================================= */
-/* 그래프 그리기 */
-/* ================================================= */
+  const pointers = new Map();
+  let dragMode = null; // 'pan' | 'pinch' | null
+  let panStart = null, panStartCamera = null;
+  let pinchStartDist = 0, pinchStartScale = 1;
 
-function draw(){
+  function getPos(e){ const r = canvas.getBoundingClientRect(); return { x: e.clientX-r.left, y: e.clientY-r.top }; }
+  function dist(p,q){ return Math.hypot(p.x-q.x, p.y-q.y); }
+  function mid(p,q){ return { x:(p.x+q.x)/2, y:(p.y+q.y)/2 }; }
 
-    const width =
-        canvas.clientWidth;
+  canvas.addEventListener("pointerdown", e => {
+    canvas.setPointerCapture(e.pointerId);
+    const pos = getPos(e);
+    pointers.set(e.pointerId, pos);
+    if (pointers.size === 2){
+      dragMode = "pinch";
+      const pts = [...pointers.values()];
+      pinchStartDist = dist(pts[0],pts[1]) || 1;
+      pinchStartScale = camera.scale;
+      return;
+    }
+    dragMode = "pan";
+    panStart = pos;
+    panStartCamera = { x:camera.x, y:camera.y };
+    canvasWrap.classList.add("is-panning");
+  });
 
-    const height =
-        canvas.clientHeight;
+  canvas.addEventListener("pointermove", e => {
+    if (!pointers.has(e.pointerId)) return;
+    const pos = getPos(e);
+    pointers.set(e.pointerId, pos);
 
+    if (dragMode === "pinch" && pointers.size >= 2){
+      const pts = [...pointers.values()];
+      const d = dist(pts[0],pts[1]) || 1;
+      zoomTo(pinchStartScale * (d/pinchStartDist), mid(pts[0],pts[1]));
+      return;
+    }
+    if (dragMode === "pan" && panStart){
+      camera.x = panStartCamera.x - (pos.x-panStart.x)/camera.scale;
+      camera.y = panStartCamera.y + (pos.y-panStart.y)/camera.scale;
+    }
+  });
 
-    ctx.clearRect(
-        0,
-        0,
-        width,
-        height
-    );
+  function endPointer(e){
+    if (!pointers.has(e.pointerId)) return;
+    pointers.delete(e.pointerId);
+    if (pointers.size === 0){ dragMode = null; canvasWrap.classList.remove("is-panning"); }
+    else if (dragMode === "pinch" && pointers.size === 1){
+      dragMode = "pan";
+      panStart = [...pointers.values()][0];
+      panStartCamera = { x:camera.x, y:camera.y };
+    }
+  }
+  canvas.addEventListener("pointerup", endPointer);
+  canvas.addEventListener("pointercancel", endPointer);
 
+  canvas.addEventListener("wheel", e => {
+    e.preventDefault();
+    const factor = Math.exp(-e.deltaY * 0.0012);
+    zoomTo(camera.scale*factor, getPos(e));
+  }, { passive:false });
 
-    /* ========================= */
-    /* 배경 */
-    /* ========================= */
+  canvas.addEventListener("dblclick", () => { camera.x = 0; camera.y = 0; });
 
-    ctx.fillStyle =
-        "#0d0d0d";
+  /* ==============================================================
+     4. 렌더링
+     ============================================================== */
+  function niceStep(rawStep){
+    const pow10 = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const frac = rawStep / pow10;
+    let niceFrac;
+    if (frac < 1.5) niceFrac = 1; else if (frac < 3.5) niceFrac = 2; else if (frac < 7.5) niceFrac = 5; else niceFrac = 10;
+    return niceFrac * pow10;
+  }
 
-    ctx.fillRect(
-        0,
-        0,
-        width,
-        height
-    );
+  function drawGrid(){
+    ctx.fillStyle = "#050609";
+    ctx.fillRect(0,0,CSS_W,CSS_H);
 
+    const step = niceStep(80/camera.scale); // 화면상 약 80px 간격이 되도록
+    const left = screenToWorld(0,0).x, right = screenToWorld(CSS_W,0).x;
+    const top = screenToWorld(0,0).y, bottom = screenToWorld(0,CSS_H).y;
 
-    /* ========================= */
-    /* 격자 */
-    /* ========================= */
-
-    drawGrid(
-        width,
-        height
-    );
-
-
-    /* ========================= */
-    /* 그래프 */
-    /* ========================= */
-
-    drawFunction(
-        width,
-        height
-    );
-
-}
-
-
-/* ================================================= */
-/* 격자 */
-/* ================================================= */
-
-function drawGrid(width,height){
-
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--grid-line").trim() || "rgba(130,170,255,0.08)";
     ctx.lineWidth = 1;
-
-    ctx.strokeStyle =
-        "#181818";
-
-
-    /*
-        너무 확대되거나 축소되지 않도록
-        적당한 간격을 유지한다.
-    */
-
-    const gridSize =
-        scale >= 25
-            ? scale
-            : scale * 5;
-
-
-    const startX =
-        ((-width/2 - offsetX) %
-            gridSize) - gridSize;
-
-
-    for(
-        let x = startX;
-        x < width;
-        x += gridSize
-    ){
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            x + width/2,
-            0
-        );
-
-        ctx.lineTo(
-            x + width/2,
-            height
-        );
-
-        ctx.stroke();
-
-    }
-
-
-    const startY =
-        ((-height/2 - offsetY) %
-            gridSize) - gridSize;
-
-
-    for(
-        let y = startY;
-        y < height;
-        y += gridSize
-    ){
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            0,
-            y + height/2
-        );
-
-        ctx.lineTo(
-            width,
-            y + height/2
-        );
-
-        ctx.stroke();
-
-    }
-
-
-    /* ========================= */
-    /* 축 */
-    /* ========================= */
-
-    ctx.strokeStyle =
-        "#444";
-
-    ctx.lineWidth = 1.5;
-
-
-    /* X축 */
-
     ctx.beginPath();
-
-    ctx.moveTo(
-        0,
-        height/2 + offsetY
-    );
-
-    ctx.lineTo(
-        width,
-        height/2 + offsetY
-    );
-
+    for (let gx = Math.ceil(left/step)*step; gx < right; gx += step){
+      const sx = worldToScreen(gx,0).x;
+      ctx.moveTo(sx, 0); ctx.lineTo(sx, CSS_H);
+    }
+    for (let gy = Math.ceil(bottom/step)*step; gy < top; gy += step){
+      const sy = worldToScreen(0,gy).y;
+      ctx.moveTo(0, sy); ctx.lineTo(CSS_W, sy);
+    }
     ctx.stroke();
 
-
-    /* Y축 */
-
+    // 좌표축 (x=0, y=0) 은 더 밝게, 화면 밖으로 나가면 가장자리에 붙여 그린다
+    const origin = worldToScreen(0,0);
+    const axisX = Math.min(Math.max(origin.x, 0), CSS_W);
+    const axisY = Math.min(Math.max(origin.y, 0), CSS_H);
+    ctx.strokeStyle = "rgba(160,190,255,0.28)";
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-
-    ctx.moveTo(
-        width/2 + offsetX,
-        0
-    );
-
-    ctx.lineTo(
-        width/2 + offsetX,
-        height
-    );
-
+    ctx.moveTo(axisX,0); ctx.lineTo(axisX,CSS_H);
+    ctx.moveTo(0,axisY); ctx.lineTo(CSS_W,axisY);
     ctx.stroke();
 
-}
+    // 축 눈금 숫자
+    ctx.fillStyle = "rgba(180,200,255,0.45)";
+    ctx.font = "10px IBM Plex Mono, monospace";
+    for (let gx = Math.ceil(left/step)*step; gx < right; gx += step){
+      if (Math.abs(gx) < step*0.001) continue;
+      const sx = worldToScreen(gx,0).x;
+      ctx.fillText(formatTick(gx), sx+3, clamp(axisY-4, 10, CSS_H-4));
+    }
+    for (let gy = Math.ceil(bottom/step)*step; gy < top; gy += step){
+      if (Math.abs(gy) < step*0.001) continue;
+      const sy = worldToScreen(0,gy).y;
+      ctx.fillText(formatTick(gy), clamp(axisX+4, 2, CSS_W-30), sy-3);
+    }
+  }
 
+  function clamp(v,a,b){ return Math.min(b, Math.max(a,v)); }
+  function formatTick(v){
+    const r = Math.round(v*1000)/1000;
+    return Math.abs(r) >= 1000 ? r.toExponential(1) : String(r);
+  }
 
-/* ================================================= */
-/* 함수 그래프 */
-/* ================================================= */
+  let lastSampleCount = 0;
 
-function drawFunction(width,height){
-
-    const step = 1;
-
+  function drawCurve(){
+    if (!state.evalAt) return;
+    const step = Math.max(1, Math.floor(1)); // 화면 1px 마다 샘플링
+    ctx.save();
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue("--trace").trim() || "#4de8ff";
+    ctx.shadowColor = "rgba(77,232,255,0.65)";
+    ctx.shadowBlur = 8;
     ctx.beginPath();
 
-    ctx.strokeStyle =
-        "#ffffff";
+    let drawing = false;
+    let prevSy = null;
+    let samples = 0;
 
-    ctx.lineWidth = 2.5;
+    for (let sx = 0; sx <= CSS_W; sx += step){
+      const wx = screenToWorld(sx, 0).x;
+      const wy = state.evalAt(wx, state.t);
+      samples++;
+      if (wy === null || !isFinite(wy)){
+        drawing = false; prevSy = null;
+        continue;
+      }
+      const sy = worldToScreen(0, wy).y;
 
+      // 점근선 등으로 인한 화면 밖 급격한 점프는 이어그리지 않고 끊는다
+      if (prevSy !== null && Math.abs(sy - prevSy) > CSS_H * 2.2){
+        drawing = false;
+      }
 
-    let started = false;
-
-    let previousY = null;
-
-
-    for(
-        let px = 0;
-        px <= width;
-        px += step
-    ){
-
-        const x =
-            screenToMathX(px);
-
-
-        const y =
-            evaluateFunction(
-                functionText,
-                x,
-                time
-            );
-
-
-        if(y === null){
-
-            started = false;
-
-            previousY = null;
-
-            continue;
-
-        }
-
-
-        /*
-            화면 밖으로 지나치게 튀는 값 방지
-        */
-
-        const py =
-            height/2
-            + offsetY
-            - y * scale;
-
-
-        if(
-            !Number.isFinite(py) ||
-            Math.abs(py) > height * 10
-        ){
-
-            started = false;
-
-            previousY = null;
-
-            continue;
-
-        }
-
-
-        /*
-            불연속점에서 선이 연결되지 않도록
-        */
-
-        if(
-            previousY !== null &&
-            Math.abs(py - previousY)
-                > height
-        ){
-
-            started = false;
-
-        }
-
-
-        if(!started){
-
-            ctx.moveTo(
-                px,
-                py
-            );
-
-            started = true;
-
-        }
-        else{
-
-            ctx.lineTo(
-                px,
-                py
-            );
-
-        }
-
-
-        previousY = py;
-
+      if (!drawing){ ctx.moveTo(sx, sy); drawing = true; }
+      else ctx.lineTo(sx, sy);
+      prevSy = sy;
     }
-
-
     ctx.stroke();
-
-}
-
-
-/* ================================================= */
-/* 함수 적용 */
-/* ================================================= */
-
-function applyFunction(){
-
-    const input =
-        document
-            .getElementById(
-                "functionInput"
-            );
-
-    const expression =
-        input.value.trim();
-
-
-    if(!expression){
-
-        showError(
-            "함수를 입력해주세요."
-        );
-
-        return;
-
-    }
-
-
-    /*
-        실제 값을 몇 개 검사하여
-        잘못된 식인지 확인
-    */
-
-    const testPoints =
-        [-3,-1,0,1,3];
-
-
-    let valid = false;
-
-
-    for(
-        const x of testPoints
-    ){
-
-        const result =
-            evaluateFunction(
-                expression,
-                x,
-                time
-            );
-
-        if(result !== null){
-
-            valid = true;
-
-            break;
-
-        }
-
-    }
-
-
-    if(!valid){
-
-        showError(
-            "유효하지 않은 함수입니다."
-        );
-
-        return;
-
-    }
-
-
-    functionText =
-        expression;
-
-
-    document
-        .getElementById(
-            "displayFunction"
-        )
-        .textContent =
-            functionText;
-
-
-    clearError();
-
-    draw();
-
-}
-
-
-/* ================================================= */
-/* PLAY */
-/* ================================================= */
-
-function play(){
-
-    if(playing){
-
-        return;
-
-    }
-
-    playing = true;
-
-    animate();
-
-}
-
-
-/* ================================================= */
-/* PAUSE */
-/* ================================================= */
-
-function pause(){
-
-    playing = false;
-
-}
-
-
-/* ================================================= */
-/* 애니메이션 */
-/* ================================================= */
-
-function animate(){
-
-    if(!playing){
-
-        return;
-
-    }
-
-
-    time +=
-        0.02 * speed;
-
-
-    document
-        .getElementById(
-            "timeDisplay"
-        )
-        .textContent =
-            time.toFixed(2);
-
-
-    draw();
-
-
-    animationId =
-        requestAnimationFrame(
-            animate
-        );
-
-}
-
-
-/* ================================================= */
-/* 시간 초기화 */
-/* ================================================= */
-
-function resetTime(){
-
-    time = 0;
-
-    document
-        .getElementById(
-            "timeDisplay"
-        )
-        .textContent =
-            "0.00";
-
-    draw();
-
-}
-
-
-/* ================================================= */
-/* 속도 */
-/* ================================================= */
-
-document
-    .getElementById("speed")
-    .addEventListener(
-        "input",
-        function(){
-
-            speed =
-                Number(this.value);
-
-            document
-                .getElementById(
-                    "speedText"
-                )
-                .textContent =
-                    speed.toFixed(1) + "×";
-
-        }
-    );
-
-
-/* ================================================= */
-/* 랜덤 함수 */
-/* ================================================= */
-
-function randomGraph(){
-
-    const generators = [
-
-        () =>
-            `${randomNumber(0.5,3)}sin(${randomNumber(1,7)}x)`,
-
-        () =>
-            `${randomNumber(0.5,3)}cos(${randomNumber(1,7)}x)`,
-
-        () =>
-            `sin(${randomNumber(1,5)}x) + cos(${randomNumber(1,9)}x)`,
-
-        () =>
-            `${randomNumber(0.2,2)}x + sin(${randomNumber(1,7)}x)`,
-
-        () =>
-            `sin(x^2 / ${randomNumber(1,6)})`,
-
-        () =>
-            `cos(x) * sin(${randomNumber(1,5)}x)`,
-
-        () =>
-            `sin(${randomNumber(1,5)}x) * cos(${randomNumber(1,5)}x)`,
-
-        () =>
-            `${randomNumber(0.5,2)}sin(x) + ${randomNumber(0.2,1)}cos(${randomNumber(2,8)}x)`
-
-    ];
-
-
-    const expression =
-        generators[
-            Math.floor(
-                Math.random() *
-                generators.length
-            )
-        ]();
-
-
-    setFunction(
-        expression
-    );
-
-}
-
-
-/* ================================================= */
-/* 랜덤 애니메이션 */
-/* ================================================= */
-
-function randomAnimation(){
-
-    const generators = [
-
-        () =>
-            `sin(${randomNumber(1,5)}x + t)`,
-
-        () =>
-            `cos(x + ${randomNumber(1,5)}t)`,
-
-        () =>
-            `sin(x) * cos(${randomNumber(1,4)}t)`,
-
-        () =>
-            `sin(${randomNumber(1,4)}x + t) * cos(t)`,
-
-        () =>
-            `sin(x * cos(t))`,
-
-        () =>
-            `cos(x + t) * sin(x)`,
-
-        () =>
-            `sin(${randomNumber(1,4)}x + t) + cos(${randomNumber(1,5)}x - t)`
-
-    ];
-
-
-    const expression =
-        generators[
-            Math.floor(
-                Math.random() *
-                generators.length
-            )
-        ]();
-
-
-    setFunction(
-        expression
-    );
-
-
-    play();
-
-}
-
-
-/* ================================================= */
-/* 함수 설정 */
-/* ================================================= */
-
-function setFunction(expression){
-
-    document
-        .getElementById(
-            "functionInput"
-        )
-        .value =
-            expression;
-
-
-    functionText =
-        expression;
-
-
-    document
-        .getElementById(
-            "displayFunction"
-        )
-        .textContent =
-            expression;
-
-
-    clearError();
-
-    resetTime();
-
-}
-
-
-/* ================================================= */
-/* 랜덤 숫자 */
-/* ================================================= */
-
-function randomNumber(min,max){
-
-    const value =
-        min +
-        Math.random() *
-        (max - min);
-
-    return Number(
-        value.toFixed(1)
-    );
-
-}
-
-
-/* ================================================= */
-/* 에러 */
-/* ================================================= */
-
-function showError(message){
-
-    const status =
-        document
-            .getElementById(
-                "status"
-            );
-
-    status.textContent =
-        message;
-
-    status.classList.add(
-        "error"
-    );
-
-}
-
-
-function clearError(){
-
-    const status =
-        document
-            .getElementById(
-                "status"
-            );
-
-    status.textContent = "";
-
-    status.classList.remove(
-        "error"
-    );
-
-}
-
-
-/* ================================================= */
-/* 마우스 드래그 */
-/* ================================================= */
-
-let dragging = false;
-
-let dragStartX = 0;
-
-let dragStartY = 0;
-
-let startOffsetX = 0;
-
-let startOffsetY = 0;
-
-
-canvas.addEventListener(
-    "mousedown",
-    function(event){
-
-        dragging = true;
-
-        canvas.classList.add(
-            "dragging"
-        );
-
-
-        dragStartX =
-            event.clientX;
-
-        dragStartY =
-            event.clientY;
-
-
-        startOffsetX =
-            offsetX;
-
-        startOffsetY =
-            offsetY;
-
-    }
-);
-
-
-window.addEventListener(
-    "mouseup",
-    function(){
-
-        dragging = false;
-
-        canvas.classList.remove(
-            "dragging"
-        );
-
-    }
-);
-
-
-window.addEventListener(
-    "mousemove",
-    function(event){
-
-        if(!dragging){
-
-            return;
-
-        }
-
-
-        offsetX =
-            startOffsetX +
-            (event.clientX -
-            dragStartX);
-
-
-        offsetY =
-            startOffsetY +
-            (event.clientY -
-            dragStartY);
-
-
-        draw();
-
-    }
-);
-
-
-/* ================================================= */
-/* 확대 / 축소 */
-/* ================================================= */
-
-canvas.addEventListener(
-    "wheel",
-    function(event){
-
-        event.preventDefault();
-
-
-        const oldScale =
-            scale;
-
-
-        if(event.deltaY < 0){
-
-            scale *= 1.12;
-
-        }
-        else{
-
-            scale /= 1.12;
-
-        }
-
-
-        scale =
-            Math.max(
-                10,
-                Math.min(
-                    250,
-                    scale
-                )
-            );
-
-
-        /*
-            마우스 위치를 중심으로
-            확대/축소
-        */
-
-        const rect =
-            canvas.getBoundingClientRect();
-
-
-        const mouseX =
-            event.clientX -
-            rect.left;
-
-        const mouseY =
-            event.clientY -
-            rect.top;
-
-
-        const mathX =
-            screenToMathX(
-                mouseX
-            );
-
-        const mathY =
-            screenToMathY(
-                mouseY
-            );
-
-
-        offsetX =
-            mouseX -
-            rect.width / 2 -
-            mathX * scale;
-
-
-        offsetY =
-            -(mouseY -
-            rect.height / 2 +
-            mathY * scale);
-
-
-        draw();
-
-    },
-    {
-        passive:false
-    }
-);
-
-
-/* ================================================= */
-/* 키보드 Enter */
-/* ================================================= */
-
-document
-    .getElementById(
-        "functionInput"
-    )
-    .addEventListener(
-        "keydown",
-        function(event){
-
-            if(
-                event.key === "Enter"
-            ){
-
-                applyFunction();
-
-            }
-
-        }
-    );
-
-
-/* ================================================= */
-/* 시작 */
-/* ================================================= */
-
-resizeCanvas();
-
+    ctx.restore();
+    lastSampleCount = samples;
+  }
+
+  function render(){
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    drawGrid();
+    drawCurve();
+  }
+
+  /* -------------------- 상태바 / 리드아웃 갱신 -------------------- */
+  const readoutT = document.getElementById("readoutT");
+  const readoutZoom = document.getElementById("readoutZoom");
+  const statFps = document.getElementById("statFps");
+  const statT = document.getElementById("statT");
+  const statSpeed = document.getElementById("statSpeed");
+  const statZoom = document.getElementById("statZoom");
+  const statSamples = document.getElementById("statSamples");
+
+  function updateReadouts(){
+    readoutT.textContent = state.t.toFixed(2);
+    readoutZoom.textContent = Math.round(camera.scale) + "px/unit";
+    statT.textContent = state.t.toFixed(2);
+    statSpeed.textContent = state.speed.toFixed(1) + "×";
+    statZoom.textContent = Math.round(camera.scale) + "px/u";
+    statSamples.textContent = lastSampleCount;
+  }
+
+  /* ==============================================================
+     5. 메인 루프
+     ============================================================== */
+  let lastTime = performance.now();
+  let fpsSmoothed = 60;
+
+  function loop(now){
+    const dt = Math.min(0.05, (now-lastTime)/1000);
+    lastTime = now;
+    const instFps = dt>0 ? 1/dt : 60;
+    fpsSmoothed += (instFps-fpsSmoothed)*0.1;
+    statFps.textContent = Math.round(fpsSmoothed);
+
+    if (state.playing) state.t += dt * state.speed;
+
+    render();
+    updateReadouts();
+    requestAnimationFrame(loop);
+  }
+
+  /* ==============================================================
+     6. 초기화
+     ============================================================== */
+  document.getElementById("exitBtn").addEventListener("click", () => { location.href = "../"; });
+
+  function init(){
+    resizeCanvas();
+    applyFormula(state.formulaText, { silent:true });
+    syncPlayButtons();
+    requestAnimationFrame(loop);
+  }
+  init();
+})();
 </script>
-
-
 </body>
-
 </html>
