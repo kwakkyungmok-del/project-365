@@ -6,8 +6,7 @@
 <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width, initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no">
+               maximum-scale=1.0, user-scalable=no">
 
 <title>ASDF</title>
 
@@ -85,6 +84,46 @@ body{
 .screen.active{
 
     display:flex;
+
+}
+
+
+/* ========================= */
+/* 홈 버튼 */
+/* ========================= */
+
+.home{
+
+    position:fixed;
+
+    top:20px;
+    left:20px;
+
+    padding:10px 16px;
+
+    background:#151515;
+
+    border:1px solid #333;
+
+    border-radius:10px;
+
+    color:white;
+
+    font-size:13px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    z-index:100;
+
+}
+
+.home:hover{
+
+    background:#222;
+
+    border-color:#555;
 
 }
 
@@ -521,6 +560,17 @@ button{
 
 @media(max-width:768px){
 
+    .home{
+
+        top:15px;
+        left:15px;
+
+        padding:9px 13px;
+
+        font-size:12px;
+
+    }
+
     .logo{
 
         font-size:48px;
@@ -702,12 +752,24 @@ button{
 
 }
 
-
 </style>
 
 </head>
 
+
 <body>
+
+
+<!-- ========================= -->
+<!-- 메인 화면으로 -->
+<!-- ========================= -->
+
+<button
+    class="home"
+    onclick="location.href='../'"
+>
+    🏠 메인 화면
+</button>
 
 
 <div id="app">
@@ -738,14 +800,14 @@ button{
 
         <button
             class="menu-button primary"
-            onclick="showTutorial()"
+            onclick="location.href='tutorial/'"
         >
             튜토리얼
         </button>
 
         <button
             class="menu-button"
-            onclick="showSongs()"
+            onclick="location.href='game/'"
         >
             이미 해봤어요
         </button>
@@ -869,7 +931,7 @@ button{
 
             <button
                 class="menu-button primary"
-                onclick="showSongs()"
+                onclick="location.href='game/'"
             >
                 곡 선택
             </button>
@@ -902,7 +964,7 @@ button{
 
             <button
                 class="song"
-                onclick="startSong(1)"
+                onclick="location.href='game/?song=1'"
             >
 
                 <span class="song-number">
@@ -922,7 +984,7 @@ button{
 
             <button
                 class="song"
-                onclick="startSong(2)"
+                onclick="location.href='game/?song=2'"
             >
 
                 <span class="song-number">
@@ -942,7 +1004,7 @@ button{
 
             <button
                 class="song"
-                onclick="startSong(3)"
+                onclick="location.href='game/?song=3'"
             >
 
                 <span class="song-number">
@@ -1148,15 +1210,13 @@ document.addEventListener(
 
 
 /* ========================= */
-/* 곡 선택 */
+/* 기존 함수 호환 */
 /* ========================= */
 
 function startSong(song){
 
-    alert(
-        `곡 ${song}번을 선택했습니다.\n\n` +
-        `게임 화면은 다음 단계에서 연결됩니다.`
-    );
+    location.href =
+        `game/?song=${song}`;
 
 }
 
