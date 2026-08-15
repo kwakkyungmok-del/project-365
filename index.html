@@ -193,6 +193,54 @@ h1{
 
 
 /* ========================= */
+/* ASDF */
+/* ========================= */
+
+.asdf{
+
+    position:absolute;
+
+    top:25px;
+    right:25px;
+
+    border:1px solid #333;
+
+    background:#111;
+
+    color:#777;
+
+    padding:10px 15px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    letter-spacing:2px;
+
+    transition:.25s;
+
+}
+
+.asdf:hover{
+
+    color:white;
+
+    background:#181818;
+
+    border-color:#555;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 0 18px rgba(255,255,255,.08);
+
+}
+
+
+/* ========================= */
 /* 최근 활동 */
 /* ========================= */
 
@@ -430,6 +478,18 @@ h1{
 
     }
 
+    .asdf{
+
+        top:18px;
+
+        right:18px;
+
+        padding:9px 13px;
+
+        font-size:11px;
+
+    }
+
     .recent{
 
         left:50%;
@@ -503,6 +563,14 @@ h1{
 
     }
 
+    .asdf{
+
+        font-size:10px;
+
+        padding:8px 11px;
+
+    }
+
 }
 
 </style>
@@ -543,6 +611,20 @@ const TOTAL_DAY = 365;
 >
 
 📜 일별 활동내역
+
+</button>
+
+
+<!-- ========================= -->
+<!-- 수상한 ASDF 버튼 -->
+<!-- ========================= -->
+
+<button
+    class="asdf"
+    onclick="location.href='asdf/'"
+>
+
+ASDF
 
 </button>
 
@@ -672,11 +754,6 @@ document.getElementById("progressBar").style.width =
 /* 최근 활동 표시 */
 /* ========================= */
 
-/*
-    report.js에 저장된 기록 중
-    가장 최근 Day를 자동으로 찾음.
-*/
-
 const recentContainer =
     document.getElementById("recentActivities");
 
@@ -712,11 +789,6 @@ if(recentReport){
     content.className =
         "activity-content";
 
-
-    /*
-        기록의 첫 번째 줄을
-        최근 활동으로 표시
-    */
 
     const firstLine =
         recentReport.content
