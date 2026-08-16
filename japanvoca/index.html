@@ -636,9 +636,14 @@ let currentKanaType = "basic"; // basic | dakuten | handakuten | combo
 let kanaViewMode = "cards"; // cards | quiz | review
 let kanaQuizState = { pool: [], idx: 0, correctCount:0, total:0 };
   const correctSound = new Audio("../dragon-studio-correct-472358.mp3");
+  const wrongSound = new Audio("../freesound_community-wrong-47985.mp3");
 function playCorrectSound(){
   correctSound.currentTime = 0;
   correctSound.play().catch(()=>{ /* 자동재생 정책으로 막힐 수 있음, 무시 */ });
+}
+function playWrongSound(){
+  wrongSound.currentTime = 0;
+  wrongSound.play().catch(()=>{ /* 자동재생 정책으로 막힐 수 있음, 무시 */ });
 }
 let quizState = { pool: [], idx: 0, correctCount:0, total:0, answered:false };
 
@@ -1024,6 +1029,7 @@ function renderQuizQuestion(){
         btn.classList.add('wrong');
         document.querySelectorAll('.opt-btn').forEach(b=>{ if(b.dataset.correct==='true') b.classList.add('correct'); });
         markDontKnowSilent(w.kana);
+        playWrongSound();
       }
       document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
       document.getElementById('quizNext').style.display='inline-block';
