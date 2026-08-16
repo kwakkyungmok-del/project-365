@@ -1,819 +1,1068 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>1년 프로젝트</title>
-
+<title>일본어 단어장</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-body{
-
-    background:#0b0b0b;
-    color:white;
-
-    height:100vh;
-
-    overflow:hidden;
-
-    font-family:
-        'Inter',
-        Arial,
-        Helvetica,
-        sans-serif;
-
-}
-
-
-/* ========================= */
-/* 중앙 */
-/* ========================= */
-
-.center{
-
-    position:absolute;
-
-    top:50%;
-    left:50%;
-
-    transform:translate(-50%,-50%);
-
-    text-align:center;
-
-    width:90%;
-
-    max-width:700px;
-
-}
-
-
-/* ========================= */
-/* 제목 */
-/* ========================= */
-
-.project-label{
-
-    font-size:13px;
-
-    font-weight:600;
-
-    letter-spacing:5px;
-
-    color:#666;
-
-    margin-bottom:18px;
-
-}
-
-h1{
-
-    font-size:64px;
-
-    font-weight:800;
-
-    letter-spacing:-3px;
-
-    line-height:1.1;
-
-    margin-bottom:24px;
-
-}
-
-.title-line{
-
-    width:60px;
-
-    height:2px;
-
-    background:#555;
-
-    margin:0 auto 25px auto;
-
-}
-
-
-/* ========================= */
-/* 설명 */
-/* ========================= */
-
-.subtitle{
-
-    color:#8f8f8f;
-
-    font-size:17px;
-
-    line-height:1.6;
-
-    margin-bottom:45px;
-
-}
-
-
-/* ========================= */
-/* 시작 버튼 */
-/* ========================= */
-
-.start{
-
-    background:white;
-
-    color:black;
-
-    border:none;
-
-    border-radius:12px;
-
-    padding:18px 42px;
-
-    font-size:17px;
-
-    font-weight:700;
-
-    cursor:pointer;
-
-    transition:.25s;
-
-}
-
-.start:hover{
-
-    transform:translateY(-4px);
-
-    box-shadow:0 0 25px rgba(255,255,255,.35);
-
-}
-
-
-/* ========================= */
-/* 일별 활동 버튼 */
-/* ========================= */
-
-.log{
-
-    position:absolute;
-
-    top:25px;
-    left:25px;
-
-    border:1px solid #444;
-
-    background:#141414;
-
-    color:white;
-
-    padding:12px 18px;
-
-    border-radius:10px;
-
-    cursor:pointer;
-
-    transition:.2s;
-
-}
-
-.log:hover{
-
-    background:#222;
-
-}
-
-
-/* ========================= */
-/* ASDF */
-/* ========================= */
-
-.asdf{
-
-    position:absolute;
-
-    top:25px;
-    right:25px;
-
-    border:1px solid #333;
-
-    background:#111;
-
-    color:#777;
-
-    padding:10px 15px;
-
-    border-radius:10px;
-
-    cursor:pointer;
-
-    font-size:12px;
-
-    font-weight:600;
-
-    letter-spacing:2px;
-
-    transition:.25s;
-
-}
-
-.asdf:hover{
-
-    color:white;
-
-    background:#181818;
-
-    border-color:#555;
-
-    transform:translateY(-2px);
-
-    box-shadow:0 0 18px rgba(255,255,255,.08);
-
-}
-
-
-/* ========================= */
-/* 최근 활동 */
-/* ========================= */
-
-.recent{
-
-    position:absolute;
-
-    left:25px;
-
-    bottom:25px;
-
-    width:310px;
-
-    background:#111;
-
-    border:1px solid #292929;
-
-    border-radius:14px;
-
-    padding:18px;
-
-    cursor:pointer;
-
-    transition:.2s;
-
-}
-
-.recent:hover{
-
-    background:#171717;
-
-    border-color:#444;
-
-    transform:translateY(-3px);
-
-}
-
-.recent-title{
-
-    font-size:11px;
-
-    font-weight:700;
-
-    letter-spacing:2px;
-
-    color:#777;
-
+  :root{
+    --bg: #faf7ef;
+    --bg-line: #efe9d8;
+    --card: #dceec8;
+    --card-dark: #c6e2ac;
+    --ink: #26331f;
+    --ink-soft: #5c6b52;
+    --deep: #3f6b32;
+    --deep-dark: #2c4d23;
+    --plum: #b5527a;
+    --plum-soft: #f3dde6;
+    --brass: #c9a227;
+    --paper: #fffdf6;
+    --shadow: rgba(63, 107, 50, 0.18);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 34px, var(--bg-line) 34px, var(--bg-line) 35px),
+      var(--bg);
+    font-family:'Noto Sans KR', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding-bottom:80px;
+  }
+  .jp{ font-family:'Zen Maru Gothic', 'Noto Sans KR', sans-serif; }
+
+  /* ---------- HEADER ---------- */
+  header{
+    max-width:880px;
+    margin:0 auto;
+    padding:34px 24px 18px;
+  }
+  .ring-row{
+    display:flex;
+    gap:10px;
     margin-bottom:14px;
-
-}
-
-.activity{
-
-    padding:9px 0;
-
-}
-
-.activity-day{
-
-    font-size:11px;
-
-    color:#666;
-
-    margin-bottom:5px;
-
-}
-
-.activity-content{
-
-    font-size:13px;
-
-    color:#ddd;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
-
-}
-
-
-/* ========================= */
-/* 진행 상황 */
-/* ========================= */
-
-.day{
-
-    position:absolute;
-
-    right:25px;
-
-    bottom:25px;
-
-    color:#888;
-
-    width:300px;
-
-}
-
-.version{
-
+  }
+  .ring-row span{
+    width:14px;height:14px;border-radius:50%;
+    background: var(--paper);
+    border:3px solid var(--brass);
+    box-shadow: inset 0 0 0 3px var(--bg);
+  }
+  h1{
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-size:clamp(28px,5vw,40px);
+    font-weight:900;
+    margin:0 0 6px;
+    color:var(--deep-dark);
+    letter-spacing:-0.01em;
+  }
+  h1 small{
+    display:block;
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    color:var(--ink-soft);
     margin-top:6px;
+  }
+  .stats-bar{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:20px;
+  }
+  .stat-chip{
+    background:var(--paper);
+    border:1px solid var(--bg-line);
+    border-radius:14px;
+    padding:10px 16px;
+    display:flex;
+    flex-direction:column;
+    min-width:88px;
+    box-shadow:0 2px 0 var(--bg-line);
+  }
+  .stat-chip .n{ font-size:22px; font-weight:900; color:var(--deep); font-family:'Zen Maru Gothic',sans-serif;}
+  .stat-chip .l{ font-size:11px; color:var(--ink-soft); margin-top:2px;}
 
-    font-size:12px;
-
-    color:#666;
-
-}
-
-.progress-container{
-
-    margin-top:16px;
-
-}
-
-.progress-text{
-
-    font-size:13px;
-
-    color:#999;
-
-    margin-bottom:6px;
-
-}
-
-.progress-bar{
-
-    width:100%;
-
-    height:10px;
-
-    background:#222;
-
+  /* ---------- NAV TABS ---------- */
+  nav{
+    max-width:880px;
+    margin:0 auto;
+    padding:0 24px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    position:sticky;
+    top:0;
+    background:linear-gradient(var(--bg) 80%, transparent);
+    padding-top:14px;
+    padding-bottom:14px;
+    z-index:20;
+  }
+  .tab{
+    font-family:'Noto Sans KR',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:9px 16px;
     border-radius:999px;
+    background:var(--paper);
+    border:1.5px solid var(--bg-line);
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:.15s;
+    white-space:nowrap;
+  }
+  .tab:hover{ border-color:var(--deep); color:var(--deep);}
+  .tab.active{ background:var(--deep); border-color:var(--deep); color:#fff; box-shadow:0 3px 0 var(--deep-dark);}
 
+  main{ max-width:880px; margin:0 auto; padding:10px 24px 40px; }
+
+  .day-select{
+    display:flex; gap:6px; flex-wrap:wrap; margin-bottom:20px;
+  }
+  .day-pill{
+    font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px;
+    background:var(--paper); border:1px solid var(--bg-line); color:var(--ink-soft); cursor:pointer;
+  }
+  .day-pill.active{ background:var(--brass); border-color:var(--brass); color:#fff;}
+
+  /* ---------- FLASHCARD GRID ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:16px;
+  }
+  .flip-card{
+    perspective:1000px;
+    height:150px;
+    cursor:pointer;
+  }
+  .flip-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .5s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0;
+    border-radius:18px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    backface-visibility:hidden;
+    padding:10px;
+    text-align:center;
+    box-shadow:0 4px 0 var(--shadow);
+  }
+  .face.front{ background:var(--card); }
+  .face.front.mastered{ background: #cdeaa8; box-shadow:0 4px 0 var(--brass); }
+  .face.front.review{ background: var(--plum-soft); box-shadow:0 4px 0 var(--plum); }
+  .face.front .kana{ font-family:'Zen Maru Gothic',sans-serif; font-size:30px; font-weight:700; color:var(--deep-dark); line-height:1.15;}
+  .face.back{
+    background:var(--deep);
+    color:#fff;
+    transform:rotateY(180deg);
+    gap:4px;
+  }
+  .face.back .romaji{ font-size:12px; letter-spacing:.06em; opacity:.8; text-transform:uppercase; font-weight:500;}
+  .face.back .meaning{ font-size:16px; font-weight:700; margin-top:2px;}
+  .mark-row{
+    position:absolute; bottom:8px; display:flex; gap:6px;
+  }
+  .mark-btn{
+    font-size:10px; font-weight:700; padding:4px 8px; border-radius:8px; border:none; cursor:pointer;
+  }
+  .mark-btn.know{ background:var(--brass); color:#fff; }
+  .mark-btn.dontknow{ background:var(--plum); color:#fff; }
+
+  /* badge for mastered ring */
+  .badge{
+    position:absolute; top:8px; right:8px; font-size:14px;
+  }
+
+  /* ---------- PHRASE LIST ---------- */
+  .phrase-set-title{
+    font-size:13px; font-weight:700; color:var(--ink-soft); margin:22px 0 10px; padding-left:2px;
+  }
+  .phrase-card{
+    background:var(--paper); border:1px solid var(--bg-line); border-radius:16px;
+    padding:16px 18px; margin-bottom:10px; cursor:pointer;
+    box-shadow:0 2px 0 var(--bg-line);
+  }
+  .phrase-jp{ font-family:'Zen Maru Gothic',sans-serif; font-size:18px; font-weight:700; color:var(--deep-dark);}
+  .phrase-kr{ font-size:14px; color:var(--ink-soft); margin-top:6px; display:none;}
+  .phrase-card.shown .phrase-kr{ display:block; }
+  .phrase-card.shown{ background:#fff9ec; }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-wrap{
+    background:var(--paper);
+    border-radius:24px;
+    padding:36px 24px;
+    text-align:center;
+    border:1px solid var(--bg-line);
+    box-shadow:0 4px 0 var(--bg-line);
+  }
+  .quiz-progress{ font-size:12px; color:var(--ink-soft); font-weight:700; margin-bottom:18px;}
+  .quiz-word{
+    font-family:'Zen Maru Gothic',sans-serif;
+    font-size:44px; font-weight:900; color:var(--deep-dark);
+    margin-bottom:8px;
+  }
+  .quiz-romaji{ font-size:13px; color:var(--ink-soft); letter-spacing:.06em; text-transform:uppercase; margin-bottom:28px;}
+  .quiz-options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:480px; margin:0 auto;}
+  .opt-btn{
+    font-family:'Noto Sans KR',sans-serif;
+    font-size:15px; font-weight:700; padding:16px 10px;
+    background:var(--card); border:none; border-radius:14px; cursor:pointer;
+    color:var(--deep-dark);
+    box-shadow:0 3px 0 var(--card-dark);
+    transition:.1s;
+  }
+  .opt-btn:active{ transform:translateY(2px); box-shadow:0 1px 0 var(--card-dark);}
+  .opt-btn.correct{ background:var(--deep); color:#fff; box-shadow:0 3px 0 var(--deep-dark);}
+  .opt-btn.wrong{ background:var(--plum); color:#fff; box-shadow:0 3px 0 #8a3a5a;}
+  .opt-btn:disabled{ cursor:default; }
+  .quiz-score{
+    margin-top:26px; font-size:13px; color:var(--ink-soft); font-weight:700;
+  }
+  .quiz-next{
+    margin-top:20px; display:none;
+    background:var(--deep); color:#fff; border:none; font-weight:700;
+    padding:12px 28px; border-radius:999px; cursor:pointer; font-family:'Noto Sans KR',sans-serif;
+    box-shadow:0 3px 0 var(--deep-dark);
+  }
+  .empty-state{ text-align:center; padding:60px 20px; color:var(--ink-soft); }
+  .empty-state .em{ font-size:40px; margin-bottom:12px;}
+
+  /* ---------- KANA REVIEW ---------- */
+  .kana-subtabs{ display:flex; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .kana-type-row{ margin-bottom:18px; }
+  .kana-subtab{
+    font-size:13px; font-weight:700; padding:8px 16px; border-radius:999px;
+    background:var(--paper); border:1.5px solid var(--bg-line); color:var(--ink-soft); cursor:pointer;
+  }
+  .kana-subtab.active{ background:var(--plum); border-color:var(--plum); color:#fff; }
+  .kana-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+  .kana-card{ perspective:800px; height:170px; cursor:pointer; }
+  .kana-inner{
+    position:relative; width:100%; height:100%;
+    transition:transform .4s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .kana-card.flipped .kana-inner{ transform:rotateY(180deg); }
+  .kana-face{
+    position:absolute; inset:0; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    backface-visibility:hidden;
+    box-shadow:0 3px 0 var(--bg-line);
+  }
+  .kana-face.front{ background:var(--card); font-family:'Zen Maru Gothic',sans-serif; font-size:72px; font-weight:700; color:var(--deep-dark); }
+  .kana-face.front.mastered{ background:#cdeaa8; box-shadow:0 3px 0 var(--brass); }
+  .kana-face.front.review{ background:var(--plum-soft); box-shadow:0 3px 0 var(--plum); }
+  .kana-face.back{ background:var(--plum); color:#fff; transform:rotateY(180deg); font-size:22px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; flex-direction:column; gap:8px; padding:10px; }
+  .kana-mnemonic{ font-size:13px; font-weight:500; text-transform:none; letter-spacing:0; opacity:.92; text-align:center; line-height:1.3; }
+  .kana-face.back .mini-marks{ display:flex; gap:10px; }
+
+  /* mnemonic (image-association) card — character overlaid on the image, positioned per-character to trace the matching shape */
+  .kana-card.mnemonic-card{ height:360px; }
+  .kana-card.mnemonic-card .kana-face.front{ font-size:56px; }
+  .kana-card.mnemonic-card .kana-face.back{ gap:8px; padding:14px 10px; font-size:16px; }
+  .mnemonic-visual{
+    position:relative;
+    width:140px; height:140px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.14);
+    border-radius:22px;
     overflow:hidden;
-
-}
-
-.progress{
-
-    height:100%;
-
-    width:0%;
-
-    background:white;
-
-    transition:.5s;
-
-}
-
-.remaining{
-
-    margin-top:8px;
-
-    font-size:12px;
-
-    color:#666;
-
-}
-
-
-/* ========================= */
-/* 모바일 */
-/* ========================= */
-
-@media(max-width:768px){
-
-    body{
-
-        overflow:auto;
-
-        min-height:100vh;
-
-    }
-
-    .center{
-
-        position:absolute;
-
-        top:42%;
-
-        width:90%;
-
-    }
-
-    .project-label{
-
-        font-size:10px;
-
-        letter-spacing:4px;
-
-        margin-bottom:14px;
-
-    }
-
-    h1{
-
-        font-size:42px;
-
-        letter-spacing:-2px;
-
-    }
-
-    .subtitle{
-
-        font-size:14px;
-
-        margin-bottom:32px;
-
-    }
-
-    .start{
-
-        width:100%;
-
-        max-width:280px;
-
-        padding:16px;
-
-        font-size:16px;
-
-    }
-
-    .log{
-
-        top:18px;
-
-        left:18px;
-
-        padding:10px 14px;
-
-        font-size:13px;
-
-    }
-
-    .asdf{
-
-        top:18px;
-
-        right:18px;
-
-        padding:9px 13px;
-
-        font-size:11px;
-
-    }
-
-    .recent{
-
-        left:50%;
-
-        transform:translateX(-50%);
-
-        bottom:145px;
-
-        width:90%;
-
-        max-width:320px;
-
-    }
-
-    .recent:hover{
-
-        transform:translateX(-50%) translateY(-3px);
-
-    }
-
-    .day{
-
-        position:absolute;
-
-        left:50%;
-
-        right:auto;
-
-        bottom:20px;
-
-        transform:translateX(-50%);
-
-        width:90%;
-
-        max-width:320px;
-
-        text-align:center;
-
-    }
-
-}
-
-
-/* ========================= */
-/* 작은 스마트폰 */
-/* ========================= */
-
-@media(max-width:480px){
-
-    h1{
-
-        font-size:34px;
-
-    }
-
-    .subtitle{
-
-        font-size:13px;
-
-    }
-
-    .recent{
-
-        bottom:145px;
-
-    }
-
-    .activity-content{
-
-        font-size:12px;
-
-    }
-
-    .asdf{
-
-        font-size:10px;
-
-        padding:8px 11px;
-
-    }
-
-}
-
+  }
+  .mnemonic-emoji{ font-size:88px; line-height:1; filter:drop-shadow(0 2px 3px rgba(0,0,0,0.25)); }
+
+  /* custom-drawn round table (no matching emoji exists) */
+  .mini-table{ position:relative; width:104px; height:92px; }
+  .mini-table .top{
+    position:absolute; top:0; left:8px;
+    width:88px; height:26px;
+    background:rgba(255,255,255,0.92);
+    border-radius:50%;
+    box-shadow:0 3px 0 rgba(0,0,0,0.15);
+  }
+  .mini-table .leg{
+    position:absolute; top:20px;
+    width:7px; height:60px;
+    background:rgba(255,255,255,0.85);
+    border-radius:3px;
+  }
+  .mini-table .l1{ left:16px; }
+  .mini-table .l2{ left:36px; }
+  .mini-table .l3{ left:62px; }
+  .mini-table .l4{ left:82px; }
+  .mnemonic-char-overlay{
+    position:absolute;
+    top:50%; left:50%;
+    font-family:'Zen Maru Gothic', sans-serif;
+    font-weight:900;
+    font-size:98px;
+    color:transparent;
+    -webkit-text-stroke:2px rgba(255,255,255,0.45);
+    text-shadow: 0 0 4px rgba(0,0,0,0.25);
+    pointer-events:none;
+    line-height:1;
+  }
+  .kana-shape-hint{
+    font-size:11.5px;
+    font-weight:500;
+    text-transform:none;
+    letter-spacing:0;
+    text-align:center;
+    line-height:1.35;
+    opacity:.95;
+    background:rgba(255,255,255,0.12);
+    border-radius:10px;
+    padding:6px 9px;
+  }
+  .kana-mnemonic-label{ font-size:14px; font-weight:700; text-transform:none; letter-spacing:0; text-align:center; line-height:1.3; }
+  .kana-mnemonic-romaji{ font-size:12px; opacity:.85; text-transform:uppercase; letter-spacing:.06em; }
+  .kana-face.back .mini-marks button{ font-size:15px; border:none; border-radius:10px; padding:8px 16px; cursor:pointer; font-weight:700; }
+  .kana-face.back .mini-marks .k{ background:var(--brass); color:#fff; }
+  .kana-face.back .mini-marks .d{ background:#8a3a5a; color:#fff; }
+  .kana-note{ font-size:12px; color:var(--ink-soft); margin-bottom:16px; }
+
+  footer{
+    max-width:880px; margin:0 auto; padding:20px 24px; text-align:center;
+    font-size:11px; color:var(--ink-soft);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .flip-inner{ transition:none; }
+  }
 </style>
-
 </head>
-
-
 <body>
+<noscript>
+  <div style="max-width:880px;margin:40px auto;padding:20px;background:#f3dde6;border:1px solid #b5527a;border-radius:16px;font-family:sans-serif;text-align:center;">
+    ⚠️ 이 화면은 자바스크립트가 꺼져 있어서 단어 카드가 보이지 않아요.<br>
+    파일을 길게 눌러 <b>"다른 앱으로 열기" → Chrome</b>으로 다시 열어주세요.
+  </div>
+</noscript>
 
+<header>
+  <div class="ring-row">
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <h1>일본어 단어장
+    <small>사진 속 단어카드를 눌러서 발음과 뜻을 확인하세요. 매일 새 단어가 추가됩니다.</small>
+  </h1>
+  <div class="stats-bar" id="statsBar"></div>
+</header>
 
-<!-- ========================= -->
-<!-- 설정 -->
-<!-- ========================= -->
+<nav>
+  <div class="tab active" data-mode="cards">🗂 카드학습</div>
+  <div class="tab" data-mode="phrase">💬 핵심구문</div>
+  <div class="tab" data-mode="quiz">✏️ 자가테스트</div>
+  <div class="tab" data-mode="review">🔁 복습</div>
+  <div class="tab" data-mode="kana">🔤 가나 복습(기초)</div>
+</nav>
 
-<script>
+<main id="main"><div class="empty-state"><div class="em">📖</div>불러오는 중...</div></main>
 
-const CURRENT_DAY = 12;
-
-const TOTAL_DAY = 365;
-
-</script>
-
-
-<!-- ========================= -->
-<!-- 기록 데이터 불러오기 -->
-<!-- ========================= -->
-
-<script src="report.js"></script>
-
-
-<!-- ========================= -->
-<!-- 일별 활동내역 -->
-<!-- ========================= -->
-
-<button
-    class="log"
-    onclick="location.href='dayreport/'"
->
-
-📜 일별 활동내역
-
-</button>
-
-
-<!-- ========================= -->
-<!-- 수상한 ASDF 버튼 -->
-<!-- ========================= -->
-
-<button
-    class="asdf"
-    onclick="location.href='asdf/'"
->
-
-ASDF
-
-</button>
-
-
-<!-- ========================= -->
-<!-- 중앙 -->
-<!-- ========================= -->
-
-<div class="center">
-
-    <div class="project-label">
-        PROJECT 365
-    </div>
-
-    <h1>
-        1년 프로젝트
-    </h1>
-
-    <div class="title-line"></div>
-
-    <div class="subtitle">
-        매일 조금씩, 365일 동안 성장하는 웹사이트
-    </div>
-
-    <button
-        class="start"
-        onclick="location.href='project/'"
-    >
-        프로젝트 시작
-    </button>
-
-</div>
-
-
-<!-- ========================= -->
-<!-- 최근 활동 -->
-<!-- ========================= -->
-
-<div
-    class="recent"
-    onclick="location.href='dayreport/'"
->
-
-    <div class="recent-title">
-        RECENT ACTIVITY
-    </div>
-
-    <div id="recentActivities"></div>
-
-</div>
-
-
-<!-- ========================= -->
-<!-- 진행 상황 -->
-<!-- ========================= -->
-
-<div class="day">
-
-    <div id="dayText"></div>
-
-    <div
-        class="version"
-        id="versionText"
-    ></div>
-
-    <div class="progress-container">
-
-        <div
-            class="progress-text"
-            id="percentText"
-        ></div>
-
-        <div class="progress-bar">
-
-            <div
-                class="progress"
-                id="progressBar"
-            ></div>
-
-        </div>
-
-        <div
-            class="remaining"
-            id="remainingText"
-        ></div>
-
-    </div>
-
-</div>
-
+<footer>매일 새 이미지가 오면 단어 목록에 추가돼요 · 학습 기록은 이 기기에 자동 저장됩니다</footer>
 
 <script>
+/* =========================================================
+   단어 데이터베이스 — 매일 새 이미지가 오면 이 배열에 추가
+   ========================================================= */
+const WORDS = [
+  {kana:"さん", romaji:"san", meaning:"~씨, ~님 (이름 뒤에 붙이는 존칭) / 셋, 3(한자 三)", day:1},
+  {kana:"くつ", romaji:"kutsu", meaning:"신발, 구두", day:1},
+  {kana:"ともだち", romaji:"tomodachi", meaning:"친구", day:1},
+  {kana:"どこ", romaji:"doko", meaning:"어디", day:1},
+  {kana:"しろい", romaji:"shiroi", meaning:"하얀, 흰색의", day:1},
 
+  {kana:"コンビニ", romaji:"konbini", meaning:"편의점", day:2},
+  {kana:"ピザ", romaji:"piza", meaning:"피자", day:2},
+  {kana:"がくせい", romaji:"gakusei", meaning:"학생", day:2},
 
-/* ========================= */
-/* 진행률 계산 */
-/* ========================= */
+  {kana:"またあした", romaji:"mata ashita", meaning:"내일 또 봐요 (인사말)", day:3},
 
-const percent =
-    (CURRENT_DAY / TOTAL_DAY) * 100;
+  {kana:"コート", romaji:"kooto", meaning:"코트", day:4},
+  {kana:"あかい", romaji:"akai", meaning:"빨간, 빨간색의", day:4},
+  {kana:"かばん", romaji:"kaban", meaning:"가방", day:4},
 
-const remaining =
-    TOTAL_DAY - CURRENT_DAY;
+  {kana:"てぶくろ", romaji:"tebukuro", meaning:"장갑", day:6},
 
+  {kana:"いいえ", romaji:"iie", meaning:"아니요", day:7},
+  {kana:"バスてい", romaji:"basutei", meaning:"버스 정류장", day:7},
+  {kana:"だいがく", romaji:"daigaku", meaning:"대학교", day:7},
+  {kana:"えき", romaji:"eki", meaning:"역", day:7},
 
-document.getElementById("dayText").textContent =
-    `DAY ${String(CURRENT_DAY).padStart(3,"0")} / ${TOTAL_DAY}`;
+  {kana:"サラダ", romaji:"sarada", meaning:"샐러드", day:8},
+  {kana:"ホテル", romaji:"hoteru", meaning:"호텔", day:8},
 
+  {kana:"にほんじん", romaji:"nihonjin", meaning:"일본인", day:10},
+  {kana:"ちいさい", romaji:"chiisai", meaning:"작은", day:10},
+  {kana:"アメリカじん", romaji:"amerikajin", meaning:"미국인", day:10},
+  {kana:"おおきい", romaji:"ookii", meaning:"큰", day:10},
+  {kana:"ブラジルじん", romaji:"burajirujin", meaning:"브라질인", day:10},
 
-document.getElementById("versionText").textContent =
-    `v0.0.${CURRENT_DAY}`;
+  {kana:"いま", romaji:"ima", meaning:"지금", day:11},
+  {kana:"なんじ", romaji:"nanji", meaning:"몇 시", day:11},
+  {kana:"いちじ", romaji:"ichiji", meaning:"한 시, 1시", day:11},
+  {kana:"にじ", romaji:"niji", meaning:"두 시, 2시", day:11},
+  {kana:"さんじ", romaji:"sanji", meaning:"세 시, 3시", day:11},
 
+  {kana:"すみません", romaji:"sumimasen", meaning:"죄송합니다, 실례합니다", day:12},
+  {kana:"デパート", romaji:"depaato", meaning:"백화점", day:12},
+  {kana:"いち", romaji:"ichi", meaning:"하나, 1(한자 一)", day:12},
+  {kana:"に", romaji:"ni", meaning:"둘, 2(한자 二)", day:12},
 
-document.getElementById("percentText").textContent =
-    `${percent.toFixed(2)}% Completed`;
+  {kana:"ちず", romaji:"chizu", meaning:"지도", day:13},
+  {kana:"くうこう", romaji:"kuukou", meaning:"공항", day:13},
+  {kana:"ここ", romaji:"koko", meaning:"여기", day:13},
+  {kana:"きっぷ", romaji:"kippu", meaning:"표, 티켓", day:13},
+  {kana:"パスポート", romaji:"pasupooto", meaning:"여권", day:13},
+  {kana:"あそこ", romaji:"asoko", meaning:"저기", day:13},
+  {kana:"ケーキ", romaji:"keeki", meaning:"케이크", day:13},
+  {kana:"すし", romaji:"sushi", meaning:"스시, 초밥", day:13},
+  {kana:"ちかてつ", romaji:"chikatetsu", meaning:"지하철", day:13},
+  {kana:"ぼうし", romaji:"boushi", meaning:"모자", day:13},
+];
 
+const PHRASES = [
+  {set:"핵심구문 A", jp:"やさしいひとです！", kr:"친절한 사람입니다!"},
+  {set:"핵심구문 A", jp:"かっこいいせんせいです。", kr:"멋있는 선생님입니다."},
+  {set:"핵심구문 A", jp:"いしゃです。", kr:"의사입니다."},
+  {set:"핵심구문 A", jp:"かっこいいひとです！", kr:"멋있는 사람이에요!"},
+  {set:"핵심구문 A", jp:"やさしいがくせいです。", kr:"친절한 학생입니다."},
 
-document.getElementById("remainingText").textContent =
-    `${remaining} Days Remaining`;
+  {set:"핵심구문 B", jp:"こんにちは、はなです。", kr:"안녕하세요, 하나입니다."},
+  {set:"핵심구문 B", jp:"こんばんは、けんです。", kr:"안녕하십니까, 켄입니다."},
+  {set:"핵심구문 B", jp:"なおみさん、こんにちは。", kr:"나오미 씨, 안녕하세요."},
+  {set:"핵심구문 B", jp:"またあした。", kr:"내일 또 봐요."},
+  {set:"핵심구문 B", jp:"はなさん、こんばんは。", kr:"하나 씨, 안녕하세요."},
 
+  {set:"핵심구문 C", jp:"これはすしですか。", kr:"이것은 스시입니까?"},
+  {set:"핵심구문 C", jp:"はい、これはおいしいです。", kr:"네, 이것은 맛있습니다."},
+  {set:"핵심구문 C", jp:"ピザ、ください。", kr:"피자 주세요."},
+  {set:"핵심구문 C", jp:"サラダはおいしいですか。", kr:"샐러드는 맛있습니까?"},
+  {set:"핵심구문 C", jp:"これはラーメンです。", kr:"이것은 라면입니다."},
 
-document.getElementById("progressBar").style.width =
-    percent + "%";
+  {set:"핵심구문 D · 친구 묘사하기", jp:"たなかさんはどこですか。", kr:"타나카 씨는 어디입니까?"},
+  {set:"핵심구문 D · 친구 묘사하기", jp:"やまぐちさんはかっこいいです。", kr:"야마구치 씨는 멋있습니다."},
+  {set:"핵심구문 D · 친구 묘사하기", jp:"たなかさんはにほんじんです。", kr:"타나카 씨는 일본인입니다."},
+  {set:"핵심구문 D · 친구 묘사하기", jp:"やまぐちさん、またあした！", kr:"야마구치 씨, 내일 또 봐요!"},
+  {set:"핵심구문 D · 친구 묘사하기", jp:"たなかさんはやさしいです。", kr:"타나카 씨는 친절합니다."},
 
+  {set:"핵심구문 E · 시간 말하기", jp:"すみません、いまなんじですか。", kr:"죄송하지만, 지금 몇 시입니까?"},
+  {set:"핵심구문 E · 시간 말하기", jp:"いまにじです。", kr:"지금 2시입니다."},
+  {set:"핵심구문 E · 시간 말하기", jp:"いまさんじです。", kr:"지금 세 시입니다."},
+  {set:"핵심구문 E · 시간 말하기", jp:"いいえ、いちじです。", kr:"아니요, 한 시예요."},
+  {set:"핵심구문 E · 시간 말하기", jp:"はい、いま三じです！", kr:"네, 지금 세 시입니다!"},
 
-/* ========================= */
-/* 최근 활동 표시 */
-/* ========================= */
+  {set:"핵심구문 F · 장소와 여행 물건 찾기", jp:"すみません、ちずはどこですか。", kr:"죄송합니다, 지도가 어디입니까?"},
+  {set:"핵심구문 F · 장소와 여행 물건 찾기", jp:"くうこうはここです。", kr:"공항은 여기입니다."},
+  {set:"핵심구문 F · 장소와 여행 물건 찾기", jp:"これはわたしのきっぷです。", kr:"이건 제 표입니다."},
+  {set:"핵심구문 F · 장소와 여행 물건 찾기", jp:"中山さんのパスポートはあそこです。", kr:"나카야마 씨의 여권은 저기입니다."},
+  {set:"핵심구문 F · 장소와 여행 물건 찾기", jp:"ちずはどこですか。", kr:"지도는 어디입니까?"},
+];
 
-const recentContainer =
-    document.getElementById("recentActivities");
+/* =========================================================
+   기초편 — 히라가나 / 가타카나 (한 글자씩 복습)
+   ========================================================= */
+const HIRAGANA = [
+  {char:"あ",romaji:"a"},{char:"い",romaji:"i"},{char:"う",romaji:"u"},{char:"え",romaji:"e"},{char:"お",romaji:"o"},
+  {char:"か",romaji:"ka"},{char:"き",romaji:"ki"},{char:"く",romaji:"ku"},{char:"け",romaji:"ke"},{char:"こ",romaji:"ko"},
+  {char:"さ",romaji:"sa"},{char:"し",romaji:"shi"},{char:"す",romaji:"su"},{char:"せ",romaji:"se"},{char:"そ",romaji:"so"},
+  {char:"た",romaji:"ta"},{char:"ち",romaji:"chi"},{char:"つ",romaji:"tsu"},{char:"て",romaji:"te"},{char:"と",romaji:"to"},
+  {char:"な",romaji:"na"},{char:"に",romaji:"ni"},{char:"ぬ",romaji:"nu"},{char:"ね",romaji:"ne"},{char:"の",romaji:"no"},
+  {char:"は",romaji:"ha"},{char:"ひ",romaji:"hi"},{char:"ふ",romaji:"fu"},{char:"へ",romaji:"he"},{char:"ほ",romaji:"ho"},
+  {char:"ま",romaji:"ma"},{char:"み",romaji:"mi"},{char:"む",romaji:"mu"},{char:"め",romaji:"me"},{char:"も",romaji:"mo"},
+  {char:"や",romaji:"ya"},{char:"ゆ",romaji:"yu"},{char:"よ",romaji:"yo"},
+  {char:"ら",romaji:"ra"},{char:"り",romaji:"ri"},{char:"る",romaji:"ru"},{char:"れ",romaji:"re"},{char:"ろ",romaji:"ro"},
+  {char:"わ",romaji:"wa"},{char:"を",romaji:"wo"},{char:"ん",romaji:"n"},
+];
+const KATAKANA = [
+  {char:"ア",romaji:"a"},{char:"イ",romaji:"i"},{char:"ウ",romaji:"u"},{char:"エ",romaji:"e"},{char:"オ",romaji:"o"},
+  {char:"カ",romaji:"ka"},{char:"キ",romaji:"ki"},{char:"ク",romaji:"ku"},{char:"ケ",romaji:"ke"},{char:"コ",romaji:"ko"},
+  {char:"サ",romaji:"sa"},{char:"シ",romaji:"shi"},{char:"ス",romaji:"su"},{char:"セ",romaji:"se"},{char:"ソ",romaji:"so"},
+  {char:"タ",romaji:"ta"},{char:"チ",romaji:"chi"},{char:"ツ",romaji:"tsu"},{char:"テ",romaji:"te"},{char:"ト",romaji:"to"},
+  {char:"ナ",romaji:"na"},{char:"ニ",romaji:"ni"},{char:"ヌ",romaji:"nu"},{char:"ネ",romaji:"ne"},{char:"ノ",romaji:"no"},
+  {char:"ハ",romaji:"ha"},{char:"ヒ",romaji:"hi"},{char:"フ",romaji:"fu"},{char:"ヘ",romaji:"he"},{char:"ホ",romaji:"ho"},
+  {char:"マ",romaji:"ma"},{char:"ミ",romaji:"mi"},{char:"ム",romaji:"mu"},{char:"メ",romaji:"me"},{char:"モ",romaji:"mo"},
+  {char:"ヤ",romaji:"ya"},{char:"ユ",romaji:"yu"},{char:"ヨ",romaji:"yo"},
+  {char:"ラ",romaji:"ra"},{char:"リ",romaji:"ri"},{char:"ル",romaji:"ru"},{char:"レ",romaji:"re"},{char:"ロ",romaji:"ro"},
+  {char:"ワ",romaji:"wa"},{char:"ヲ",romaji:"wo"},{char:"ン",romaji:"n"},
+];
 
+const HIRAGANA_DAKUTEN = [
+  {char:"が",romaji:"ga"},{char:"ぎ",romaji:"gi"},{char:"ぐ",romaji:"gu"},{char:"げ",romaji:"ge"},{char:"ご",romaji:"go"},
+  {char:"ざ",romaji:"za"},{char:"じ",romaji:"ji"},{char:"ず",romaji:"zu"},{char:"ぜ",romaji:"ze"},{char:"ぞ",romaji:"zo"},
+  {char:"だ",romaji:"da"},{char:"ぢ",romaji:"ji"},{char:"づ",romaji:"zu"},{char:"で",romaji:"de"},{char:"ど",romaji:"do"},
+  {char:"ば",romaji:"ba"},{char:"び",romaji:"bi"},{char:"ぶ",romaji:"bu"},{char:"べ",romaji:"be"},{char:"ぼ",romaji:"bo"},
+];
+const HIRAGANA_HANDAKUTEN = [
+  {char:"ぱ",romaji:"pa"},{char:"ぴ",romaji:"pi"},{char:"ぷ",romaji:"pu"},{char:"ぺ",romaji:"pe"},{char:"ぽ",romaji:"po"},
+];
+const HIRAGANA_COMBO = [
+  {char:"きゃ",romaji:"kya"},{char:"きゅ",romaji:"kyu"},{char:"きょ",romaji:"kyo"},
+  {char:"しゃ",romaji:"sha"},{char:"しゅ",romaji:"shu"},{char:"しょ",romaji:"sho"},
+  {char:"ちゃ",romaji:"cha"},{char:"ちゅ",romaji:"chu"},{char:"ちょ",romaji:"cho"},
+  {char:"にゃ",romaji:"nya"},{char:"にゅ",romaji:"nyu"},{char:"にょ",romaji:"nyo"},
+  {char:"ひゃ",romaji:"hya"},{char:"ひゅ",romaji:"hyu"},{char:"ひょ",romaji:"hyo"},
+  {char:"みゃ",romaji:"mya"},{char:"みゅ",romaji:"myu"},{char:"みょ",romaji:"myo"},
+  {char:"りゃ",romaji:"rya"},{char:"りゅ",romaji:"ryu"},{char:"りょ",romaji:"ryo"},
+  {char:"ぎゃ",romaji:"gya"},{char:"ぎゅ",romaji:"gyu"},{char:"ぎょ",romaji:"gyo"},
+  {char:"じゃ",romaji:"ja"},{char:"じゅ",romaji:"ju"},{char:"じょ",romaji:"jo"},
+  {char:"びゃ",romaji:"bya"},{char:"びゅ",romaji:"byu"},{char:"びょ",romaji:"byo"},
+  {char:"ぴゃ",romaji:"pya"},{char:"ぴゅ",romaji:"pyu"},{char:"ぴょ",romaji:"pyo"},
+];
+const KATAKANA_DAKUTEN = [
+  {char:"ガ",romaji:"ga"},{char:"ギ",romaji:"gi"},{char:"グ",romaji:"gu"},{char:"ゲ",romaji:"ge"},{char:"ゴ",romaji:"go"},
+  {char:"ザ",romaji:"za"},{char:"ジ",romaji:"ji"},{char:"ズ",romaji:"zu"},{char:"ゼ",romaji:"ze"},{char:"ゾ",romaji:"zo"},
+  {char:"ダ",romaji:"da"},{char:"ヂ",romaji:"ji"},{char:"ヅ",romaji:"zu"},{char:"デ",romaji:"de"},{char:"ド",romaji:"do"},
+  {char:"バ",romaji:"ba"},{char:"ビ",romaji:"bi"},{char:"ブ",romaji:"bu"},{char:"ベ",romaji:"be"},{char:"ボ",romaji:"bo"},
+];
+const KATAKANA_HANDAKUTEN = [
+  {char:"パ",romaji:"pa"},{char:"ピ",romaji:"pi"},{char:"プ",romaji:"pu"},{char:"ペ",romaji:"pe"},{char:"ポ",romaji:"po"},
+];
+const KATAKANA_COMBO = [
+  {char:"キャ",romaji:"kya"},{char:"キュ",romaji:"kyu"},{char:"キョ",romaji:"kyo"},
+  {char:"シャ",romaji:"sha"},{char:"シュ",romaji:"shu"},{char:"ショ",romaji:"sho"},
+  {char:"チャ",romaji:"cha"},{char:"チュ",romaji:"chu"},{char:"チョ",romaji:"cho"},
+  {char:"ニャ",romaji:"nya"},{char:"ニュ",romaji:"nyu"},{char:"ニョ",romaji:"nyo"},
+  {char:"ヒャ",romaji:"hya"},{char:"ヒュ",romaji:"hyu"},{char:"ヒョ",romaji:"hyo"},
+  {char:"ミャ",romaji:"mya"},{char:"ミュ",romaji:"myu"},{char:"ミョ",romaji:"myo"},
+  {char:"リャ",romaji:"rya"},{char:"リュ",romaji:"ryu"},{char:"リョ",romaji:"ryo"},
+  {char:"ギャ",romaji:"gya"},{char:"ギュ",romaji:"gyu"},{char:"ギョ",romaji:"gyo"},
+  {char:"ジャ",romaji:"ja"},{char:"ジュ",romaji:"ju"},{char:"ジョ",romaji:"jo"},
+  {char:"ビャ",romaji:"bya"},{char:"ビュ",romaji:"byu"},{char:"ビョ",romaji:"byo"},
+  {char:"ピャ",romaji:"pya"},{char:"ピュ",romaji:"pyu"},{char:"ピョ",romaji:"pyo"},
+];
+const KANA_MNEMONICS = {
+  "あ": {emoji:"👶", label:"아기의 아", shape:"팔로 아기를 폭 감싸안은 곡선 모양이에요", pos:{x:8,y:14,rot:-8,scale:1}},
+  "い": {emoji:"🦷", label:"이빨의 이", shape:"나란히 선 두 획이 이빨 두 개를 닮았어요", pos:{x:0,y:0,rot:0,scale:0.95}},
+  "う": {emoji:"📢", label:"우렁차다의 우", shape:"위쪽 갈고리가 크게 외치는 입 모양처럼 보여요", pos:{x:-8,y:-10,rot:-10,scale:1}},
+  "え": {emoji:"🤸", label:"에어로빅의 에", shape:"뻗은 팔다리가 운동하는 동작을 닮았어요", pos:{x:0,y:0,rot:15,scale:1}},
+  "お": {emoji:"🦑", label:"오징어의 오", shape:"아래 고리가 오징어 다리처럼 동그랗게 말려있어요", pos:{x:5,y:18,rot:5,scale:1}},
+  "か": {emoji:"🛶", label:"카누의 카", shape:"갈라진 획이 노를 젓는 카누 모양과 닮았어요", pos:{x:0,y:0,rot:-5,scale:1}},
+  "き": {emoji:"🔑", label:"열쇠의 키", shape:"가로획들이 열쇠의 톱니처럼 보여요", pos:{x:14,y:0,rot:0,scale:0.95}},
+  "く": {emoji:"🍪", label:"쿠키의 쿠", shape:"꺾인 한 획이 쿠키 조각의 뾰족한 모서리를 닮았어요", pos:{x:8,y:8,rot:-18,scale:1}},
+  "け": {emoji:"🍰", label:"케이크의 케", shape:"세로획 옆 갈고리가 케이크 위 초처럼 보여요", pos:{x:12,y:-14,rot:5,scale:0.95}},
+  "こ": {emoji:"🥥", label:"코코넛의 코", shape:"두 개의 짧은 획이 반으로 쪼갠 코코넛 두 조각을 닮았어요", pos:{x:0,y:0,rot:0,scale:0.9}},
+  "さ": {emoji:"🦌", label:"사슴의 사", shape:"위쪽 갈고리가 사슴의 뿔처럼 뻗어있어요", pos:{x:0,y:-18,rot:0,scale:0.95}},
+  "し": {emoji:"🎣", label:"낚시의 시", shape:"아래로 굽은 한 획이 낚싯바늘 모양 그대로예요", pos:{x:0,y:8,rot:0,scale:1}},
+  "す": {emoji:"🍝", label:"스파게티의 스", shape:"동그랗게 말린 끝이 스파게티 면발처럼 돌돌 말려있어요", pos:{x:0,y:14,rot:0,scale:1}},
+  "せ": {emoji:"🧺", label:"세탁물의 세", shape:"가로획이 빨랫줄에 걸린 옷처럼 보여요", pos:{x:0,y:0,rot:0,scale:0.95}},
+  "そ": {emoji:"🐄", label:"소의 소", shape:"지그재그로 꺾인 획이 소의 구불구불한 뿔 모양을 닮았어요", pos:{x:0,y:-14,rot:-5,scale:0.95}},
+  "た": {emoji:"🥁", label:"타악기의 타", shape:"세로획과 곡선이 북채로 두드리는 모양이에요", pos:{x:0,y:0,rot:-10,scale:1}},
+  "ち": {emoji:"🐟", label:"참치의 치", shape:"부드럽게 굽은 한 획이 참치 꼬리지느러미를 닮았어요", pos:{x:14,y:0,rot:0,scale:0.95}},
+  "つ": {emoji:"👕", label:"티셔츠의 츠", shape:"굽은 한 획이 티셔츠 목둘레(카라) 곡선과 꼭 닮았어요", pos:{x:0,y:-32,rot:0,scale:0.85}},
+  "て": {custom:"table", label:"테이블의 테", shape:"둥근 상판과 다리 네 개가 원형 테이블 모양 그대로예요", pos:{x:0,y:-6,rot:0,scale:0.85}},
+  "と": {emoji:"🐰", label:"토끼의 토", shape:"세로획 옆 짧은 갈고리가 토끼의 앞니처럼 보여요", pos:{x:10,y:-10,rot:0,scale:0.95}},
+  "な": {emoji:"🌳", label:"나무의 나", shape:"얽힌 획이 뻗어나간 나뭇가지 모양을 닮았어요", pos:{x:0,y:10,rot:0,scale:1}},
+  "に": {emoji:"🦷", label:"어금니의 니", shape:"나란한 두 세로획이 어금니 두 개를 닮았어요", pos:{x:0,y:0,rot:0,scale:0.95}},
+  "ぬ": {emoji:"🍜", label:"누들의 누", shape:"끝이 동그랗게 말린 획이 돌돌 말린 면발 모양이에요", pos:{x:0,y:10,rot:0,scale:1}},
+  "ね": {emoji:"🐈‍⬛", label:"검은 고양이 네로의 네", shape:"아래 말린 부분이 고양이 꼬리를 닮았어요", pos:{x:14,y:18,rot:10,scale:0.9}},
+  "の": {emoji:"🚫", label:"노(NO!)의 노", shape:"한 바퀴 도는 획 자체가 동그란 금지 표시를 닮았어요", pos:{x:0,y:0,rot:0,scale:1}},
+  "は": {emoji:"🦛", label:"하마의 하", shape:"세로획 옆 갈고리가 하마의 벌어진 입처럼 보여요", pos:{x:0,y:14,rot:0,scale:1}},
+  "ひ": {emoji:"😁", label:"히죽의 히", shape:"부드럽게 휘어진 한 획이 웃는 입꼬리를 닮았어요", pos:{x:0,y:14,rot:0,scale:1}},
+  "ふ": {emoji:"🏃", label:"후다닥의 후", shape:"여러 획이 흩날리듯 배치돼 후다닥 뛰는 모습을 닮았어요", pos:{x:0,y:0,rot:-15,scale:1}},
+  "へ": {emoji:"🏊", label:"헤엄의 헤", shape:"꺾인 한 획이 물살을 가르는 팔 동작을 닮았어요", pos:{x:0,y:0,rot:10,scale:1}},
+  "ほ": {emoji:"🐯", label:"호랑이의 호", shape:"세로획 옆 짧은 가로획들이 호랑이 수염처럼 보여요", pos:{x:-10,y:0,rot:0,scale:0.95}},
+  "ま": {emoji:"🍠", label:"고구마의 마", shape:"아래 고리가 고구마 덩굴손처럼 동그랗게 말려있어요", pos:{x:0,y:14,rot:0,scale:1}},
+  "み": {emoji:"🍌💫", label:"미끄덩의 미", shape:"소용돌이치는 곡선이 바나나 껍질에 미끄러지는 동작을 닮았어요", pos:{x:0,y:0,rot:15,scale:0.9}},
+  "む": {emoji:"😔", label:"시무룩의 무", shape:"구불구불한 획이 시무룩하게 처진 입꼬리를 닮았어요", pos:{x:0,y:14,rot:0,scale:1}},
+  "め": {emoji:"🐡", label:"메기의 메", shape:"고리 모양이 수염 난 메기의 동그란 눈(일본어로 눈=め)을 닮았어요", pos:{x:-12,y:-6,rot:0,scale:0.8}},
+  "も": {emoji:"🎩", label:"모자의 모", shape:"아래 고리가 모자 챙처럼 둥글게 말려있어요", pos:{x:0,y:-18,rot:0,scale:0.9}},
+  "や": {emoji:"⚾", label:"야구의 야", shape:"교차한 두 획이 배트와 공이 부딪히는 순간을 닮았어요", pos:{x:0,y:0,rot:0,scale:0.8}},
+  "ゆ": {emoji:"🥛", label:"우유의 유", shape:"세로획과 고리가 컵에 꽂힌 빨대를 닮았어요", pos:{x:8,y:-10,rot:0,scale:1}},
+  "よ": {emoji:"🧘", label:"요가의 요", shape:"가로획과 고리가 몸을 비트는 요가 동작을 닮았어요", pos:{x:0,y:14,rot:0,scale:1}},
+  "ら": {emoji:"📣", label:"이겨라~의 라", shape:"위쪽 갈고리가 확성기를 든 팔 모양이에요", pos:{x:10,y:-14,rot:-10,scale:1}},
+  "り": {emoji:"🎀", label:"리본의 리", shape:"길고 짧은 두 획이 늘어진 리본 자락 두 가닥 그대로예요", pos:{x:0,y:14,rot:0,scale:1.1}},
+  "る": {emoji:"🦌🔴", label:"루돌프의 루", shape:"동그랗게 만 고리가 루돌프의 빨간 코를 닮았어요", pos:{x:0,y:8,rot:0,scale:0.9}},
+  "れ": {emoji:"🤼", label:"레슬링의 레", shape:"얽힌 두 획이 뒤엉킨 레슬링 선수들을 닮았어요", pos:{x:0,y:0,rot:-10,scale:1}},
+  "ろ": {emoji:"🪢", label:"로프의 로", shape:"한 바퀴 도는 고리가 돌돌 말린 로프 모양 그대로예요", pos:{x:0,y:0,rot:0,scale:1.1}},
+  "わ": {emoji:"🐶", label:"치와와의 와", shape:"동그랗게 만 아래 고리가 치와와의 말린 꼬리를 닮았어요", pos:{x:12,y:12,rot:10,scale:0.95}},
+  "を": {emoji:"🧗", label:"오르다의 오", shape:"복잡하게 뻗은 획이 몸을 젖히며 오르는 동작을 닮았어요", pos:{x:0,y:-10,rot:15,scale:1}},
+  "ん": {emoji:"🚩", label:"응원의 응", shape:"끝이 휘어진 한 획이 펄럭이는 깃발 모양이에요", pos:{x:10,y:-14,rot:-10,scale:1}},
+};
 
-const recentReport =
-    reports
-        .slice()
-        .sort((a,b) => b.day - a.day)[0];
+const KANA_TYPES = [
+  {key:"basic", label:"기본"},
+  {key:"dakuten", label:"탁음"},
+  {key:"handakuten", label:"반탁음"},
+  {key:"combo", label:"콤보(요음)"},
+];
+const KANA_MAP = {
+  hiragana_basic: HIRAGANA, hiragana_dakuten: HIRAGANA_DAKUTEN, hiragana_handakuten: HIRAGANA_HANDAKUTEN, hiragana_combo: HIRAGANA_COMBO,
+  katakana_basic: KATAKANA, katakana_dakuten: KATAKANA_DAKUTEN, katakana_handakuten: KATAKANA_HANDAKUTEN, katakana_combo: KATAKANA_COMBO,
+};
 
+/* =========================================================
+   저장소 래퍼 — Claude 미리보기(window.storage)와
+   폰에 다운로드해 독립 실행할 때(localStorage) 둘 다 지원
+   ========================================================= */
+const Store = {
+  async get(key){
+    if(typeof window.storage !== 'undefined' && window.storage){
+      try{
+        const r = await window.storage.get(key);
+        return r ? r.value : null;
+      }catch(e){ return null; }
+    }
+    try{ return localStorage.getItem(key); }catch(e){ return null; }
+  },
+  async set(key, value){
+    if(typeof window.storage !== 'undefined' && window.storage){
+      try{ await window.storage.set(key, value); return; }catch(e){ /* fall through */ }
+    }
+    try{ localStorage.setItem(key, value); }catch(e){}
+  }
+};
 
-if(recentReport){
+/* =========================================================
+   진행 상황 저장 — 단어별 마스터 상태
+   ========================================================= */
+const progress = {}; // kana -> {correct, wrong, streak, mastered}
+const kanaProgress = {}; // char -> {correct, wrong, streak, mastered}
+let currentMode = "cards";
+let currentKanaSet = "hiragana"; // hiragana | katakana
+let currentKanaType = "basic"; // basic | dakuten | handakuten | combo
+let kanaViewMode = "cards"; // cards | quiz | review
+let kanaQuizState = { pool: [], idx: 0, correctCount:0, total:0 };
+let quizState = { pool: [], idx: 0, correctCount:0, total:0, answered:false };
 
-    const activity =
-        document.createElement("div");
-
-    activity.className =
-        "activity";
-
-
-    const day =
-        document.createElement("div");
-
-    day.className =
-        "activity-day";
-
-    day.textContent =
-        `DAY ${String(recentReport.day).padStart(3,"0")}`;
-
-
-    const content =
-        document.createElement("div");
-
-    content.className =
-        "activity-content";
-
-
-    const firstLine =
-        recentReport.content
-            .trim()
-            .split("\n")
-            .map(line => line.trim())
-            .filter(line => line.length > 0)[0];
-
-
-    content.textContent =
-        firstLine || recentReport.title;
-
-
-    activity.appendChild(day);
-
-    activity.appendChild(content);
-
-    recentContainer.appendChild(activity);
-
+async function loadProgress(){
+  for(const w of WORDS){
+    try{
+      const r = await Store.get('progress:'+w.kana);
+      progress[w.kana] = r ? JSON.parse(r) : {correct:0,wrong:0,streak:0,mastered:false};
+    }catch(e){
+      progress[w.kana] = {correct:0,wrong:0,streak:0,mastered:false};
+    }
+  }
+  for(const k of [...HIRAGANA, ...KATAKANA, ...HIRAGANA_DAKUTEN, ...HIRAGANA_HANDAKUTEN, ...HIRAGANA_COMBO, ...KATAKANA_DAKUTEN, ...KATAKANA_HANDAKUTEN, ...KATAKANA_COMBO]){
+    try{
+      const r = await Store.get('kanachar:'+k.char);
+      kanaProgress[k.char] = r ? JSON.parse(r) : {correct:0,wrong:0,streak:0,mastered:false};
+    }catch(e){
+      kanaProgress[k.char] = {correct:0,wrong:0,streak:0,mastered:false};
+    }
+  }
+}
+async function saveKanaProgress(char){
+  try{ await Store.set('kanachar:'+char, JSON.stringify(kanaProgress[char])); }catch(e){}
+}
+function markKanaKnow(char){
+  const p = kanaProgress[char];
+  p.correct++; p.streak++; if(p.streak>=2) p.mastered = true;
+  saveKanaProgress(char); renderKana();
+}
+function markKanaDontKnow(char){
+  const p = kanaProgress[char];
+  p.wrong++; p.streak=0; p.mastered=false;
+  saveKanaProgress(char); renderKana();
+}
+async function saveProgress(kana){
+  try{ await Store.set('progress:'+kana, JSON.stringify(progress[kana])); }catch(e){}
+}
+function markKnow(kana){
+  const p = progress[kana];
+  p.correct++; p.streak++; if(p.streak>=2) p.mastered = true;
+  saveProgress(kana); render();
+}
+function markDontKnow(kana){
+  const p = progress[kana];
+  p.wrong++; p.streak=0; p.mastered=false;
+  saveProgress(kana); render();
 }
 
+/* =========================================================
+   렌더링
+   ========================================================= */
+function renderStats(){
+  const total = WORDS.length;
+  const mastered = WORDS.filter(w=>progress[w.kana] && progress[w.kana].mastered).length;
+  const review = WORDS.filter(w=>progress[w.kana] && progress[w.kana].wrong>0 && !progress[w.kana].mastered).length;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-chip"><div class="n">${total}</div><div class="l">전체 단어</div></div>
+    <div class="stat-chip"><div class="n">${mastered}</div><div class="l">외운 단어</div></div>
+    <div class="stat-chip"><div class="n">${review}</div><div class="l">복습 필요</div></div>
+  `;
+}
 
+function renderCards(){
+  let html = '<div class="grid">';
+  WORDS.forEach(w=>{
+    const p = progress[w.kana] || {mastered:false, wrong:0};
+    let cls = '';
+    if(p.mastered) cls='mastered'; else if(p.wrong>0) cls='review';
+    html += `
+      <div class="flip-card" data-kana="${w.kana}">
+        <div class="flip-inner">
+          <div class="face front ${cls}">
+            <div class="kana jp">${w.kana}</div>
+            ${p.mastered?'<div class="badge">⭐</div>':''}
+          </div>
+          <div class="face back">
+            <div class="romaji">${w.romaji}</div>
+            <div class="meaning">${w.meaning}</div>
+            <div class="mark-row">
+              <button class="mark-btn dontknow" onclick="event.stopPropagation();markDontKnow('${w.kana}')">모르겠어요</button>
+              <button class="mark-btn know" onclick="event.stopPropagation();markKnow('${w.kana}')">외웠어요</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  document.getElementById('main').innerHTML = html;
+  document.querySelectorAll('.flip-card').forEach(card=>{
+    card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  });
+}
+
+function renderReview(){
+  const filtered = WORDS.filter(w=>{
+    const p = progress[w.kana];
+    return p && p.wrong>0 && !p.mastered;
+  });
+  if(filtered.length===0){
+    document.getElementById('main').innerHTML = `<div class="empty-state"><div class="em">🌱</div>복습할 단어가 없어요.<br>카드학습이나 자가테스트에서 '모르겠어요'를 누른 단어가 여기 모여요.</div>`;
+    return;
+  }
+  let html = '<div class="grid">';
+  filtered.forEach(w=>{
+    html += `
+      <div class="flip-card" data-kana="${w.kana}">
+        <div class="flip-inner">
+          <div class="face front review">
+            <div class="kana jp">${w.kana}</div>
+          </div>
+          <div class="face back">
+            <div class="romaji">${w.romaji}</div>
+            <div class="meaning">${w.meaning}</div>
+            <div class="mark-row">
+              <button class="mark-btn dontknow" onclick="event.stopPropagation();markDontKnow('${w.kana}')">모르겠어요</button>
+              <button class="mark-btn know" onclick="event.stopPropagation();markKnow('${w.kana}')">외웠어요</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  document.getElementById('main').innerHTML = html;
+  document.querySelectorAll('.flip-card').forEach(card=>{
+    card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  });
+}
+
+function renderPhrase(){
+  const sets = [...new Set(PHRASES.map(p=>p.set))];
+  let html = '';
+  sets.forEach(s=>{
+    html += `<div class="phrase-set-title">${s}</div>`;
+    PHRASES.filter(p=>p.set===s).forEach((p,i)=>{
+      html += `<div class="phrase-card" data-idx="${PHRASES.indexOf(p)}">
+        <div class="phrase-jp jp">${p.jp}</div>
+        <div class="phrase-kr">${p.kr}</div>
+      </div>`;
+    });
+  });
+  document.getElementById('main').innerHTML = html;
+  document.querySelectorAll('.phrase-card').forEach(el=>{
+    el.addEventListener('click', ()=> el.classList.toggle('shown'));
+  });
+}
+
+function renderKana(){
+  const typeTabsHtml = KANA_TYPES.map(t=>{
+    const arr = KANA_MAP[currentKanaSet + '_' + t.key];
+    const masteredCount = arr.filter(k=>kanaProgress[k.char] && kanaProgress[k.char].mastered).length;
+    return `<div class="kana-subtab ${currentKanaType===t.key?'active':''}" data-type="${t.key}">${t.label} (${masteredCount}/${arr.length})</div>`;
+  }).join('');
+
+  const header = `
+    <div class="kana-note">한 글자씩 카드로 외우고, 뒷면 연상 이미지로 기억하고, 자가테스트로 확인하고, 복습 탭에서 헷갈리는 글자만 다시 보세요.</div>
+    <div class="kana-subtabs">
+      <div class="kana-subtab ${kanaViewMode==='cards'?'active':''}" data-viewmode="cards">🗂 카드학습</div>
+      <div class="kana-subtab ${kanaViewMode==='quiz'?'active':''}" data-viewmode="quiz">✏️ 자가테스트</div>
+      <div class="kana-subtab ${kanaViewMode==='review'?'active':''}" data-viewmode="review">🔁 복습</div>
+    </div>
+    <div class="kana-subtabs">
+      <div class="kana-subtab ${currentKanaSet==='hiragana'?'active':''}" data-set="hiragana">히라가나</div>
+      <div class="kana-subtab ${currentKanaSet==='katakana'?'active':''}" data-set="katakana">가타카나</div>
+    </div>
+    <div class="kana-subtabs kana-type-row">${typeTabsHtml}</div>
+    <div id="kanaBody"></div>`;
+
+  document.getElementById('main').innerHTML = header;
+
+  document.querySelectorAll('[data-viewmode]').forEach(el=>{
+    el.addEventListener('click', ()=>{ kanaViewMode = el.dataset.viewmode; renderKana(); });
+  });
+  document.querySelectorAll('[data-set]').forEach(el=>{
+    el.addEventListener('click', ()=>{ currentKanaSet = el.dataset.set; renderKana(); });
+  });
+  document.querySelectorAll('[data-type]').forEach(el=>{
+    el.addEventListener('click', ()=>{ currentKanaType = el.dataset.type; renderKana(); });
+  });
+
+  if(kanaViewMode==='cards') renderKanaCardsBody();
+  else if(kanaViewMode==='review') renderKanaReviewBody();
+  else if(kanaViewMode==='quiz') startKanaQuiz();
+}
+
+function kanaCardHtml(k, frontClass){
+  const mnemonic = KANA_MNEMONICS[k.char];
+  const cardClass = mnemonic ? 'kana-card mnemonic-card' : 'kana-card';
+  let backContent = `${k.romaji}`;
+  if(mnemonic){
+    const p = mnemonic.pos;
+    const overlayStyle = `transform: translate(-50%, -50%) translate(${p.x}px, ${p.y}px) rotate(${p.rot}deg) scale(${p.scale});`;
+    const visualHtml = mnemonic.custom === 'table'
+      ? `<div class="mini-table">
+           <div class="top"></div>
+           <div class="leg l1"></div><div class="leg l2"></div><div class="leg l3"></div><div class="leg l4"></div>
+         </div>`
+      : `<div class="mnemonic-emoji">${mnemonic.emoji}</div>`;
+    backContent = `
+            <div class="mnemonic-visual">
+              ${visualHtml}
+              <div class="mnemonic-char-overlay" style="${overlayStyle}">${k.char}</div>
+            </div>
+            <div class="kana-shape-hint">💡 ${mnemonic.shape}</div>
+            <div class="kana-mnemonic-label">${mnemonic.label}</div>
+            <div class="kana-mnemonic-romaji">${k.romaji}</div>`;
+  }
+  return `
+      <div class="${cardClass}" data-char="${k.char}">
+        <div class="kana-inner">
+          <div class="kana-face front ${frontClass||''}">${k.char}</div>
+          <div class="kana-face back">
+            ${backContent}
+            <div class="mini-marks">
+              <button class="d" onclick="event.stopPropagation();markKanaDontKnow('${k.char}')">✗</button>
+              <button class="k" onclick="event.stopPropagation();markKanaKnow('${k.char}')">✓</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+}
+
+function renderKanaCardsBody(){
+  const list = KANA_MAP[currentKanaSet + '_' + currentKanaType];
+  let html = '<div class="kana-grid">';
+  list.forEach(k=>{
+    const p = kanaProgress[k.char] || {mastered:false};
+    html += kanaCardHtml(k, p.mastered ? 'mastered' : '');
+  });
+  html += '</div>';
+  document.getElementById('kanaBody').innerHTML = html;
+  document.querySelectorAll('#kanaBody .kana-card').forEach(card=>{
+    card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  });
+}
+
+function renderKanaReviewBody(){
+  const list = KANA_MAP[currentKanaSet + '_' + currentKanaType];
+  const filtered = list.filter(k=>{
+    const p = kanaProgress[k.char];
+    return p && p.wrong>0 && !p.mastered;
+  });
+  const body = document.getElementById('kanaBody');
+  if(filtered.length===0){
+    body.innerHTML = `<div class="empty-state"><div class="em">🌱</div>이 카테고리엔 복습할 글자가 없어요.<br>카드학습이나 자가테스트에서 ✗를 누른 글자가 여기 모여요.</div>`;
+    return;
+  }
+  let html = '<div class="kana-grid">';
+  filtered.forEach(k=>{
+    html += kanaCardHtml(k, 'review');
+  });
+  html += '</div>';
+  body.innerHTML = html;
+  document.querySelectorAll('#kanaBody .kana-card').forEach(card=>{
+    card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  });
+}
+
+function kanaQuizMark(char, correct){
+  const p = kanaProgress[char];
+  if(correct){ p.correct++; p.streak++; if(p.streak>=2) p.mastered = true; }
+  else { p.wrong++; p.streak = 0; p.mastered = false; }
+  saveKanaProgress(char);
+}
+
+function startKanaQuiz(){
+  const list = KANA_MAP[currentKanaSet + '_' + currentKanaType];
+  kanaQuizState.pool = [...list].sort(()=>Math.random()-0.5);
+  kanaQuizState.idx = 0;
+  kanaQuizState.correctCount = 0;
+  kanaQuizState.total = 0;
+  renderKanaQuizBody();
+}
+
+function renderKanaQuizBody(){
+  const body = document.getElementById('kanaBody');
+  if(!body) return;
+  const list = KANA_MAP[currentKanaSet + '_' + currentKanaType];
+  if(list.length < 4){
+    body.innerHTML = `<div class="empty-state">이 카테고리는 문항이 너무 적어서 테스트를 만들 수 없어요 (${list.length}자).<br>다른 카테고리를 선택해보세요.</div>`;
+    return;
+  }
+  if(kanaQuizState.idx >= kanaQuizState.pool.length){
+    body.innerHTML = `
+      <div class="quiz-wrap">
+        <div style="font-size:40px;margin-bottom:14px;">🎉</div>
+        <div style="font-size:20px;font-weight:900;color:var(--deep-dark);margin-bottom:8px;">테스트 완료!</div>
+        <div class="quiz-score">${kanaQuizState.total}문제 중 ${kanaQuizState.correctCount}개 정답</div>
+        <button class="quiz-next" style="display:inline-block;margin-top:20px;" onclick="startKanaQuiz()">다시 풀기</button>
+      </div>`;
+    return;
+  }
+  const k = kanaQuizState.pool[kanaQuizState.idx];
+  const wrongPool = list.filter(x=>x.char!==k.char).sort(()=>Math.random()-0.5).slice(0,3);
+  const options = [k, ...wrongPool].sort(()=>Math.random()-0.5);
+
+  let optHtml = '';
+  options.forEach(o=>{
+    optHtml += `<button class="opt-btn" data-correct="${o.char===k.char}" data-char="${o.char}">${o.romaji}</button>`;
+  });
+
+  body.innerHTML = `
+    <div class="quiz-wrap">
+      <div class="quiz-progress">${kanaQuizState.idx+1} / ${kanaQuizState.pool.length}</div>
+      <div class="quiz-word jp">${k.char}</div>
+      <div class="quiz-options">${optHtml}</div>
+      <div class="quiz-score">맞은 개수: ${kanaQuizState.correctCount} / ${kanaQuizState.total}</div>
+      <button class="quiz-next" id="kanaQuizNext">다음 문제 →</button>
+    </div>`;
+
+  document.querySelectorAll('#kanaBody .opt-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const allBtns = document.querySelectorAll('#kanaBody .opt-btn');
+      if(allBtns[0].disabled) return;
+      allBtns.forEach(b=>b.disabled=true);
+      kanaQuizState.total++;
+      const isCorrect = btn.dataset.correct === 'true';
+      if(isCorrect){ kanaQuizState.correctCount++; btn.classList.add('correct'); }
+      else{
+        btn.classList.add('wrong');
+        allBtns.forEach(b=>{ if(b.dataset.correct==='true') b.classList.add('correct'); });
+      }
+      kanaQuizMark(k.char, isCorrect);
+      document.getElementById('kanaQuizNext').style.display='inline-block';
+    });
+  });
+  document.getElementById('kanaQuizNext').addEventListener('click', ()=>{
+    kanaQuizState.idx++;
+    renderKanaQuizBody();
+  });
+}
+
+/* ---------- QUIZ ---------- */
+function startQuiz(){
+  quizState.pool = [...WORDS].sort(()=>Math.random()-0.5);
+  quizState.idx = 0;
+  quizState.correctCount = 0;
+  quizState.total = 0;
+  renderQuizQuestion();
+}
+function renderQuizQuestion(){
+  if(quizState.idx >= quizState.pool.length){
+    document.getElementById('main').innerHTML = `
+      <div class="quiz-wrap">
+        <div class="em" style="font-size:40px;margin-bottom:14px;">🎉</div>
+        <div style="font-size:20px;font-weight:900;color:var(--deep-dark);margin-bottom:8px;">테스트 완료!</div>
+        <div class="quiz-score">${quizState.total}문제 중 ${quizState.correctCount}개 정답</div>
+        <button class="quiz-next" style="display:inline-block;margin-top:20px;" onclick="startQuiz()">다시 풀기</button>
+      </div>`;
+    return;
+  }
+  const w = quizState.pool[quizState.idx];
+  const wrongPool = WORDS.filter(x=>x.kana!==w.kana).sort(()=>Math.random()-0.5).slice(0,3);
+  const options = [w, ...wrongPool].sort(()=>Math.random()-0.5);
+  quizState.answered = false;
+
+  let optHtml = '';
+  options.forEach(o=>{
+    optHtml += `<button class="opt-btn" data-correct="${o.kana===w.kana}" data-kana="${o.kana}">${o.meaning}</button>`;
+  });
+
+  document.getElementById('main').innerHTML = `
+    <div class="quiz-wrap">
+      <div class="quiz-progress">${quizState.idx+1} / ${quizState.pool.length}</div>
+      <div class="quiz-word jp">${w.kana}</div>
+      <div class="quiz-romaji">${w.romaji}</div>
+      <div class="quiz-options">${optHtml}</div>
+      <div class="quiz-score">맞은 개수: ${quizState.correctCount} / ${quizState.total}</div>
+      <button class="quiz-next" id="quizNext">다음 문제 →</button>
+    </div>`;
+
+  document.querySelectorAll('.opt-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(quizState.answered) return;
+      quizState.answered = true;
+      quizState.total++;
+      const isCorrect = btn.dataset.correct === 'true';
+      if(isCorrect){
+        quizState.correctCount++;
+        btn.classList.add('correct');
+        markKnowSilent(w.kana);
+      }else{
+        btn.classList.add('wrong');
+        document.querySelectorAll('.opt-btn').forEach(b=>{ if(b.dataset.correct==='true') b.classList.add('correct'); });
+        markDontKnowSilent(w.kana);
+      }
+      document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+      document.getElementById('quizNext').style.display='inline-block';
+    });
+  });
+  document.getElementById('quizNext').addEventListener('click', ()=>{
+    quizState.idx++;
+    renderQuizQuestion();
+  });
+}
+function markKnowSilent(kana){
+  const p = progress[kana]; p.correct++; p.streak++; if(p.streak>=2) p.mastered=true; saveProgress(kana); renderStats();
+}
+function markDontKnowSilent(kana){
+  const p = progress[kana]; p.wrong++; p.streak=0; p.mastered=false; saveProgress(kana); renderStats();
+}
+
+/* ---------- 모드 전환 ---------- */
+function render(){
+  renderStats();
+  if(currentMode==='cards') renderCards();
+  else if(currentMode==='phrase') renderPhrase();
+  else if(currentMode==='review') renderReview();
+  else if(currentMode==='quiz') startQuiz();
+  else if(currentMode==='kana') renderKana();
+}
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    currentMode = tab.dataset.mode;
+    render();
+  });
+});
+
+(async function init(){
+  try{
+    await loadProgress();
+    render();
+  }catch(e){
+    document.getElementById('main').innerHTML =
+      '<div class="empty-state"><div class="em">⚠️</div>불러오는 중 문제가 생겼어요.<br>페이지를 새로고침해 주세요.</div>';
+    console.error(e);
+  }
+})();
 </script>
-
-
 </body>
-
 </html>
