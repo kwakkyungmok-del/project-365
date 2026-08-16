@@ -635,6 +635,11 @@ let currentKanaSet = "hiragana"; // hiragana | katakana
 let currentKanaType = "basic"; // basic | dakuten | handakuten | combo
 let kanaViewMode = "cards"; // cards | quiz | review
 let kanaQuizState = { pool: [], idx: 0, correctCount:0, total:0 };
+  const correctSound = new Audio("../dragon-studio-correct-472358.mp3");
+function playCorrectSound(){
+  correctSound.currentTime = 0;
+  correctSound.play().catch(()=>{ /* 자동재생 정책으로 막힐 수 있음, 무시 */ });
+}
 let quizState = { pool: [], idx: 0, correctCount:0, total:0, answered:false };
 
 async function loadProgress(){
@@ -1014,6 +1019,7 @@ function renderQuizQuestion(){
         quizState.correctCount++;
         btn.classList.add('correct');
         markKnowSilent(w.kana);
+        playCorrectSound();
       }else{
         btn.classList.add('wrong');
         document.querySelectorAll('.opt-btn').forEach(b=>{ if(b.dataset.correct==='true') b.classList.add('correct'); });
