@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>카드 게임</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+    --gold:#d4a24c;
+    --gold-dim:#8a6a30;
+    --gold-glow:rgba(212,162,76,.35);
+}
+body{
+    background:#0b0b0b;
+    color:#fff;
+    min-height:100vh;
+    font-family:'Inter',Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+}
+
+/* 메인으로 버튼 */
+.home{
+    position:fixed;
+    top:20px;left:20px;
+    border:1px solid #333;
+    background:#111;
+    color:#888;
+    padding:9px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+    text-decoration:none;
+    z-index:50;
+    transition:.2s;
+}
+.home:hover{color:var(--gold);background:#181818;border-color:var(--gold-dim);}
+
+.wrap{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:80px 20px 60px;
+    text-align:center;
+}
+
+.label{
+    font-size:12px;
+    letter-spacing:5px;
+    color:var(--gold);
+    font-weight:700;
+    margin-bottom:18px;
+}
+
+h1{
+    font-size:52px;
+    font-weight:800;
+    letter-spacing:-2px;
+    margin-bottom:14px;
+    position:relative;
+    display:inline-block;
+}
+
+h1::after{
+    content:"";
+    position:absolute;
+    left:2px;right:2px;bottom:-10px;
+    height:3px;
+    background:linear-gradient(90deg, var(--gold), transparent);
+    border-radius:2px;
+}
+
+.subtitle{
+    color:#8f8f8f;
+    font-size:16px;
+    margin-bottom:56px;
+}
+
+.game-grid{
+    display:flex;
+    gap:24px;
+    flex-wrap:wrap;
+    justify-content:center;
+    max-width:760px;
+}
+
+.game-card{
+    width:320px;
+    background:#111;
+    border:1px solid #262626;
+    border-radius:18px;
+    padding:32px 26px;
+    cursor:pointer;
+    text-decoration:none;
+    color:inherit;
+    text-align:left;
+    transition:.25s;
+    position:relative;
+    overflow:hidden;
+    border-top:2px solid transparent;
+}
+
+.game-card:hover{
+    transform:translateY(-6px);
+    border-color:var(--gold-dim);
+    border-top-color:var(--gold);
+    box-shadow:0 12px 30px rgba(0,0,0,.5), 0 0 26px var(--gold-glow);
+}
+
+.game-icon{
+    font-size:34px;
+    margin-bottom:20px;
+    display:block;
+}
+
+.game-title{
+    font-size:22px;
+    font-weight:800;
+    margin-bottom:10px;
+    letter-spacing:-.5px;
+}
+
+.game-desc{
+    font-size:13px;
+    color:#999;
+    line-height:1.7;
+    margin-bottom:22px;
+}
+
+.game-tags{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+.tag{
+    font-size:11px;
+    color:var(--gold);
+    background:rgba(212,162,76,.1);
+    border:1px solid var(--gold-dim);
+    padding:4px 10px;
+    border-radius:999px;
+    font-weight:600;
+}
+
+.game-card .arrow{
+    position:absolute;
+    right:22px;
+    bottom:22px;
+    font-size:20px;
+    color:#444;
+    transition:.25s;
+}
+
+.game-card:hover .arrow{
+    color:var(--gold);
+    transform:translateX(4px);
+}
+
+@media(max-width:768px){
+    h1{font-size:38px;}
+    .subtitle{font-size:14px;margin-bottom:40px;}
+    .game-card{width:100%;max-width:340px;}
+}
+</style>
+</head>
+<body>
+
+<a class="home" href="../">← 메인으로</a>
+
+<div class="wrap">
+
+    <div class="label">PROJECT 365</div>
+    <h1>카드 게임</h1>
+    <div class="subtitle">할 게임을 선택하세요</div>
+
+    <div class="game-grid">
+
+        <a class="game-card" href="onecard/">
+            <span class="game-icon">🃏</span>
+            <div class="game-title">원카드</div>
+            <div class="game-desc">
+                트럼프 카드로 즐기는 원카드. CPU 1~3명과 대결하며,
+                Q·K·J·7·2·A·조커까지 풀 룰이 적용됩니다.
+            </div>
+            <div class="game-tags">
+                <span class="tag">CPU 대전</span>
+                <span class="tag">전략</span>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+
+        <a class="game-card" href="haligali/">
+            <span class="game-icon">🔔</span>
+            <div class="game-title">할리갈리</div>
+            <div class="game-desc">
+                과일 카드가 5개가 되는 순간 먼저 종을 치세요.
+                CPU 난이도(쉬움/보통/고수)를 골라 반응속도 승부를 겨룹니다.
+            </div>
+            <div class="game-tags">
+                <span class="tag">반응속도</span>
+                <span class="tag">실시간</span>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>
