@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>할리갈리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+    --gold:#d4a24c;
+    --gold-dim:#8a6a30;
+    --gold-glow:rgba(212,162,76,.35);
+}
+body{
+    background:#0b0b0b;color:#fff;min-height:100vh;
+    font-family:'Inter',Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+}
+.wrap{max-width:900px;margin:0 auto;padding:24px 18px 60px;}
+
+.home{
+    position:fixed;top:20px;left:20px;border:1px solid #333;background:#111;color:#888;
+    padding:9px 15px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;
+    text-decoration:none;z-index:50;
+}
+.home:hover{color:var(--gold);background:#181818;border-color:var(--gold-dim);}
+
+/* 세팅 화면 */
+#setupScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;}
+.setup-label{font-size:12px;letter-spacing:5px;color:var(--gold);font-weight:700;margin-bottom:16px;}
+.setup-title{font-size:44px;font-weight:800;letter-spacing:-2px;margin-bottom:36px;}
+.diff-select{display:flex;gap:12px;margin-bottom:36px;}
+.diff-btn{
+    border:1px solid #333;background:#111;color:#aaa;padding:16px 26px;border-radius:12px;
+    font-size:15px;font-weight:700;cursor:pointer;transition:.2s;
+}
+.diff-btn.active{background:var(--gold);color:#1a1204;border-color:var(--gold);}
+.diff-btn:hover:not(.active){background:#1a1a1a;border-color:var(--gold-dim);color:#ddd;}
+.rules-box{
+    max-width:560px;text-align:left;color:#888;font-size:13px;line-height:1.9;
+    background:#111;border:1px solid #262626;border-left:3px solid var(--gold);border-radius:14px;padding:22px 26px;margin-bottom:36px;
+}
+.rules-box b{color:var(--gold);}
+.start-btn{
+    background:#fff;color:#000;border:none;border-radius:12px;padding:16px 46px;
+    font-size:16px;font-weight:700;cursor:pointer;transition:.25s;
+}
+.start-btn:hover{transform:translateY(-3px);box-shadow:0 0 24px var(--gold-glow);color:#1a1204;background:var(--gold);}
+
+/* 게임 화면 */
+#gameScreen{display:none;}
+
+.status-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:26px;}
+.side-box{
+    background:#111;border:1px solid #262626;border-radius:14px;padding:16px 22px;text-align:center;min-width:130px;
+}
+.side-name{font-size:12px;color:#999;font-weight:700;letter-spacing:1px;margin-bottom:6px;}
+.side-count{font-size:26px;font-weight:800;}
+.side-count span{font-size:11px;color:#666;font-weight:600;}
+
+.center-table{
+    display:flex;justify-content:center;align-items:center;gap:60px;margin:20px 0 34px;flex-wrap:wrap;
+}
+
+.stack-area{text-align:center;}
+.stack-label{font-size:11px;color:#666;font-weight:700;letter-spacing:2px;margin-bottom:12px;}
+.deck-pile{
+    width:90px;height:126px;border-radius:10px;margin:0 auto 10px;
+    background:repeating-linear-gradient(45deg,#1a1a1a,#1a1a1a 6px,#222 6px,#222 12px);
+    border:2px solid #333;display:flex;align-items:center;justify-content:center;
+    font-size:12px;color:#666;cursor:pointer;transition:.15s;
+}
+.deck-pile:hover{border-color:var(--gold);box-shadow:0 0 14px var(--gold-glow);}
+.deck-pile.disabled{cursor:not-allowed;opacity:.35;}
+.deck-count-txt{font-size:12px;color:#777;margin-bottom:14px;}
+
+.fruit-card{
+    width:90px;height:126px;border-radius:10px;background:#f4f4f2;color:#111;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    box-shadow:0 4px 12px rgba(0,0,0,.4);font-weight:800;
+}
+.fruit-icons{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    align-content:center;
+    gap:1px 3px;
+    width:70px;
+    font-size:18px;
+    line-height:1;
+}
+.fruit-icons span{display:inline-block;}
+.fruit-name{font-size:11px;color:#555;}
+.empty-slot{
+    width:90px;height:126px;border-radius:10px;border:2px dashed #2a2a2a;
+}
+
+.bell-area{text-align:center;margin:10px 0 30px;}
+.bell-btn{
+    width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, #e6cf9e 55%, var(--gold) 100%);
+    color:#1a1204;font-size:16px;font-weight:800;border:3px solid var(--gold-dim);cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,.5);transition:.12s;
+}
+.bell-btn:hover{border-color:var(--gold);box-shadow:0 6px 22px var(--gold-glow);}
+.bell-btn:active{transform:scale(.93);}
+.bell-hint{margin-top:12px;color:#666;font-size:12px;}
+
+.msg-banner{
+    text-align:center;font-size:15px;font-weight:700;min-height:24px;margin-bottom:10px;color:var(--gold);
+}
+
+.log{
+    margin-top:10px;background:#0f0f0f;border:1px solid #222;border-radius:12px;
+    padding:14px 18px;max-height:150px;overflow-y:auto;font-size:12px;color:#888;line-height:1.8;
+}
+
+.overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);
+    align-items:center;justify-content:center;z-index:100;flex-direction:column;text-align:center;
+}
+.overlay.show{display:flex;}
+.overlay h2{font-size:38px;font-weight:800;margin-bottom:10px;color:var(--gold);}
+.overlay p{color:#999;margin-bottom:26px;}
+
+.flash{animation:flash .4s;}
+@keyframes flash{
+    0%{box-shadow:0 0 0 rgba(212,162,76,0);}
+    40%{box-shadow:0 0 34px var(--gold-glow);}
+    100%{box-shadow:0 0 0 rgba(212,162,76,0);}
+}
+.penalty-note{font-size:11px;color:#555;margin-top:6px;}
+</style>
+</head>
+<body>
+
+<a class="home" href="../">← 카드게임 홈</a>
+
+<div class="wrap">
+
+<div id="setupScreen">
+    <div class="setup-label">REACTION CARD GAME</div>
+    <div class="setup-title">할리갈리</div>
+
+    <div>
+        <div class="stack-label" style="margin-bottom:12px;">CPU 난이도</div>
+        <div class="diff-select" id="diffSelect">
+            <button class="diff-btn" data-d="easy">쉬움</button>
+            <button class="diff-btn active" data-d="normal">보통</button>
+            <button class="diff-btn" data-d="hard">고수</button>
+        </div>
+    </div>
+
+    <div class="rules-box">
+        과일(라임·자두·딸기·바나나) 1~5개가 그려진 카드를 번갈아 냅니다.<br>
+        같은 과일이 <b>공개된 카드 기준 5개</b>가 되는 순간, 먼저 종(<b>E키</b> 또는 아래 버튼)을 치면
+        그 라운드에 나온 카드를 모두 가져갑니다.<br>
+        5개가 아닌데 잘못 치면 그 라운드 카드는 종 밑에 깔려 다음 승자에게 몰아서 넘어가요.<br>
+        상대 카드를 모두 가져오면 승리! (시작 30장씩)
+    </div>
+
+    <button class="start-btn" id="startBtn">게임 시작</button>
+</div>
+
+<div id="gameScreen">
+
+    <div class="msg-banner" id="msgBanner"></div>
+
+    <div class="status-row">
+        <div class="side-box" id="cpuBox">
+            <div class="side-name">CPU 🤖</div>
+            <div class="side-count" id="cpuCount">30<span> 장</span></div>
+        </div>
+        <div class="side-box" id="penaltyBox">
+            <div class="side-name">종 밑 카드</div>
+            <div class="side-count" id="penaltyCount">0<span> 장</span></div>
+        </div>
+        <div class="side-box" id="meBox">
+            <div class="side-name">나</div>
+            <div class="side-count" id="meCount">30<span> 장</span></div>
+        </div>
+    </div>
+
+    <div class="center-table">
+        <div class="stack-area">
+            <div class="stack-label">CPU 카드</div>
+            <div id="cpuStackCard"><div class="empty-slot"></div></div>
+        </div>
+        <div class="stack-area">
+            <div class="stack-label">내 카드 (클릭해서 내기)</div>
+            <div class="deck-pile" id="myDeckPile">내 덱</div>
+            <div class="deck-count-txt" id="myDeckCount">30장 남음</div>
+        </div>
+        <div class="stack-area">
+            <div class="stack-label">내가 낸 카드</div>
+            <div id="myStackCard"><div class="empty-slot"></div></div>
+        </div>
+    </div>
+
+    <div class="bell-area">
+        <button class="bell-btn" id="bellBtn">🔔<br>종 치기</button>
+        <div class="bell-hint">키보드 E 키로도 칠 수 있어요</div>
+    </div>
+
+    <div class="log" id="logBox"></div>
+</div>
+
+</div>
+
+<div class="overlay" id="overlay">
+    <h2 id="overlayTitle"></h2>
+    <p id="overlaySub"></p>
+    <button class="start-btn" onclick="location.reload()">다시 하기</button>
+</div>
+
+<script>
+/* ===================== 데이터 ===================== */
+
+const FRUITS = [
+    {key:"lime", name:"라임", icon:"🟢"},
+    {key:"plum", name:"자두", icon:"🟣"},
+    {key:"straw", name:"딸기", icon:"🔴"},
+    {key:"banana", name:"바나나", icon:"🟡"}
+];
+
+const DIFF = {
+    easy:   {min:300, max:500, mistake:0.15},
+    normal: {min:100, max:299, mistake:0.05},
+    hard:   {min:50,  max:150, mistake:0.02}
+};
+
+function makeDeck(){
+    const deck = [];
+    for(const f of FRUITS){
+        for(let n=1;n<=5;n++){
+            for(let copy=0;copy<3;copy++){
+                deck.push({fruit:f.key, name:f.name, icon:f.icon, count:n});
+            }
+        }
+    }
+    return deck;
+}
+
+function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+}
+
+/* ===================== 상태 ===================== */
+
+let state = null;
+let bellTimer = null;
+let cpuTurnTimer = null;
+
+function initGame(diffKey){
+    const deck = shuffle(makeDeck());
+    const meDeck = deck.slice(0,30);
+    const cpuDeck = deck.slice(30,60);
+
+    state = {
+        diff: DIFF[diffKey],
+        me:  {deck: meDeck, stack: [], roundCards: []},
+        cpu: {deck: cpuDeck, stack: [], roundCards: []},
+        penaltyPile: [],
+        turn: "me", // 다음 플립 차례
+        bellOpen: false,   // 5조건 성립 중인지
+        bellWinnerCheck: null, // true일때 정답
+        over: false,
+        flipping: false
+    };
+
+    log("게임 시작! 카드를 클릭해서 내보세요.");
+    renderAll();
+    scheduleCpuFlipIfNeeded();
+}
+
+function log(msg){
+    const box = document.getElementById("logBox");
+    const line = document.createElement("div");
+    line.textContent = msg;
+    box.prepend(line);
+}
+
+/* ===================== 핵심 로직 ===================== */
+
+function currentFruitTotals(){
+    const totals = {};
+    for(const f of FRUITS) totals[f.key]=0;
+    if(state.me.stack.length){
+        const top = state.me.stack[state.me.stack.length-1];
+        totals[top.fruit]+=top.count;
+    }
+    if(state.cpu.stack.length){
+        const top = state.cpu.stack[state.cpu.stack.length-1];
+        totals[top.fruit]+=top.count;
+    }
+    return totals;
+}
+
+function isFiveCondition(){
+    const totals = currentFruitTotals();
+    return Object.values(totals).some(v=>v===5);
+}
+
+function flipCard(who){
+    if(state.over || state.flipping) return;
+    const side = state[who];
+    if(side.deck.length===0) return; // 낼 카드 없음
+
+    const card = side.deck.pop();
+    side.stack.push(card);
+    side.roundCards.push(card);
+
+    log(`${who==="me"?"나":"CPU"}: ${card.name} ${card.count}개 냄`);
+
+    renderAll();
+
+    // 다음 차례로 넘기기 전에 5 조건 확인 후 벨 윈도우 오픈
+    if(isFiveCondition()){
+        openBellWindow();
+    } else {
+        state.turn = who==="me" ? "cpu" : "me";
+        scheduleCpuFlipIfNeeded();
+    }
+}
+
+function openBellWindow(){
+    state.bellOpen = true;
+    document.getElementById("bellBtn").classList.add("flash");
+
+    // CPU 반응 예약 (조건이 참일 때만 = 정확한 반응)
+    const d = state.diff;
+    const reactTime = d.min + Math.random()*(d.max-d.min);
+    const willMistakeInstead = Math.random() < d.mistake; // 실수로 반응 못함(놓침)
+
+    clearTimeout(bellTimer);
+    bellTimer = setTimeout(()=>{
+        if(!state.bellOpen) return;
+        if(willMistakeInstead){
+            log("CPU: 반응하지 못했다 (실수)");
+            // CPU가 놓치면 계속 벨윈도우는 열려있는 채로 유지, 유저가 나중에라도 칠 수 있음
+            // 하지만 실제 게임처럼 잠깐의 기회를 놓친 것으로 처리하고, 이후 유저가 계속 칠 수 있게 둔다.
+            return;
+        }
+        resolveBell("cpu", true);
+    }, reactTime);
+}
+
+function ringBell(who){
+    if(state.over) return;
+    const correct = isFiveCondition();
+    clearTimeout(bellTimer);
+    resolveBell(who, correct);
+}
+
+function resolveBell(who, correct){
+    if(!state.bellOpen && !correct) {
+        // 조건이 거짓인 상태에서 임의로 친 경우도 처리 (bellOpen 여부와 무관하게 오탐 가능)
+    }
+    state.bellOpen = false;
+    document.getElementById("bellBtn").classList.remove("flash");
+
+    const allRoundCards = [...state.me.roundCards, ...state.cpu.roundCards];
+
+    if(correct){
+        const winner = who==="me" ? state.me : state.cpu;
+        const won = [...allRoundCards, ...state.penaltyPile];
+        winner.deck.unshift(...shuffle(won));
+        state.penaltyPile = [];
+        state.me.stack = [];
+        state.cpu.stack = [];
+        state.me.roundCards = [];
+        state.cpu.roundCards = [];
+        log(`${who==="me"?"나":"CPU"}: 정확히 종을 쳐서 ${won.length}장 획득!`);
+        showMsg(`${who==="me"?"나":"CPU"} 종 치기 성공! +${won.length}장`);
+    } else {
+        state.penaltyPile.push(...allRoundCards);
+        state.me.stack = [];
+        state.cpu.stack = [];
+        state.me.roundCards = [];
+        state.cpu.roundCards = [];
+        log(`${who==="me"?"나":"CPU"}: 잘못 쳤다! 카드가 종 밑에 깔림`);
+        showMsg(`${who==="me"?"나":"CPU"} 오답! 카드가 종 아래로`);
+    }
+
+    renderAll();
+
+    // 승패 체크
+    const meTotal = state.me.deck.length + state.me.stack.length;
+    const cpuTotal = state.cpu.deck.length + state.cpu.stack.length;
+
+    if(meTotal===0 || cpuTotal===0){
+        state.over = true;
+        renderAll();
+        if(meTotal===0 && cpuTotal===0){
+            showOverlay("무승부", "카드가 모두 소진됐어요.");
+        } else if(cpuTotal===0){
+            showOverlay("승리!", "CPU의 카드를 모두 가져왔어요.");
+        } else {
+            showOverlay("패배", "카드를 모두 잃었어요.");
+        }
+        return;
+    }
+
+    // 다음 라운드 이어가기: 턴 유지, 덱 있는 쪽이 계속 낼 수 있게
+    if(state.me.deck.length===0 && state.cpu.deck.length===0){
+        // 아무도 못냄 -> 정지 (이론상 도달하기 어려움)
+        return;
+    }
+    if(state.me.deck.length===0) state.turn = "cpu";
+    else if(state.cpu.deck.length===0) state.turn = "me";
+
+    scheduleCpuFlipIfNeeded();
+}
+
+function showMsg(text){
+    const el = document.getElementById("msgBanner");
+    el.textContent = text;
+    setTimeout(()=>{ if(el.textContent===text) el.textContent=""; }, 2200);
+}
+
+function scheduleCpuFlipIfNeeded(){
+    clearTimeout(cpuTurnTimer);
+    if(state.over || state.bellOpen) return;
+    if(state.turn!=="cpu") return;
+    if(state.cpu.deck.length===0){
+        state.turn = "me";
+        return;
+    }
+    cpuTurnTimer = setTimeout(()=>{
+        if(state.over || state.bellOpen) return;
+        flipCard("cpu");
+    }, 550 + Math.random()*400);
+}
+
+/* ===================== 렌더링 ===================== */
+
+function fruitCardHTML(card){
+    if(!card) return `<div class="empty-slot"></div>`;
+    return `<div class="fruit-card">
+        <div class="fruit-icons">${Array(card.count).fill(`<span>${card.icon}</span>`).join("")}</div>
+        <div class="fruit-name">${card.name} ${card.count}</div>
+    </div>`;
+}
+
+function renderAll(){
+    if(!state) return;
+
+    document.getElementById("cpuCount").innerHTML = `${state.cpu.deck.length + state.cpu.stack.length}<span> 장</span>`;
+    document.getElementById("meCount").innerHTML = `${state.me.deck.length + state.me.stack.length}<span> 장</span>`;
+    document.getElementById("penaltyCount").innerHTML = `${state.penaltyPile.length}<span> 장</span>`;
+
+    document.getElementById("myDeckCount").textContent = state.me.deck.length + "장 남음";
+
+    const myPileEl = document.getElementById("myDeckPile");
+    const canFlip = !state.over && !state.bellOpen && state.turn==="me" && state.me.deck.length>0;
+    myPileEl.classList.toggle("disabled", !canFlip);
+
+    document.getElementById("cpuStackCard").innerHTML = fruitCardHTML(state.cpu.stack[state.cpu.stack.length-1]);
+    document.getElementById("myStackCard").innerHTML = fruitCardHTML(state.me.stack[state.me.stack.length-1]);
+}
+
+function showOverlay(title, sub){
+    document.getElementById("overlayTitle").textContent = title;
+    document.getElementById("overlaySub").textContent = sub;
+    document.getElementById("overlay").classList.add("show");
+}
+
+/* ===================== 이벤트 ===================== */
+
+let selectedDiff = "normal";
+document.querySelectorAll(".diff-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".diff-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedDiff = btn.dataset.d;
+    });
+});
+
+document.getElementById("startBtn").addEventListener("click", ()=>{
+    document.getElementById("setupScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
+    initGame(selectedDiff);
+});
+
+document.getElementById("myDeckPile").addEventListener("click", ()=>{
+    if(!state || state.over || state.bellOpen) return;
+    if(state.turn!=="me") return;
+    flipCard("me");
+});
+
+document.getElementById("bellBtn").addEventListener("click", ()=>{
+    if(!state || state.over) return;
+    ringBell("me");
+});
+
+document.addEventListener("keydown", (e)=>{
+    if(e.key.toLowerCase()==="e"){
+        if(!state || state.over) return;
+        ringBell("me");
+    }
+});
+</script>
+</body>
+</html>
