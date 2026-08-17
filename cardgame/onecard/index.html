@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>원카드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+    --gold:#d4a24c;
+    --gold-dim:#8a6a30;
+    --gold-glow:rgba(212,162,76,.35);
+}
+body{
+    background:#0b0b0b;
+    color:#fff;
+    min-height:100vh;
+    font-family:'Inter',Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+}
+.wrap{max-width:980px;margin:0 auto;padding:24px 18px 60px;}
+
+/* 홈 버튼 */
+.home{
+    position:fixed;
+    top:20px;left:20px;
+    border:1px solid #333;
+    background:#111;
+    color:#888;
+    padding:9px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+    text-decoration:none;
+    z-index:50;
+}
+.home:hover{color:var(--gold);background:#181818;border-color:var(--gold-dim);}
+
+/* ===== 세팅 화면 ===== */
+#setupScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    text-align:center;
+}
+.setup-label{font-size:12px;letter-spacing:5px;color:var(--gold);font-weight:700;margin-bottom:16px;}
+.setup-title{font-size:44px;font-weight:800;letter-spacing:-2px;margin-bottom:36px;}
+.cpu-select{display:flex;gap:12px;margin-bottom:36px;}
+.cpu-btn{
+    border:1px solid #333;
+    background:#111;
+    color:#aaa;
+    padding:16px 26px;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
+    min-width:64px;
+}
+.cpu-btn.active{background:var(--gold);color:#1a1204;border-color:var(--gold);}
+.cpu-btn:hover:not(.active){background:#1a1a1a;border-color:var(--gold-dim);color:#ddd;}
+.rules-box{
+    max-width:560px;
+    text-align:left;
+    color:#888;
+    font-size:13px;
+    line-height:1.9;
+    background:#111;
+    border:1px solid #262626;
+    border-left:3px solid var(--gold);
+    border-radius:14px;
+    padding:22px 26px;
+    margin-bottom:36px;
+}
+.rules-box b{color:var(--gold);}
+.start-btn{
+    background:#fff;color:#000;border:none;border-radius:12px;
+    padding:16px 46px;font-size:16px;font-weight:700;cursor:pointer;transition:.25s;
+}
+.start-btn:hover{transform:translateY(-3px);box-shadow:0 0 24px var(--gold-glow);color:#1a1204;background:var(--gold);}
+
+/* ===== 게임 화면 ===== */
+#gameScreen{display:none;}
+.table{
+    display:flex;flex-direction:column;gap:14px;
+}
+.opponents{
+    display:flex;gap:14px;flex-wrap:wrap;justify-content:center;
+}
+.player-box{
+    background:#111;border:1px solid #262626;border-radius:14px;
+    padding:14px 18px;min-width:150px;text-align:center;position:relative;
+}
+.player-box.turn{border-color:var(--gold);box-shadow:0 0 18px var(--gold-glow);}
+.player-name{font-size:12px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:8px;}
+.player-count{font-size:26px;font-weight:800;}
+.player-count span{font-size:12px;color:#666;font-weight:600;}
+
+.center-area{
+    display:flex;align-items:center;justify-content:center;gap:40px;
+    margin:20px 0;flex-wrap:wrap;
+}
+.pile{text-align:center;}
+.pile-label{font-size:11px;color:#666;font-weight:700;letter-spacing:2px;margin-bottom:10px;}
+.card{
+    width:76px;height:108px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:800;
+    position:relative;
+    user-select:none;
+    box-shadow:0 4px 10px rgba(0,0,0,.4);
+}
+.card.back{
+    background:repeating-linear-gradient(45deg,#1a1a1a,#1a1a1a 6px,#222 6px,#222 12px);
+    border:2px solid #333;
+}
+.card.face{background:#f4f4f2;color:#111;border:2px solid #ddd;flex-direction:column;gap:2px;}
+.card.face.red{color:#c0392b;}
+.card.face .rank{font-size:20px;}
+.card.face .suit{font-size:16px;}
+.card.joker{background:#1c1c1c;color:#fff;border:2px solid #555;}
+.deck-stack{position:relative;cursor:pointer;}
+.deck-count{margin-top:8px;font-size:12px;color:#888;}
+
+.direction{font-size:26px;color:var(--gold);transition:.3s;}
+.suit-tag{
+    position:absolute;top:-10px;right:-10px;
+    background:var(--gold);color:#1a1204;border-radius:50%;
+    width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:800;
+    box-shadow:0 0 10px var(--gold-glow);
+}
+
+.attack-banner{
+    text-align:center;color:var(--gold);font-weight:700;font-size:14px;
+    min-height:20px;margin-bottom:6px;
+}
+
+.controls{display:flex;justify-content:center;gap:12px;margin:14px 0;}
+.ctrl-btn{
+    border:1px solid #333;background:#141414;color:#eee;
+    padding:12px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;
+}
+.ctrl-btn:hover{background:#1e1e1e;border-color:var(--gold-dim);color:var(--gold);}
+.ctrl-btn:disabled{opacity:.35;cursor:not-allowed;}
+
+.hand-label{text-align:center;font-size:12px;color:#666;font-weight:700;letter-spacing:2px;margin:20px 0 10px;}
+.hand{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:118px;
+}
+.hand .card{cursor:pointer;transition:.15s;}
+.hand .card:hover{transform:translateY(-8px);box-shadow:0 8px 18px var(--gold-glow);}
+.hand .card.disabled{opacity:.35;cursor:not-allowed;}
+.hand .card.disabled:hover{transform:none;}
+
+.log{
+    margin-top:24px;background:#0f0f0f;border:1px solid #222;border-radius:12px;
+    padding:14px 18px;max-height:150px;overflow-y:auto;font-size:12px;color:#888;line-height:1.8;
+}
+
+.suit-picker{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
+    align-items:center;justify-content:center;z-index:100;
+}
+.suit-picker.show{display:flex;}
+.suit-picker-box{background:#141414;border:1px solid #333;border-radius:16px;padding:30px;text-align:center;}
+.suit-picker-box p{margin-bottom:18px;color:#ccc;font-weight:700;}
+.suit-opts{display:flex;gap:14px;}
+.suit-opt{
+    width:60px;height:60px;border-radius:12px;background:#1c1c1c;border:1px solid #333;
+    display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;transition:.2s;
+}
+.suit-opt:hover{background:#262626;border-color:var(--gold);transform:translateY(-3px);box-shadow:0 0 16px var(--gold-glow);}
+
+.overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);
+    align-items:center;justify-content:center;z-index:100;flex-direction:column;text-align:center;
+}
+.overlay.show{display:flex;}
+.overlay h2{font-size:38px;font-weight:800;margin-bottom:10px;color:var(--gold);}
+.overlay p{color:#999;margin-bottom:26px;}
+</style>
+</head>
+<body>
+
+<a class="home" href="../">← 카드게임 홈</a>
+
+<div class="wrap">
+
+<!-- 세팅 화면 -->
+<div id="setupScreen">
+    <div class="setup-label">TRUMP CARD</div>
+    <div class="setup-title">원카드</div>
+
+    <div>
+        <div class="hand-label" style="margin-top:0;">CPU 인원 선택</div>
+        <div class="cpu-select" id="cpuSelect">
+            <button class="cpu-btn" data-n="1">1명</button>
+            <button class="cpu-btn active" data-n="2">2명</button>
+            <button class="cpu-btn" data-n="3">3명</button>
+        </div>
+    </div>
+
+    <div class="rules-box">
+        <b>Q</b> 방향 전환 · <b>K</b> 한 번 더 내기 · <b>J</b> 다음 사람 점프<br>
+        <b>7</b> 모양 바꾸기 · <b>2</b> 다음 사람 1장 먹이기 · <b>A</b> 다음 사람 2장 먹이기<br>
+        <b>흑백 Joker</b> 3장 먹이기 · <b>색 Joker</b> 5장 먹이기<br>
+        먹이는 카드는 <b>같은 등급 이상</b>의 먹이는 카드로만 방어할 수 있어요 (2 → A → 흑백조커 → 색조커).<br>
+        <b>Joker만 모양/숫자 상관없이 언제나</b> 낼 수 있고, <b>A와 2는 다른 카드처럼 모양이나 숫자가 맞아야</b> 낼 수 있어요.
+    </div>
+
+    <button class="start-btn" id="startBtn">게임 시작</button>
+</div>
+
+<!-- 게임 화면 -->
+<div id="gameScreen">
+    <div class="opponents" id="opponents"></div>
+
+    <div class="attack-banner" id="attackBanner"></div>
+
+    <div class="center-area">
+        <div class="pile">
+            <div class="pile-label">DECK</div>
+            <div class="deck-stack" id="deckPile">
+                <div class="card back"></div>
+            </div>
+            <div class="deck-count" id="deckCount">0장</div>
+        </div>
+
+        <div class="direction" id="directionIcon">→</div>
+
+        <div class="pile">
+            <div class="pile-label">DISCARD</div>
+            <div id="discardPile"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="ctrl-btn" id="drawBtn">카드 뽑기</button>
+    </div>
+
+    <div class="player-box turn" id="myBox" style="max-width:200px;margin:0 auto;">
+        <div class="player-name">나</div>
+        <div class="player-count" id="myCount">0<span> 장</span></div>
+    </div>
+
+    <div class="hand-label">내 카드</div>
+    <div class="hand" id="myHand"></div>
+
+    <div class="log" id="logBox"></div>
+</div>
+
+</div>
+
+<!-- 모양 선택 팝업 -->
+<div class="suit-picker" id="suitPicker">
+    <div class="suit-picker-box">
+        <p>바꿀 모양을 선택하세요</p>
+        <div class="suit-opts">
+            <div class="suit-opt" data-suit="spade" style="color:#eee;">♠</div>
+            <div class="suit-opt" data-suit="heart" style="color:#e74c3c;">♥</div>
+            <div class="suit-opt" data-suit="diamond" style="color:#e74c3c;">♦</div>
+            <div class="suit-opt" data-suit="club" style="color:#eee;">♣</div>
+        </div>
+    </div>
+</div>
+
+<!-- 결과 오버레이 -->
+<div class="overlay" id="overlay">
+    <h2 id="overlayTitle"></h2>
+    <p id="overlaySub"></p>
+    <button class="start-btn" onclick="location.reload()">다시 하기</button>
+</div>
+
+<script>
+/* ===================== 데이터 정의 ===================== */
+
+const SUITS = ["spade","heart","diamond","club"];
+const SUIT_SYMBOL = {spade:"♠",heart:"♥",diamond:"♦",club:"♣"};
+const SUIT_RED = {spade:false,heart:true,diamond:true,club:false};
+const RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+
+// 먹이기 등급 순서 (낮음 -> 높음)
+const ATTACK_TIER = {"2":1, "A":2, "JOKER_MONO":3, "JOKER_COLOR":4};
+const ATTACK_VALUE = {"2":1, "A":2, "JOKER_MONO":3, "JOKER_COLOR":5};
+
+function makeDeck(){
+    const deck = [];
+    for(const s of SUITS){
+        for(const r of RANKS){
+            deck.push({type:"normal", suit:s, rank:r});
+        }
+    }
+    deck.push({type:"joker", kind:"JOKER_MONO"});
+    deck.push({type:"joker", kind:"JOKER_COLOR"});
+    return deck;
+}
+
+function shuffle(arr){
+    for(let i=arr.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [arr[i],arr[j]] = [arr[j],arr[i]];
+    }
+    return arr;
+}
+
+function isAttackCard(card){
+    if(card.type==="joker") return true;
+    return card.rank==="2" || card.rank==="A";
+}
+
+function attackKey(card){
+    if(card.type==="joker") return card.kind;
+    return card.rank; // "2" or "A"
+}
+
+function cardLabel(card){
+    if(card.type==="joker") return card.kind==="JOKER_MONO" ? "JOKER" : "COLOR JOKER";
+    return `${card.rank}${SUIT_SYMBOL[card.suit]}`;
+}
+
+/* ===================== 게임 상태 ===================== */
+
+let state = null;
+
+function initGame(cpuCount){
+    const deck = shuffle(makeDeck());
+    const players = [];
+    players.push({id:0, name:"나", isCPU:false, hand:[]});
+    for(let i=1;i<=cpuCount;i++){
+        players.push({id:i, name:`CPU ${i}`, isCPU:true, hand:[]});
+    }
+
+    for(const p of players){
+        for(let i=0;i<7;i++) p.hand.push(deck.pop());
+    }
+
+    // 시작 카드: 일반 숫자 카드가 나올 때까지 (효과 카드 제외)
+    let top = deck.pop();
+    while(top.type!=="normal" || ["J","Q","K","7","A","2"].includes(top.rank)){
+        deck.unshift(top);
+        deck_shuffleTail(deck);
+        top = deck.pop();
+    }
+
+    state = {
+        players,
+        deck,
+        discard:[top],
+        currentSuit: top.suit,
+        turn: 0,
+        direction: 1,
+        pendingAttack: null, // {total, tier, key}
+        skipNext: false,
+        over: false
+    };
+
+    log(`게임 시작! CPU ${cpuCount}명과 대결합니다.`);
+    renderAll();
+    maybeCPUTurn();
+}
+
+function deck_shuffleTail(deck){
+    // 남은 덱 재섞기 (무한루프 방지용 안전장치)
+    shuffle(deck);
+}
+
+function log(msg){
+    const box = document.getElementById("logBox");
+    const line = document.createElement("div");
+    line.textContent = msg;
+    box.prepend(line);
+}
+
+/* ===================== 카드 낼 수 있는지 판정 ===================== */
+
+function matchesTopOrSuit(card){
+    // 조커를 제외한 모든 카드(A, 2 포함)는 현재 모양이나 top카드 숫자와 일치해야 냄
+    const top = state.discard[state.discard.length-1];
+    return card.suit===state.currentSuit || card.rank===top.rank;
+}
+
+function canPlay(card){
+    if(state.pendingAttack){
+        if(!isAttackCard(card)) return false;
+        const tier = ATTACK_TIER[attackKey(card)];
+        if(tier < state.pendingAttack.tier) return false;
+        // 조커는 언제나 자유, A/2는 여전히 모양-숫자 매칭 필요
+        if(card.type==="joker") return true;
+        return matchesTopOrSuit(card);
+    }
+    if(card.type==="joker") return true; // 조커만 언제나 낼 수 있음
+    return matchesTopOrSuit(card); // A, 2 포함 나머지는 전부 모양/숫자 매칭 필요
+}
+
+/* ===================== 진행 로직 ===================== */
+
+function nextTurnIndex(from, dir, skip){
+    const n = state.players.length;
+    let idx = from;
+    idx = (idx + dir*(skip?2:1) + n*2) % n;
+    return idx;
+}
+
+function advanceTurn(skip){
+    state.turn = nextTurnIndex(state.turn, state.direction, skip);
+}
+
+function checkWin(playerIdx){
+    if(state.players[playerIdx].hand.length===0){
+        state.over = true;
+        renderAll();
+        showOverlay(playerIdx===0 ? "승리!" : `${state.players[playerIdx].name} 승리`, playerIdx===0 ? "축하합니다, 카드를 모두 냈어요." : "다음엔 더 잘할 수 있어요.");
+        return true;
+    }
+    return false;
+}
+
+function playCard(playerIdx, card, chosenSuit){
+    const p = state.players[playerIdx];
+    const idx = p.hand.indexOf(card);
+    p.hand.splice(idx,1);
+    state.discard.push(card);
+
+    if(card.type==="joker"){
+        state.currentSuit = null;
+    } else {
+        state.currentSuit = card.suit;
+    }
+
+    log(`${p.name}: ${cardLabel(card)}`);
+
+    if(checkWin(playerIdx)) return;
+
+    let skip = false;
+    let extraTurn = false;
+
+    if(isAttackCard(card)){
+        const key = attackKey(card);
+        const tier = ATTACK_TIER[key];
+        const val = ATTACK_VALUE[key];
+        if(state.pendingAttack && tier>=state.pendingAttack.tier){
+            state.pendingAttack.total += val;
+            state.pendingAttack.tier = tier;
+            state.pendingAttack.key = key;
+        } else {
+            state.pendingAttack = {total: val, tier, key};
+        }
+    } else if(card.rank==="Q"){
+        state.direction *= -1;
+    } else if(card.rank==="K"){
+        extraTurn = true;
+    } else if(card.rank==="J"){
+        skip = true;
+    } else if(card.rank==="7"){
+        if(chosenSuit) state.currentSuit = chosenSuit;
+    }
+
+    renderAll();
+
+    if(!extraTurn){
+        advanceTurn(skip);
+    }
+    renderAll();
+    maybeCPUTurn();
+}
+
+function drawFromDeckN(n){
+    const cards = [];
+    for(let i=0;i<n;i++){
+        if(state.deck.length===0){
+            // 버림더미 재활용 (맨 위 카드 제외)
+            const top = state.discard.pop();
+            state.deck = shuffle(state.discard);
+            state.discard = [top];
+        }
+        cards.push(state.deck.pop());
+    }
+    return cards;
+}
+
+function humanDraw(){
+    if(state.over) return;
+    if(state.turn!==0) return;
+
+    if(state.pendingAttack){
+        const drawn = drawFromDeckN(state.pendingAttack.total);
+        state.players[0].hand.push(...drawn);
+        log(`나: 방어하지 못해 ${drawn.length}장 뽑음`);
+        state.pendingAttack = null;
+        advanceTurn(false);
+        renderAll();
+        maybeCPUTurn();
+        return;
+    }
+
+    const drawn = drawFromDeckN(1);
+    state.players[0].hand.push(...drawn);
+    log(`나: 카드 1장 뽑음`);
+    advanceTurn(false);
+    renderAll();
+    maybeCPUTurn();
+}
+
+function humanPlay(card){
+    if(state.over) return;
+    if(state.turn!==0) return;
+    if(!canPlay(card)) return;
+
+    if(card.rank==="7"){
+        pendingSevenCard = card;
+        document.getElementById("suitPicker").classList.add("show");
+        return;
+    }
+    playCard(0, card);
+}
+
+let pendingSevenCard = null;
+
+document.querySelectorAll(".suit-opt").forEach(el=>{
+    el.addEventListener("click", ()=>{
+        const suit = el.dataset.suit;
+        document.getElementById("suitPicker").classList.remove("show");
+        if(pendingSevenCard){
+            playCard(0, pendingSevenCard, suit);
+            pendingSevenCard = null;
+        }
+    });
+});
+
+/* ===================== CPU AI ===================== */
+
+function cpuChoose(p){
+    const playable = p.hand.filter(canPlay);
+    if(playable.length===0) return null;
+
+    if(state.pendingAttack){
+        // 가장 낮은 등급으로 방어 (카드 아끼기), 단 상위 카드 없으면 있는 걸로
+        playable.sort((a,b)=>ATTACK_TIER[attackKey(a)]-ATTACK_TIER[attackKey(b)]);
+        return playable[0];
+    }
+
+    // 먹이는 카드 아닌 일반 카드 우선 소진, 그 다음 효과카드, 마지막에 먹이는 카드
+    const normal = playable.filter(c=>!isAttackCard(c) && !["J","Q","K","7"].includes(c.rank));
+    const special = playable.filter(c=>!isAttackCard(c) && ["J","Q","K","7"].includes(c.rank));
+    const attackC = playable.filter(isAttackCard);
+
+    if(normal.length) return normal[Math.floor(Math.random()*normal.length)];
+    if(special.length) return special[Math.floor(Math.random()*special.length)];
+    return attackC[Math.floor(Math.random()*attackC.length)];
+}
+
+function cpuPickSuit(p){
+    const counts = {spade:0,heart:0,diamond:0,club:0};
+    for(const c of p.hand){ if(c.type==="normal") counts[c.suit]++; }
+    let best = "spade", bestN = -1;
+    for(const s of SUITS){ if(counts[s]>bestN){bestN=counts[s]; best=s;} }
+    return best;
+}
+
+function maybeCPUTurn(){
+    if(state.over) return;
+    const p = state.players[state.turn];
+    if(!p.isCPU) return;
+
+    setTimeout(()=>{
+        if(state.over) return;
+        const choice = cpuChoose(p);
+
+        if(!choice){
+            const n = state.pendingAttack ? state.pendingAttack.total : 1;
+            const drawn = drawFromDeckN(n);
+            p.hand.push(...drawn);
+            log(`${p.name}: ${drawn.length}장 뽑음`);
+            if(state.pendingAttack) state.pendingAttack = null;
+            advanceTurn(false);
+            renderAll();
+            maybeCPUTurn();
+            return;
+        }
+
+        const suit = choice.rank==="7" ? cpuPickSuit(p) : null;
+        playCard(state.players.indexOf(p), choice, suit);
+
+    }, 700 + Math.random()*500);
+}
+
+/* ===================== 렌더링 ===================== */
+
+function cardHTML(card, faceUp){
+    if(!faceUp) return `<div class="card back"></div>`;
+    if(card.type==="joker"){
+        return `<div class="card joker">${card.kind==="JOKER_MONO"?"J\u2661K":"J\u2661K★"}</div>`;
+    }
+    const red = SUIT_RED[card.suit];
+    return `<div class="card face ${red?"red":""}">
+        <div class="rank">${card.rank}</div>
+        <div class="suit">${SUIT_SYMBOL[card.suit]}</div>
+    </div>`;
+}
+
+function renderAll(){
+    if(!state) return;
+
+    const opp = document.getElementById("opponents");
+    opp.innerHTML = "";
+    state.players.forEach((p,i)=>{
+        if(i===0) return;
+        const box = document.createElement("div");
+        box.className = "player-box" + (state.turn===i ? " turn":"");
+        box.innerHTML = `<div class="player-name">${p.name}${p.isCPU?" 🤖":""}</div>
+            <div class="player-count">${p.hand.length}<span> 장</span></div>`;
+        opp.appendChild(box);
+    });
+
+    document.getElementById("myBox").classList.toggle("turn", state.turn===0);
+    document.getElementById("myCount").innerHTML = `${state.players[0].hand.length}<span> 장</span>`;
+
+    document.getElementById("deckCount").textContent = state.deck.length + "장";
+
+    const top = state.discard[state.discard.length-1];
+    const discardEl = document.getElementById("discardPile");
+    let suitTag = "";
+    if(top.type!=="joker" && state.currentSuit && state.currentSuit!==top.suit){
+        suitTag = `<div class="suit-tag" style="color:${SUIT_RED[state.currentSuit]?'#c0392b':'#111'}">${SUIT_SYMBOL[state.currentSuit]}</div>`;
+    }
+    discardEl.innerHTML = `<div style="position:relative;display:inline-block;">${cardHTML(top,true)}${suitTag}</div>`;
+
+    document.getElementById("directionIcon").textContent = state.direction===1 ? "→" : "←";
+
+    const banner = document.getElementById("attackBanner");
+    banner.textContent = state.pendingAttack ? `⚠ 다음 사람 ${state.pendingAttack.total}장 대기 중!` : "";
+
+    const hand = document.getElementById("myHand");
+    hand.innerHTML = "";
+    state.players[0].hand.forEach(card=>{
+        const el = document.createElement("div");
+        const ok = state.turn===0 && !state.over && canPlay(card);
+        el.className = "card " + (card.type==="joker" ? "joker" : `face ${SUIT_RED[card.suit]?"red":""}`) + (ok?"":" disabled");
+        el.innerHTML = card.type==="joker"
+            ? (card.kind==="JOKER_MONO"?"JOKER":"★JOKER★")
+            : `<div class="rank">${card.rank}</div><div class="suit">${SUIT_SYMBOL[card.suit]}</div>`;
+        el.addEventListener("click", ()=> ok && humanPlay(card));
+        hand.appendChild(el);
+    });
+
+    const drawBtn = document.getElementById("drawBtn");
+    drawBtn.disabled = state.turn!==0 || state.over;
+    drawBtn.textContent = (state.pendingAttack && state.turn===0) ? `방어 못하면 뽑기 (${state.pendingAttack.total}장)` : "카드 뽑기";
+}
+
+function showOverlay(title, sub){
+    document.getElementById("overlayTitle").textContent = title;
+    document.getElementById("overlaySub").textContent = sub;
+    document.getElementById("overlay").classList.add("show");
+}
+
+/* ===================== 이벤트 바인딩 ===================== */
+
+let selectedCPU = 2;
+document.querySelectorAll(".cpu-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+        document.querySelectorAll(".cpu-btn").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedCPU = parseInt(btn.dataset.n);
+    });
+});
+
+document.getElementById("startBtn").addEventListener("click", ()=>{
+    document.getElementById("setupScreen").style.display = "none";
+    document.getElementById("gameScreen").style.display = "block";
+    initGame(selectedCPU);
+});
+
+document.getElementById("drawBtn").addEventListener("click", humanDraw);
+
+</script>
+</body>
+</html>
