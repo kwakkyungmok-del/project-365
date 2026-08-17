@@ -639,9 +639,47 @@ h1{
 
 <script>
 
-const CURRENT_DAY = 12;
+/*
+    DAY 계산을 하드코딩(예: const CURRENT_DAY = 12)하지 않고,
+    START_DATE를 기준으로 오늘 날짜와의 차이를 매번 계산합니다.
+    -> 자정이 지나면 자동으로 DAY가 하루씩 올라갑니다.
+
+    START_DATE = 1일째가 되는 날짜.
+    예: 2026-08-17이 13일째이므로, 1일째는 2026-08-05 입니다.
+*/
+
+const START_DATE = new Date(2026, 7, 5); // 월(month)은 0부터 시작 -> 7 = 8월
 
 const TOTAL_DAY = 365;
+
+function getCurrentDay(){
+
+    const today = new Date();
+
+    // 시간(시,분,초)을 제거하고 '날짜'만 비교하기 위해 자정 기준으로 새로 생성
+    const startMidnight = new Date(
+        START_DATE.getFullYear(),
+        START_DATE.getMonth(),
+        START_DATE.getDate()
+    );
+
+    const todayMidnight = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+    );
+
+    const diffDays =
+        Math.round(
+            (todayMidnight - startMidnight) / (1000 * 60 * 60 * 24)
+        ) + 1; // 시작일 자체가 DAY 1
+
+    // 1 미만이나 TOTAL_DAY 초과로 튀지 않도록 범위 고정
+    return Math.min(Math.max(diffDays, 1), TOTAL_DAY);
+
+}
+
+const CURRENT_DAY = getCurrentDay();
 
 </script>
 
