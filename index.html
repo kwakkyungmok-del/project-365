@@ -281,6 +281,31 @@ h1{
     box-shadow:0 0 18px rgba(255,255,255,.08);
 
 }
+
+.cardgame{
+    position:absolute;
+    top:125px;
+    right:25px;
+
+    border:1px solid #333;
+    background:#111;
+    color:#777;
+    padding:10px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:2px;
+    transition:.25s;
+}
+
+.cardgame:hover{
+    color:white;
+    background:#181818;
+    border-color:#555;
+    transform:translateY(-2px);
+    box-shadow:0 0 18px rgba(255,255,255,.08);
+}
 /* ========================= */
 /* 최근 활동 */
 /* ========================= */
@@ -542,6 +567,12 @@ h1{
     font-size:11px;
 
     }
+    .cardgame{
+    top:112px;
+    right:18px;
+    padding:9px 13px;
+    font-size:11px;
+    }
     .recent{
 
         left:50%;
@@ -725,6 +756,12 @@ ASDF
 
 일본어 단어장
 
+</button>
+ <button
+    class="cardgame"
+    onclick="location.href='cardgame/'"
+>
+    카드게임
 </button>
 <!-- ========================= -->
 <!-- 중앙 -->
