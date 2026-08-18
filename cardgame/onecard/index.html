@@ -213,7 +213,8 @@ body{
         <b>7</b> 모양 바꾸기 · <b>2</b> 다음 사람 1장 먹이기 · <b>A</b> 다음 사람 2장 먹이기<br>
         <b>흑백 Joker</b> 3장 먹이기 · <b>색 Joker</b> 5장 먹이기<br>
         먹이는 카드는 <b>같은 등급 이상</b>의 먹이는 카드로만 방어할 수 있어요 (2 → A → 흑백조커 → 색조커).<br>
-        <b>Joker만 모양/숫자 상관없이 언제나</b> 낼 수 있고, <b>A와 2는 다른 카드처럼 모양이나 숫자가 맞아야</b> 낼 수 있어요.
+        <b>Joker만 모양/숫자 상관없이 언제나</b> 낼 수 있고, 낸 뒤엔 <b>7과 마찬가지로 원하는 모양을 지정</b>할 수 있어요.<br>
+        <b>A와 2는 다른 카드처럼 모양이나 숫자가 맞아야</b> 낼 수 있어요.
     </div>
 
     <button class="start-btn" id="startBtn">게임 시작</button>
@@ -430,7 +431,7 @@ function playCard(playerIdx, card, chosenSuit){
     state.discard.push(card);
 
     if(card.type==="joker"){
-        state.currentSuit = null;
+        state.currentSuit = chosenSuit || state.currentSuit;
     } else {
         state.currentSuit = card.suit;
     }
@@ -514,7 +515,7 @@ function humanPlay(card){
     if(state.turn!==0) return;
     if(!canPlay(card)) return;
 
-    if(card.rank==="7"){
+    if(card.rank==="7" || card.type==="joker"){
         pendingSevenCard = card;
         document.getElementById("suitPicker").classList.add("show");
         return;
@@ -586,7 +587,7 @@ function maybeCPUTurn(){
             return;
         }
 
-        const suit = choice.rank==="7" ? cpuPickSuit(p) : null;
+        const suit = (choice.rank==="7" || choice.type==="joker") ? cpuPickSuit(p) : null;
         playCard(state.players.indexOf(p), choice, suit);
 
     }, 700 + Math.random()*500);
