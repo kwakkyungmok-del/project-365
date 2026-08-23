@@ -153,5 +153,21 @@ asdf 추가-아직 곡x
     content:`
 미니 보완 중. 아직 연결 x
 `
+},
+
+{
+    day:18,
+    title:"Day 18",
+    content:`
+컴퓨터 사용 금지 시켜서 못함
+`
+},
+
+{
+    day:19,
+    title:"Day 19",
+    content:`
+
+`
 }
 ];
