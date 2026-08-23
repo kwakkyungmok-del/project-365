@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>당첨자 추첨 — Project 365 Mini</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg-deep:#07070a;
+    --bg-panel:rgba(16,15,22,0.7);
+    --bg-input:rgba(255,255,255,0.04);
+    --border-soft:rgba(255,255,255,0.09);
+    --border-strong:rgba(255,255,255,0.2);
+    --accent:#ff5e6c;
+    --accent-strong:#ff96a0;
+    --text:#c9cdda;
+    --text-dim:#666b7d;
+    --text-bright:#f2f3f9;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --radius-lg:18px; --radius-md:10px; --radius-sm:6px;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; width:100%; min-height:100%; background:var(--bg-deep); color:var(--text); font-family:var(--font-mono); }
+  button, input{ font-family:inherit; }
+
+  .exit-btn{
+    position:fixed; top:20px; left:20px; z-index:30;
+    display:flex; align-items:center; gap:6px;
+    background:rgba(7,7,10,0.7); border:1px solid var(--border-soft); color:var(--text);
+    padding:9px 14px; border-radius:var(--radius-sm); cursor:pointer; font-size:12.5px; backdrop-filter:blur(6px);
+    transition:background .18s ease, border-color .18s ease, color .18s ease, transform .12s ease;
+  }
+  .exit-btn:hover{ background:rgba(255,255,255,0.08); border-color:var(--border-strong); color:var(--text-bright); }
+  .exit-btn:active{ transform:scale(0.96); }
+
+  .wrap{ max-width:900px; margin:0 auto; padding:76px 18px 60px; }
+  .title{ font-family:var(--font-display); font-weight:700; font-size:24px; color:var(--text-bright); text-align:center; letter-spacing:0.03em; margin-bottom:6px; }
+  .title span{ color:var(--accent); }
+  .subtitle{ text-align:center; font-size:12px; color:var(--text-dim); margin-bottom:30px; }
+
+  .panel{
+    background:var(--bg-panel); backdrop-filter:blur(14px); border:1px solid var(--border-soft);
+    border-radius:var(--radius-lg); padding:22px; margin-bottom:20px;
+  }
+  .panel-title{ font-family:var(--font-display); font-weight:600; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-dim); margin-bottom:14px; }
+  .name-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:10px; margin-bottom:18px; }
+  .name-field{ display:flex; align-items:center; gap:8px; }
+  .name-field .num{ width:20px; flex-shrink:0; font-size:11px; color:var(--text-dim); text-align:right; }
+  .name-field input{
+    flex:1; min-width:0; background:var(--bg-input); border:1px solid var(--border-soft); color:var(--text-bright);
+    padding:9px 10px; border-radius:var(--radius-sm); font-size:13px;
+  }
+  .name-field input:focus{ outline:none; border-color:var(--accent); }
+
+  .generate-btn{
+    display:block; width:100%; background:linear-gradient(160deg, var(--accent-strong), var(--accent));
+    color:#2a0308; border:none; font-family:var(--font-display); font-weight:700; font-size:15px;
+    padding:14px; border-radius:var(--radius-md); cursor:pointer; box-shadow:0 0 20px rgba(255,94,108,0.25);
+    transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+  }
+  .generate-btn:hover:not(:disabled){ box-shadow:0 0 28px rgba(255,94,108,0.4); }
+  .generate-btn:active:not(:disabled){ transform:scale(0.98); }
+  .generate-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+  .error-msg{ text-align:center; font-size:12px; color:#ff5d7a; margin-top:10px; min-height:16px; }
+
+  /* -------------------- 추첨 화면 -------------------- */
+  .stage{ display:none; }
+  .stage.show{ display:block; }
+
+  .machine-wrap{ display:flex; flex-direction:column; align-items:center; gap:18px; }
+
+  .machine{ position:relative; width:280px; height:280px; }
+  .dome{
+    position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle at 34% 28%, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 40%, rgba(0,0,0,0.25) 100%),
+               radial-gradient(circle at 50% 50%, rgba(30,10,14,0.7), rgba(10,4,6,0.9));
+    border:2px solid var(--border-strong);
+    box-shadow:0 0 40px rgba(255,94,108,0.15), inset 0 0 40px rgba(0,0,0,0.5);
+    overflow:hidden;
+  }
+  .marble{
+    position:absolute; width:26px; height:26px; border-radius:50%; top:0; left:0;
+    box-shadow:inset -3px -3px 6px rgba(0,0,0,0.35), inset 3px 3px 5px rgba(255,255,255,0.5), 0 2px 6px rgba(0,0,0,0.4);
+    will-change:transform; transition:opacity .4s ease;
+  }
+  .marble.exiting{ transition:transform .9s cubic-bezier(.3,.6,.3,1), opacity .5s ease .5s; z-index:5; }
+  .marble.faded{ opacity:0; }
+
+  .chute{
+    position:absolute; left:50%; bottom:-14px; width:36px; height:28px; transform:translateX(-50%);
+    background:linear-gradient(180deg, #1a1114, #0a0607); border:2px solid var(--border-strong); border-top:none;
+    border-radius:0 0 8px 8px;
+  }
+  .stand{ width:120px; height:14px; background:linear-gradient(180deg,#211318,#0d0709); border-radius:6px; margin-top:-2px; box-shadow:0 8px 20px rgba(0,0,0,0.5); }
+
+  .machine-status{ font-size:12.5px; color:var(--accent-strong); min-height:18px; text-align:center; }
+
+  .legend{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:560px; }
+  .legend-chip{
+    display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-dim);
+    background:rgba(255,255,255,0.03); border:1px solid var(--border-soft); border-radius:20px; padding:5px 10px 5px 6px;
+  }
+  .legend-dot{ width:12px; height:12px; border-radius:50%; flex-shrink:0; box-shadow:0 0 6px var(--dot-color, transparent); }
+
+  .stage-actions{ display:flex; justify-content:center; gap:10px; margin-top:6px; flex-wrap:wrap; }
+  .action-btn{
+    background:rgba(255,255,255,0.03); border:1px solid var(--border-soft); color:var(--text);
+    padding:10px 18px; border-radius:var(--radius-md); cursor:pointer; font-size:12.5px;
+    transition:background .15s ease, color .15s ease, opacity .2s ease;
+  }
+  .action-btn:hover:not(:disabled){ background:rgba(255,255,255,0.08); color:var(--text-bright); }
+  .action-btn:disabled{ opacity:0.35; cursor:not-allowed; }
+  .action-btn.primary{ color:var(--accent-strong); border-color:rgba(255,94,108,0.4); }
+
+  /* -------------------- 결과 오버레이 -------------------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(4,4,6,0.72); backdrop-filter:blur(4px);
+    display:none; align-items:center; justify-content:center; z-index:100;
+  }
+  .overlay.show{ display:flex; }
+  .overlay-card{
+    text-align:center; padding:36px 48px; border-radius:24px;
+    background:rgba(18,17,24,0.9); border:1px solid var(--border-soft);
+    animation:pop-in .35s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes pop-in{ from{ opacity:0; transform:scale(0.7); } to{ opacity:1; transform:scale(1); } }
+  .overlay-card .who{ font-size:14px; color:var(--text-dim); margin-bottom:8px; }
+  .overlay-card .result{ font-family:var(--font-display); font-weight:700; font-size:40px; color:var(--accent-strong); text-shadow:0 0 40px rgba(255,94,108,0.5); }
+  .overlay-close{
+    margin-top:20px; background:rgba(255,255,255,0.06); border:1px solid var(--border-soft); color:var(--text-bright);
+    padding:9px 22px; border-radius:var(--radius-md); cursor:pointer; font-size:12.5px;
+  }
+
+  @media (max-width: 640px){
+    .machine{ width:220px; height:220px; }
+    .overlay-card{ padding:28px 26px; } .overlay-card .result{ font-size:30px; }
+  }
+</style>
+</head>
+<body>
+
+  <button class="exit-btn" id="exitBtn">← 나가기</button>
+
+  <div class="wrap">
+    <div class="title">🔮 <span>당첨자 추첨</span></div>
+    <div class="subtitle">참가자를 입력하고 구슬 추첨기를 돌려보세요</div>
+
+    <!-- ============ 입력 화면 ============ -->
+    <div class="panel" id="inputStage">
+      <div class="panel-title">참가자 (최대 10명)</div>
+      <div class="name-grid" id="nameGrid"></div>
+      <button class="generate-btn" id="generateBtn">추첨 시작</button>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <!-- ============ 추첨 화면 ============ -->
+    <div class="stage" id="drawStage">
+      <div class="machine-wrap">
+        <div class="machine-status" id="machineStatus">구슬을 기계에 넣는 중...</div>
+        <div class="machine">
+          <div class="dome" id="dome"></div>
+          <div class="chute"></div>
+        </div>
+        <div class="stand"></div>
+        <div class="legend" id="legend"></div>
+        <div class="stage-actions">
+          <button class="action-btn" id="rebuildBtn">🔄 새로 만들기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="resultOverlay">
+    <div class="overlay-card">
+      <div class="who">당첨자</div>
+      <div class="result" id="overlayResult">—</div>
+      <button class="overlay-close" id="overlayClose">확인</button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  const MAX_PARTICIPANTS = 10;
+  const DOME_SIZE = () => (window.innerWidth <= 640 ? 220 : 280);
+  const MARBLE_R = 13;
+  const MIX_DURATION = 2600; // ms
+
+  /* ==============================================================
+     1. 입력 화면
+     ============================================================== */
+  const nameGrid = document.getElementById("nameGrid");
+  const nameInputs = [];
+  for (let i=0;i<MAX_PARTICIPANTS;i++){
+    const field = document.createElement("div");
+    field.className = "name-field";
+    field.innerHTML = '<span class="num">'+(i+1)+'</span>';
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "이름 " + (i+1);
+    input.maxLength = 12;
+    field.appendChild(input);
+    nameGrid.appendChild(field);
+    nameInputs.push(input);
+  }
+  const generateBtn = document.getElementById("generateBtn");
+  const errorMsg = document.getElementById("errorMsg");
+  function getFilledNames(){ return nameInputs.map(i => i.value.trim()).filter(v => v.length > 0); }
+
+  /* ==============================================================
+     2. 색상 팔레트
+     ============================================================== */
+  function paletteFor(n){
+    const colors = [];
+    const jitter = Math.random()*40;
+    for (let i=0;i<n;i++){
+      const hue = Math.round((360/n)*i + jitter) % 360;
+      colors.push("hsl(" + hue + ", 72%, 62%)");
+    }
+    return colors;
+  }
+
+  /* ==============================================================
+     3. 추첨 상태
+     ============================================================== */
+  const dome = document.getElementById("dome");
+  const legend = document.getElementById("legend");
+  const machineStatus = document.getElementById("machineStatus");
+  const rebuildBtn = document.getElementById("rebuildBtn");
+
+  let marbles = []; // { name, color, el, x, y, vx, vy }
+  let running = false;
+  let rafId = null;
+
+  function startDraw(){
+    const names = getFilledNames();
+    if (names.length === 0){
+      errorMsg.textContent = "참가자를 1명 이상 입력해주세요.";
+      return;
+    }
+    errorMsg.textContent = "";
+    generateBtn.disabled = true;
+
+    document.getElementById("inputStage").style.display = "none";
+    document.getElementById("drawStage").classList.add("show");
+
+    setupMachine(names);
+  }
+  generateBtn.addEventListener("click", startDraw);
+
+  function setupMachine(names){
+    const size = DOME_SIZE();
+    document.querySelector(".machine").style.width = size + "px";
+    document.querySelector(".machine").style.height = size + "px";
+
+    dome.innerHTML = "";
+    legend.innerHTML = "";
+    machineStatus.textContent = "구슬을 기계에 넣는 중...";
+
+    const colors = paletteFor(names.length);
+    const cx = size/2, cy = size/2;
+    const boundaryR = size/2 - MARBLE_R - 6;
+
+    // 결과는 지금 미리 결정한다 (애니메이션은 이 결과를 보여줄 뿐).
+    const winnerIndex = Math.floor(Math.random() * names.length);
+
+    marbles = names.map((name, i) => {
+      const el = document.createElement("div");
+      el.className = "marble";
+      el.style.background = "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.85), " + colors[i] + " 60%)";
+      dome.appendChild(el);
+
+      const chip = document.createElement("div");
+      chip.className = "legend-chip";
+      chip.style.setProperty("--dot-color", colors[i]);
+      chip.innerHTML = '<span class="legend-dot" style="background:'+colors[i]+'"></span>' + escapeHtml(name);
+      legend.appendChild(chip);
+
+      // 입구(하단 중앙) 바깥에서 시작해서 원 안으로 들어오는 연출
+      const enterAngle = Math.random()*Math.PI*2;
+      const startX = cx + Math.cos(enterAngle) * (boundaryR*0.3);
+      const startY = size + 20;
+      el.style.transform = "translate(" + (startX-MARBLE_R) + "px," + (startY-MARBLE_R) + "px)";
+
+      return { name, color: colors[i], el, x:startX, y:startY, vx:0, vy:0, targetX:null, targetY:null };
+    });
+
+    // 순차적으로 안으로 들어오는 애니메이션
+    marbles.forEach((m, i) => {
+      setTimeout(() => {
+        const angle = Math.random()*Math.PI*2;
+        const dist = Math.random()*boundaryR*0.6;
+        m.x = cx + Math.cos(angle)*dist;
+        m.y = cy + Math.sin(angle)*dist;
+        m.el.style.transition = "transform .5s cubic-bezier(.3,.7,.3,1.1)";
+        m.el.style.transform = "translate(" + (m.x-MARBLE_R) + "px," + (m.y-MARBLE_R) + "px)";
+      }, i*120);
+    });
+
+    const totalEnterTime = marbles.length*120 + 600;
+    setTimeout(() => {
+      marbles.forEach(m => { m.el.style.transition = "opacity .4s ease"; });
+      startMixing(size, cx, cy, boundaryR, winnerIndex);
+    }, totalEnterTime);
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[ch]));
+  }
+
+  /* ==============================================================
+     4. 섞기 물리 시뮬레이션 (원형 경계 안에서 튕김)
+     ============================================================== */
+  function startMixing(size, cx, cy, boundaryR, winnerIndex){
+    machineStatus.textContent = "구슬을 섞는 중...";
+    running = true;
+
+    marbles.forEach(m => {
+      const speed = 60 + Math.random()*60;
+      const ang = Math.random()*Math.PI*2;
+      m.vx = Math.cos(ang)*speed;
+      m.vy = Math.sin(ang)*speed;
+    });
+
+    let last = performance.now();
+    const mixStart = last;
+
+    function tick(now){
+      const dt = Math.min(0.05, (now-last)/1000);
+      last = now;
+
+      marbles.forEach(m => {
+        m.x += m.vx*dt;
+        m.y += m.vy*dt;
+        const dx = m.x-cx, dy = m.y-cy;
+        const dist = Math.hypot(dx,dy) || 0.0001;
+        if (dist > boundaryR){
+          const nx = dx/dist, ny = dy/dist;
+          const dot = m.vx*nx + m.vy*ny;
+          m.vx -= 2*dot*nx; m.vy -= 2*dot*ny;
+          m.x = cx + nx*boundaryR; m.y = cy + ny*boundaryR;
+        }
+        // 가끔 무작위 힘을 살짝 줘서 계속 활기차게 움직이도록 함
+        if (Math.random() < 0.02){ m.vx += (Math.random()-0.5)*40; m.vy += (Math.random()-0.5)*40; }
+        m.el.style.transform = "translate(" + (m.x-MARBLE_R) + "px," + (m.y-MARBLE_R) + "px)";
+      });
+
+      if (now - mixStart < MIX_DURATION){
+        rafId = requestAnimationFrame(tick);
+      } else {
+        running = false;
+        ejectWinner(size, cx, cy, boundaryR, winnerIndex);
+      }
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  /* ==============================================================
+     5. 당첨 구슬 배출 + 결과 공개
+     ============================================================== */
+  function ejectWinner(size, cx, cy, boundaryR, winnerIndex){
+    machineStatus.textContent = "당첨 구슬을 꺼내는 중...";
+
+    const winner = marbles[winnerIndex];
+    marbles.forEach((m, i) => {
+      if (i === winnerIndex) return;
+      m.el.classList.add("faded");
+    });
+
+    winner.el.classList.add("exiting");
+    winner.el.style.zIndex = 5;
+    const exitX = cx, exitY = size + 30;
+    winner.el.style.transform = "translate(" + (exitX-MARBLE_R) + "px," + (exitY-MARBLE_R) + "px) scale(1.3)";
+
+    setTimeout(() => {
+      machineStatus.textContent = "추첨 완료!";
+      document.getElementById("overlayResult").textContent = winner.name;
+      document.getElementById("resultOverlay").classList.add("show");
+    }, 950);
+  }
+
+  document.getElementById("overlayClose").addEventListener("click", () => {
+    document.getElementById("resultOverlay").classList.remove("show");
+  });
+
+  /* ==============================================================
+     6. 새로 만들기 / 나가기
+     ============================================================== */
+  rebuildBtn.addEventListener("click", () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    running = false;
+    document.getElementById("drawStage").classList.remove("show");
+    document.getElementById("inputStage").style.display = "block";
+    generateBtn.disabled = false;
+  });
+  document.getElementById("exitBtn").addEventListener("click", () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    location.href = "../";
+  });
+
+})();
+</script>
+</body>
+</html>
