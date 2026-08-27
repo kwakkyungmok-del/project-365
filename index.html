@@ -38,7 +38,55 @@ body{
 
 }
 
+/* ========================= */
+/* FUN FACT */
+/* ========================= */
 
+.fun-fact{
+
+    position:absolute;
+
+    right:25px;
+
+    top:50%;
+
+    transform:translateY(-50%);
+
+    width:300px;
+
+    background:#111;
+
+    border:1px solid #292929;
+
+    border-radius:14px;
+
+    padding:18px;
+
+}
+
+.fun-fact-title{
+
+    font-size:11px;
+
+    font-weight:700;
+
+    letter-spacing:2px;
+
+    color:#777;
+
+    margin-bottom:12px;
+
+}
+
+.fun-fact-content{
+
+    font-size:13px;
+
+    color:#ddd;
+
+    line-height:1.6;
+
+}
 /* ========================= */
 /* 중앙 */
 /* ========================= */
@@ -366,7 +414,22 @@ h1{
     text-overflow:ellipsis;
 
 }
+<!-- ========================= -->
+<!-- FUN FACT -->
+<!-- ========================= -->
 
+<div class="fun-fact">
+
+    <div class="fun-fact-title">
+        FUN FACT
+    </div>
+
+    <div
+        class="fun-fact-content"
+        id="funFact"
+    ></div>
+
+</div>
 
 /* ========================= */
 /* 진행 상황 */
@@ -548,6 +611,25 @@ h1{
     padding:9px 13px;
     font-size:11px;
     }
+    .fun-fact{
+
+    position:absolute;
+
+    left:50%;
+
+    right:auto;
+
+    top:auto;
+
+    bottom:330px;
+
+    transform:translateX(-50%);
+
+    width:90%;
+
+    max-width:320px;
+
+}
     .recent{
 
         left:50%;
@@ -621,13 +703,7 @@ h1{
 
     }
 
-    .asdf{
-
-        font-size:10px;
-
-        padding:8px 11px;
-
-    }
+  
 
 }
 
@@ -695,6 +771,7 @@ const CURRENT_DAY = getCurrentDay();
 <!-- ========================= -->
 
 <script src="report.js"></script>
+<script src="funfact.js"></script>
 
 
 <!-- ========================= -->
@@ -822,7 +899,12 @@ const CURRENT_DAY = getCurrentDay();
     </div>
 
 </div>
+/* ========================= */
+/* FUN FACT */
+/* ========================= */
 
+document.getElementById("funFact").textContent =
+    getRandomFunFact();
 
 <script>
 
