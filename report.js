@@ -170,4 +170,44 @@ asdf 추가-아직 곡x
 미니를 완성하기에는 너무 오래 걸려서 그 안에 있는 뽑기를 연결
 `
 }
+
+{
+    day:20,
+    title:"Day 20",
+    content:`
+바빠서 못 함
+`
+}
+
+{
+    day:21,
+    title:"Day 21",
+    content:`
+바빠서 못 함
+`
+}
+
+{
+    day:22,
+    title:"Day 22",
+    content:`
+바빠서 못 함
+`
+}
+
+{
+    day:23,
+    title:"Day 23",
+    content:`
+바빠서 못 함
+`
+}
+
+{
+    day:24,
+    title:"Day 24",
+    content:`
+신기한 사실 버튼 추가, asdf 삭제
+`
+}
 ];
