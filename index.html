@@ -745,6 +745,34 @@ function closeFunFact(){
     document.getElementById("funfactOverlay").classList.remove("active");
 }
 </script>
+<!-- ========================= -->
+<!-- 배경음악 -->
+<!-- ========================= -->
+<audio id="bgm" src="project-365.mp3" loop preload="auto"></audio>
 
+<script>
+(function(){
+    const bgm = document.getElementById("bgm");
+    bgm.volume = 0.75; // 75% 크기
+
+    function tryPlay(){
+        const playPromise = bgm.play();
+        if(playPromise !== undefined){
+            playPromise.catch(() => {
+                // 자동재생이 막힌 경우, 사용자가 처음 클릭/터치할 때 재생
+                const startOnInteraction = () => {
+                    bgm.play();
+                    document.removeEventListener("click", startOnInteraction);
+                    document.removeEventListener("touchstart", startOnInteraction);
+                };
+                document.addEventListener("click", startOnInteraction);
+                document.addEventListener("touchstart", startOnInteraction);
+            });
+        }
+    }
+
+    tryPlay();
+})();
+</script>
 </body>
 </html>
