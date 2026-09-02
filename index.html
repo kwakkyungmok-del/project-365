@@ -185,6 +185,30 @@ h1{
     box-shadow:0 0 18px rgba(255,255,255,.08);
 }
 
+.lucky{
+    position:absolute;
+    top:25px;
+    right:25px;
+    border:1px solid #333;
+    background:#111;
+    color:#777;
+    padding:10px 15px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:2px;
+    transition:.25s;
+}
+
+.lucky:hover{
+    color:white;
+    background:#181818;
+    border-color:#555;
+    transform:translateY(-2px);
+    box-shadow:0 0 18px rgba(255,255,255,.08);
+}
+
 /* ========================= */
 /* FUN FACT 버튼 (우측 세로 중앙) */
 /* ========================= */
@@ -458,6 +482,13 @@ h1{
         font-size:11px;
     }
 
+    .lucky{
+    top:18px;
+    right:18px;
+    padding:9px 13px;
+    font-size:11px;
+    }
+
     .funfact{
         right:18px;
         padding:10px 14px;
@@ -593,6 +624,14 @@ const CURRENT_DAY = getCurrentDay();
 
 <button class="winner" onclick="location.href='winner/'" >
     당첨자 뽑기
+</button>
+
+<button class="lucky" onclick="location.href='project-365/lucky'">
+    운빨
+</button>
+
+<button class="japanvoca" onclick="location.href='japanvoca/'" >
+    일본어 단어장
 </button>
 
 <!-- ========================= -->
