@@ -211,7 +211,45 @@ asdf 추가-아직 곡x
 메인 화면 bgm을 추가
 bgm이 망한 거 같아서 다음에 고치기로
 `
-}
+},
 
+{
+    day:25,
+    title:"Day 25",
+    content:`
+일정상 못함
+`
+},
 
+{
+    day:26,
+    title:"Day 26",
+    content:`
+일정상 못함
+`
+},
+
+{
+    day:27,
+    title:"Day 27",
+    content:`
+일정상 못함
+`
+},
+
+{
+    day:28,
+    title:"Day 28",
+    content:`
+일정상 못함
+`
+},
+
+{
+    day:29,
+    title:"Day 29",
+    content:`
+운빨 추가
+`
+},
 ];
