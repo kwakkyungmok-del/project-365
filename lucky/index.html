@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>운빨 — 세상은 운빨이고 이 사이트는 거짓이다</title>
+<style>
+  :root{
+    --bg:#0b0b0e;
+    --bg2:#141418;
+    --card:#18181d;
+    --card2:#1f1f26;
+    --fg:#f5f3ee;
+    --dim:#9a9aa2;
+    --dim2:#6c6c74;
+    --line:rgba(245,243,238,0.10);
+    --accent:#ff4b3e;
+    --gold:#ffd23f;
+    --radius-lg:28px;
+    --radius-md:18px;
+    --radius-sm:12px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(120% 100% at 50% 0%, #17171d 0%, var(--bg) 55%);
+    color:var(--fg);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    overscroll-behavior-y:none;
+  }
+  #app{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    padding:0 20px 40px;
+  }
+  .screen{display:none;}
+  .screen.active{display:flex; flex-direction:column;}
+
+  /* ---------- HOME ---------- */
+  #home{flex:1; justify-content:space-between; padding-top:48px;}
+  .brand{text-align:center;}
+  .brand .mark{
+    font-size:15px; letter-spacing:2px; color:var(--dim); margin-bottom:10px; font-weight:600;
+  }
+  .brand h1{
+    font-size:56px; margin:0; font-weight:800; letter-spacing:-1px; line-height:1;
+  }
+  .brand .sub{
+    margin-top:18px; font-size:19px; color:var(--dim); line-height:1.55; font-weight:500;
+  }
+  .brand .sub b{color:var(--fg); font-weight:700;}
+
+  .today-card{
+    margin-top:44px;
+    background:linear-gradient(155deg, var(--card2), var(--card));
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    padding:26px 24px;
+    text-align:center;
+  }
+  .today-card .day-label{
+    font-size:14px; color:var(--accent); font-weight:700; margin-bottom:8px;
+  }
+  .today-card .content-name{
+    font-size:26px; font-weight:800; letter-spacing:-0.5px;
+  }
+  .today-card .content-desc{
+    margin-top:8px; font-size:14px; color:var(--dim);
+  }
+
+  .cta-wrap{margin-top:36px; text-align:center;}
+  #startBtn{
+    width:100%;
+    padding:22px 0;
+    border-radius:999px;
+    border:none;
+    background:var(--fg);
+    color:#0b0b0e;
+    font-size:19px;
+    font-weight:800;
+    letter-spacing:-0.3px;
+    cursor:pointer;
+    transition:transform .12s ease;
+  }
+  #startBtn:active{transform:scale(0.97);}
+  .next-preview{
+    margin-top:16px; font-size:13px; color:var(--dim2);
+  }
+
+  .day-dots{
+    margin-top:28px; display:flex; justify-content:center; gap:8px; flex-wrap:wrap;
+  }
+  .day-dot{
+    width:34px; height:34px; border-radius:50%;
+    background:var(--card); border:1px solid var(--line);
+    color:var(--dim); font-size:12px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  .day-dot.active{background:var(--accent); color:#fff; border-color:var(--accent);}
+  .peek-label{text-align:center; font-size:11px; color:var(--dim2); margin-top:10px;}
+
+  .home-foot{text-align:center; font-size:12px; color:var(--dim2); margin-top:30px;}
+
+  /* ---------- LOADING ---------- */
+  #loading{flex:1; align-items:center; justify-content:center; text-align:center;}
+  .spinner{
+    width:64px; height:64px; border-radius:50%;
+    border:3px solid var(--line);
+    border-top-color:var(--accent);
+    animation:spin .9s linear infinite;
+    margin-bottom:26px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #loadingText{font-size:17px; font-weight:600; color:var(--dim); min-height:24px; transition:opacity .15s;}
+
+  /* ---------- RESULT ---------- */
+  #result{flex:1; padding-top:34px; animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+  .r-head{text-align:center; margin-bottom:22px;}
+  .r-head .r-tag{font-size:13px; color:var(--accent); font-weight:700; letter-spacing:1px;}
+  .r-head .r-title{font-size:24px; font-weight:800; margin-top:6px; letter-spacing:-0.5px;}
+  .shared-badge{
+    display:inline-block; margin-top:10px; font-size:11px; color:var(--bg);
+    background:var(--gold); padding:4px 10px; border-radius:999px; font-weight:700;
+  }
+
+  .r-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius-lg);
+    padding:26px 22px;
+    margin-bottom:14px;
+    animation:pop .4s cubic-bezier(.2,.9,.3,1.2);
+  }
+  @keyframes pop{from{opacity:0; transform:scale(0.94);} to{opacity:1; transform:scale(1);}}
+
+  .luck-big{
+    text-align:center; padding:6px 0 18px;
+  }
+  .luck-big .pct{
+    font-family:ui-monospace,"SF Mono",Consolas,monospace;
+    font-size:64px; font-weight:800; letter-spacing:-2px; color:var(--fg);
+  }
+  .luck-big .grade{
+    margin-top:6px; display:inline-block; font-size:14px; font-weight:800;
+    color:var(--accent); background:rgba(255,75,62,0.12);
+    padding:6px 16px; border-radius:999px;
+  }
+
+  .r-row{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:14px 0; border-top:1px solid var(--line); gap:16px;
+  }
+  .r-row:first-child{border-top:none;}
+  .r-row .k{font-size:13px; color:var(--dim); flex-shrink:0; padding-top:2px; width:78px;}
+  .r-row .v{font-size:15px; font-weight:600; text-align:right; line-height:1.5;}
+
+  .r-para{font-size:16px; line-height:1.75; color:var(--fg); font-weight:500;}
+  .r-quote{
+    margin-top:18px; padding:14px 16px; background:var(--bg2); border-radius:var(--radius-sm);
+    font-size:14px; color:var(--dim); font-style:normal; border-left:3px solid var(--gold);
+  }
+  .r-analysis{
+    margin-top:14px; font-family:ui-monospace,"SF Mono",Consolas,monospace;
+    font-size:12px; color:var(--dim2);
+  }
+
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;}
+  .stat-box{
+    background:var(--bg2); border-radius:var(--radius-sm); padding:12px 14px;
+  }
+  .stat-box .sk{font-size:11px; color:var(--dim2); font-weight:700;}
+  .stat-box .sv{font-size:18px; font-weight:800; margin-top:3px; font-family:ui-monospace,"SF Mono",Consolas,monospace;}
+
+  .skill-block{margin-top:12px;}
+  .skill-block .sb-label{font-size:12px; color:var(--gold); font-weight:800; margin-bottom:4px;}
+  .skill-block .sb-text{font-size:14.5px; line-height:1.6; color:var(--fg);}
+
+  .week-day-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 0; border-top:1px solid var(--line); gap:10px;
+  }
+  .week-day-row:first-child{border-top:none;}
+  .week-day-row .wd-name{font-size:14px; font-weight:700; width:44px; flex-shrink:0;}
+  .week-day-row .wd-pct{
+    font-family:ui-monospace,"SF Mono",Consolas,monospace; font-size:15px; font-weight:800; width:48px; text-align:right; flex-shrink:0;
+  }
+  .week-day-row .wd-desc{font-size:12.5px; color:var(--dim); flex:1; text-align:right;}
+
+  .disclaimer{
+    text-align:center; font-size:12px; color:var(--dim2); margin:14px 0 20px; line-height:1.7;
+  }
+
+  .r-actions{display:flex; gap:10px; margin-top:6px;}
+  .btn{
+    flex:1; padding:16px 0; border-radius:999px; border:1px solid var(--line);
+    background:var(--card); color:var(--fg); font-size:15px; font-weight:700; cursor:pointer;
+    transition:transform .12s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn.primary{background:var(--fg); color:#0b0b0e; border:none;}
+  .home-link{
+    text-align:center; font-size:13px; color:var(--dim2); margin-top:18px;
+    text-decoration:underline; text-underline-offset:3px; cursor:pointer;
+  }
+  .toast{
+    position:fixed; bottom:26px; left:50%; transform:translateX(-50%);
+    background:var(--fg); color:#0b0b0e; padding:12px 20px; border-radius:999px;
+    font-size:13px; font-weight:700; z-index:50; opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-6px);}
+
+  @media (min-width:480px){
+    body{padding:20px 0;}
+    #app{min-height:calc(100vh - 40px); border-radius:32px; box-shadow:0 0 0 1px var(--line), 0 30px 80px rgba(0,0,0,0.5);}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <section id="home" class="screen active">
+    <div class="brand">
+      <div class="mark">FORTUNE IS FAKE</div>
+      <h1>운빨</h1>
+      <p class="sub"><b>세상은 운빨이고</b><br><b>이 사이트는 거짓이다</b></p>
+    </div>
+
+    <div>
+      <div class="today-card">
+        <div class="day-label" id="dayLabel">오늘은 월요일</div>
+        <div class="content-name" id="contentName">오늘의 운빨</div>
+        <div class="content-desc" id="contentDesc">버튼 하나로 오늘의 운을 확인하세요</div>
+      </div>
+
+      <div class="cta-wrap">
+        <button id="startBtn">운명 확인하기</button>
+        <div class="next-preview" id="nextPreview">내일은 전생에 당신은?가 공개됩니다.</div>
+      </div>
+
+      <div class="day-dots" id="dayDots"></div>
+      <div class="peek-label">다른 요일 콘텐츠 살짝 보기</div>
+    </div>
+
+    <div class="home-foot">본 사이트의 모든 결과는 100% 무근거입니다.</div>
+  </section>
+
+  <!-- LOADING -->
+  <section id="loading" class="screen">
+    <div class="spinner"></div>
+    <div id="loadingText">운빨을 분석하는 중...</div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="screen"></section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   운빨 — 단일 HTML 완성형 사이트
+   ========================================================= */
+
+/* ---------- 시드 랜덤 ---------- */
+function mulberry32(seed){
+  let a = seed >>> 0;
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function pick(arr, rng){ return arr[Math.floor(rng() * arr.length)]; }
+function pickWeighted(arr, rng){ // arr of [value, weight]
+  const total = arr.reduce((s,x)=>s+x[1],0);
+  let r = rng() * total;
+  for(const [v,w] of arr){ if(r < w) return v; r -= w; }
+  return arr[arr.length-1][0];
+}
+function randInt(min, max, rng){ return Math.floor(rng() * (max - min + 1)) + min; }
+
+/* ---------- 공통 문구 ---------- */
+const LOADING_PHRASES = [
+  "운빨을 분석하는 중...","운빨 데이터 확인 중...","근거를 찾는 중...","근거 없음.",
+  "우주의 기운을 수집하는 중...","신뢰도를 조작하는 중...","그럴듯한 이유를 만드는 중...",
+  "통계 없음. 계속 진행.","운명의 주사위 굴리는 중...","믿음직한 척 하는 중...",
+  "랜덤값을 생성하는 중...","진지하게 보이는 중...","확신을 연기하는 중...",
+  "출처: 없음. 진행.","오늘의 거짓말 준비 중...","믿거나 말거나 계산 중...",
+  "알고리즘이 눈치 보는 중...","타로 카드는 안 씀. 계속.","정확도 0%로 수렴 중...",
+  "당신의 운명을 지어내는 중..."
+];
+const DISCLAIMERS = [
+  "본 결과는 과학적 근거가 없습니다.","정확하지 않습니다.","애초에 맞을 이유가 없습니다.",
+  "이 사이트는 거짓입니다.","믿는 순간 당신 책임입니다.","통계청 승인 안 받음.",
+  "우주도 이 결과를 모릅니다.","재현성 없음.","심리적 위안 그 이상 그 이하도 아닙니다.",
+  "별자리보다 신뢰도 낮습니다.","저희도 몰라요.","그냥 랜덤입니다.",
+  "세상은 운빨이고 이 결과는 거짓입니다.","반박 시 저희 말이 맞습니다.",
+  "논문 없음. 각주 없음. 근거 없음."
+];
+const ODD_EVENTS = [
+  "그 와중에 옆집 고양이가 당신을 지그시 쳐다봅니다.",
+  "갑자기 어디선가 정체불명의 소리가 들리지만 범인은 끝까지 밝혀지지 않습니다.",
+  "이상하게 오늘따라 비둘기가 당신을 따라다닙니다.",
+  "알 수 없는 이유로 신발끈 한쪽만 자꾸 풀립니다.",
+  "지나가던 사람이 당신을 보고 이유 없이 웃습니다.",
+  "어디선가 정체불명의 좋은 냄새가 납니다.",
+  "오늘따라 자판기가 유독 당신에게만 친절합니다.",
+  "이상하게 오늘 하루 종일 같은 노래가 세 번 들립니다.",
+  "알 수 없는 이유로 왼쪽 귀만 간지럽습니다.",
+  "오늘따라 거울 속 내가 낯설게 느껴집니다."
+];
+const TIMES = [
+  "오전 7시 13분","오전 9시 27분","오전 10시 41분","오전 11시 5분","정오 12시 0분",
+  "오후 1시 33분","오후 2시 47분","오후 3시 15분","오후 4시 22분","오후 5시 9분",
+  "오후 6시 38분","오후 7시 51분","오후 8시 4분","오후 9시 17분","오후 10시 29분",
+  "오후 11시 45분","자정 12시 0분","새벽 1시 12분","새벽 2시 36분","새벽 3시 3분"
+];
+
+const WEEKDAY_INFO = [
+  {key:"week", name:"일요일", title:"당신의 일주일", desc:"월요일부터 일요일까지, 한 주의 운을 미리 확인하세요"},
+  {key:"luck", name:"월요일", title:"오늘의 운빨", desc:"버튼 하나로 오늘의 운을 확인하세요"},
+  {key:"past", name:"화요일", title:"전생에 당신은?", desc:"당신의 전생을 무책임하게 알려드립니다"},
+  {key:"ability", name:"수요일", title:"당신에게 숨겨진 능력", desc:"당신도 몰랐던 쓸모없는 초능력을 찾아드립니다"},
+  {key:"difficulty", name:"목요일", title:"인생 난이도", desc:"현재 당신의 인생 난이도를 게임처럼 측정합니다"},
+  {key:"character", name:"금요일", title:"당신이 게임 캐릭터라면", desc:"당신의 스탯 창을 열람합니다"},
+  {key:"zombie", name:"토요일", title:"좀비 사태라면?", desc:"당신의 생존 가능성을 가볍게 계산합니다"}
+];
+// index = Date.getDay() (0=일 ... 6=토)
+
+/* =========================================================
+   1. 월요일 — 오늘의 운빨
+   ========================================================= */
+const LUCK_TIERS = [
+{min:1,max:10,label:"최악",
+  desc:["오늘은 그냥 이불 밖으로 나가지 않는 게 상책입니다.","우주가 오늘 하루는 당신 편이 아니라고 못박았습니다.","모든 선택이 최악으로 수렴하는 하루입니다.","오늘의 운은 마이너스 통장 수준입니다.","평소보다 세 배 조심해야 하는 날입니다.","작은 실수가 큰 사고로 번질 확률이 높습니다.","오늘만큼은 도전보다 방어가 답입니다.","운명이 오늘 하루 자체를 반품하고 싶어합니다.","행운의 신이 오늘 연차를 냈습니다.","오늘 하루는 그냥 버티는 것에 의의를 둡시다.","계획을 세우기보다 계획을 포기하는 게 나을지도 모릅니다.","오늘은 존재 자체가 리스크입니다."],
+  events:["아침에 마시려던 커피를 옷에 쏟습니다.","중요한 순간에 스마트폰 배터리가 방전됩니다.","엘리베이터를 눈앞에서 놓칩니다.","우산을 챙겼는데 비가 안 옵니다. 안 챙기면 옵니다.","약속 시간을 착각해서 헛걸음을 합니다.","발가락을 책상 모서리에 찧습니다.","중요한 파일을 저장하지 않고 컴퓨터가 꺼집니다.","지하철 반대 방향을 탑니다.","친구가 빌려간 돈을 갑자기 기억 못 합니다.","택배가 다른 집 앞으로 배송됩니다.","이어폰 한쪽이 갑자기 먹통이 됩니다.","새로 산 옷에 커피 얼룩이 생깁니다."],
+  items:["검은 우산","짝짝이 양말","깨진 손거울","방전된 보조배터리","삐뚤어진 액자","울리지 않는 알람","잃어버린 열쇠고리","얼룩진 셔츠","고장난 우산살","13층 엘리베이터 버튼","빈 배터리 아이콘","금 간 머그컵"],
+  quotes:["오늘은 그냥 눕는 게 승리입니다.","버티는 것도 실력입니다.","내일은 오늘보다 나을 겁니다. 확률상요.","오늘 하루만 버티면 평균으로 회귀합니다.","이 순간도 지나갑니다. 빨리요.","운이 나쁜 날엔 그냥 일찍 잡시다.","오늘의 목표: 무사히 하루 마치기.","최악을 겪었으니 이제 오를 일만 남았습니다.","오늘은 로또도 사지 마세요.","조용히, 조심히, 무사히.","오늘 하루는 존버가 답입니다.","이런 날도 있어야 내일이 빛나죠."]},
+{min:11,max:25,label:"나쁨",
+  desc:["오늘은 잔잔한 파도처럼 잔실수가 이어지는 날입니다.","큰 사고는 없지만 자잘하게 꼬이는 하루입니다.","계획은 세우되 기대는 낮춰두는 게 좋습니다.","오늘은 무난보다 조금 아래의 컨디션입니다.","타이밍이 자꾸 살짝씩 어긋나는 날입니다.","작은 짜증이 쌓이기 쉬운 하루입니다.","결정을 미룰수록 유리한 날입니다.","예상보다 일이 조금씩 늦어집니다.","오늘은 방어적으로 움직이는 게 낫습니다.","무리한 도전은 잠시 미뤄두세요.","사소한 것에서 스트레스를 받기 쉬운 날입니다.","평소보다 여유를 조금 더 챙겨야 하는 날입니다."],
+  events:["버스를 눈앞에서 놓치지만 다음 차가 금방 옵니다.","메시지를 보냈는데 답장이 늦게 옵니다.","약속 장소를 착각해 5분 늦습니다.","프린터가 하필 지금 종이 걸림을 일으킵니다.","주문한 음식이 조금 늦게 도착합니다.","와이파이가 잠깐 끊깁니다.","신발끈이 자꾸 풀립니다.","생각보다 줄이 긴 곳에 도착합니다.","충전기를 안 챙겨서 아쉬운 하루가 됩니다.","핸드폰 알림이 계속 울려 집중이 깨집니다.","카페에서 주문이 밀려서 오래 기다립니다.","날씨 예보가 살짝 틀립니다."],
+  items:["얇은 우산","낡은 이어폰","느린 와이파이","구겨진 영수증","미지근한 커피","늦게 오는 버스","먼지 쌓인 키보드","반쯤 죽은 배터리","삐걱대는 의자","얼음 없는 아이스아메리카노","잠긴 파일함","낡은 슬리퍼"],
+  quotes:["오늘은 그냥 무난하게 넘기는 게 최선입니다.","작은 일에 너무 마음 쓰지 마세요.","내일은 오늘보다 나을 확률이 높습니다.","오늘은 속도보다 안정이 중요합니다.","잔잔한 하루도 나쁘지 않습니다.","오늘의 미션: 큰 실수 없이 지나가기.","가볍게, 무리하지 않게 보내세요.","오늘은 소소하게 넘어가는 하루입니다.","완벽하지 않아도 괜찮은 날입니다.","천천히 가도 늦지 않습니다.","오늘은 그냥 흘러가는 대로 두세요.","작은 불편함은 곧 잊힙니다."]},
+{min:26,max:45,label:"약간 나쁨",
+  desc:["나쁘지도 좋지도 않은, 살짝 기울어진 하루입니다.","노력한 만큼 절반 정도만 보상받는 날입니다.","새로운 시도보다는 익숙한 루틴이 유리합니다.","긴장을 놓으면 작은 실수가 생기는 날입니다.","감정 기복이 살짝 있을 수 있는 하루입니다.","예상과 결과가 미묘하게 어긋나는 날입니다.","오늘은 계획의 80%만 실행되는 날입니다.","타인의 말에 살짝 예민해질 수 있습니다.","체력 관리가 특히 필요한 하루입니다.","오늘은 완벽보다 무난함을 목표로 하세요.","결정을 내리기 애매한 순간이 자주 옵니다.","약간의 인내가 필요한 하루입니다."],
+  events:["회의가 예정보다 길어집니다.","생각했던 메뉴가 품절입니다.","날씨가 갑자기 흐려집니다.","지갑을 두고 나왔다가 다시 돌아갑니다.","예약이 살짝 밀립니다.","친구와의 약속이 30분 조정됩니다.","생각보다 할 일이 하나 더 생깁니다.","택시가 잘 안 잡힙니다.","이메일을 오타 낸 채로 보냅니다.","충전이 생각보다 느립니다.","책상 정리를 하다 시간을 더 씁니다.","작은 오해가 생겼다가 금방 풀립니다."],
+  items:["미묘하게 안 맞는 신발","절반만 충전된 배터리","살짝 눅눅한 과자","헷갈리게 하는 시계","애매한 온도의 커피","느슨해진 신발끈","반쯤 지워진 메모","구름 낀 하늘","미묘하게 짧은 우산","예민해진 알람 소리","약간 늦는 지하철","살짝 흐릿한 거울"],
+  quotes:["오늘은 평타만 쳐도 성공입니다.","무리하지 않는 게 최선의 전략입니다.","오늘의 컨디션에 맞춰 속도를 조절하세요.","완벽하지 않아도 충분한 하루입니다.","가끔은 애매한 날도 필요합니다.","오늘은 그냥 흐름을 따라가세요.","작은 인내가 내일의 여유가 됩니다.","적당히, 무난하게 보내는 하루입니다.","오늘 하루도 무사히 지나가고 있습니다.","완벽보다 꾸준함이 이기는 날입니다.","오늘은 그냥 페이스 유지가 답입니다.","약간의 불편함은 곧 지나갑니다."]},
+{min:46,max:55,label:"평범",
+  desc:["특별할 것 없는, 그야말로 평균적인 하루입니다.","좋을 것도 나쁠 것도 없는 균형 잡힌 날입니다.","오늘은 있는 그대로가 최선인 하루입니다.","루틴대로만 움직여도 무난한 하루입니다.","평온함이 곧 행운인 날입니다.","특이사항 없음, 그것이 오늘의 특징입니다.","무난함이 최고의 미덕인 하루입니다.","오늘은 그저 흘러가는 대로 두면 됩니다.","잔잔한 일상이 이어지는 평범한 날입니다.","특별한 이벤트 없이 안정적으로 흘러갑니다.","오늘은 평상심을 유지하기 좋은 날입니다.","무색무취, 그것이 오늘의 운입니다."],
+  events:["평소와 같은 시간에 일어납니다.","늘 가던 카페에서 늘 마시던 걸 마십니다.","특별한 일 없이 하루가 지나갑니다.","정해진 일정대로 하루가 흘러갑니다.","평소보다 조금 일찍 하루를 마칩니다.","익숙한 길로 무사히 도착합니다.","평범한 점심을 평범하게 먹습니다.","오늘의 할 일을 무난히 끝냅니다.","특별한 연락 없이 조용한 하루입니다.","일상적인 대화로 하루를 채웁니다.","정시에 모든 일정이 진행됩니다.","평소와 다름없는 저녁을 맞이합니다."],
+  items:["무난한 흰 티셔츠","평범한 검정 우산","늘 쓰던 볼펜","익숙한 텀블러","정시에 도착하는 버스","적당히 충전된 배터리","무난한 날씨","평범한 하루의 일기","익숙한 알람 소리","적당한 온도의 방","늘 앉던 자리","평범한 신호등"],
+  quotes:["평범함이야말로 가장 큰 축복입니다.","오늘은 그냥 오늘답게 보내세요.","무난한 하루도 소중한 하루입니다.","특별하지 않아도 충분히 좋은 날입니다.","평온한 하루, 그 자체로 행운입니다.","오늘은 있는 그대로를 즐기세요.","평범함 속에 작은 행복이 있습니다.","무탈함이 곧 성공인 하루입니다.","오늘 하루도 무사히 흘러갑니다.","특별할 필요 없는, 딱 좋은 하루입니다.","평범한 하루가 모여 인생이 됩니다.","오늘은 그냥 오늘로 충분합니다."]},
+{min:56,max:70,label:"약간 좋음",
+  desc:["은근히 되는 일이 많은 살짝 기분 좋은 날입니다.","노력한 만큼, 아니 조금 더 보상받는 하루입니다.","작은 행운이 여기저기 숨어있는 날입니다.","타이밍이 은근히 잘 맞아떨어지는 하루입니다.","기분 좋은 우연이 몇 번 찾아옵니다.","오늘은 시도해볼 만한 가치가 있는 날입니다.","무언가 하나쯤은 잘 풀리는 하루입니다.","평소보다 컨디션이 살짝 좋은 날입니다.","사소한 것에서 기분 좋은 순간이 생깁니다.","오늘은 조금 용기를 내도 좋은 날입니다.","일이 예상보다 수월하게 풀립니다.","은근한 행운이 계속 따라오는 하루입니다."],
+  events:["생각보다 빨리 도착하는 버스를 만납니다.","우연히 좋아하는 노래가 흘러나옵니다.","주문한 음식이 예상보다 맛있습니다.","예상치 못한 칭찬을 듣습니다.","찾던 물건이 의외로 쉽게 나옵니다.","날씨가 예상보다 화창합니다.","카페 자리가 딱 하나 비어있습니다.","친구에게서 반가운 연락이 옵니다.","일이 예상보다 일찍 끝납니다.","길에서 마음에 드는 물건을 발견합니다.","엘리베이터를 딱 맞춰 탑니다.","작은 할인 혜택을 받습니다."],
+  items:["따뜻한 라떼","딱 맞는 신호등","포근한 담요","새로 산 볼펜","좋아하는 향수","말끔한 하늘","선명한 무지개","산뜻한 바람","포근한 햇살","말랑한 쿠션","산뜻한 새 노트","잘 맞는 이어폰"],
+  quotes:["오늘은 조금 자신감을 가져도 좋습니다.","은근히 좋은 날엔 은근히 나서보세요.","작은 행운을 놓치지 마세요.","오늘의 흐름을 믿고 가보세요.","기분 좋은 하루, 마음껏 누리세요.","오늘은 새로운 시도에 열려있는 날입니다.","작은 성공들이 쌓이는 하루입니다.","오늘의 운을 살짝 믿어봐도 됩니다.","좋은 흐름을 타고 하루를 마무리하세요.","은근한 행운, 알아채면 두 배가 됩니다.","오늘은 웃을 일이 조금 더 많은 날입니다.","이 기세를 내일까지 이어가 보세요."]},
+{min:71,max:85,label:"좋음",
+  desc:["확실히 되는 일이 많은 기분 좋은 하루입니다.","오늘은 자신 있게 움직여도 되는 날입니다.","노력이 확실한 결과로 이어지는 하루입니다.","좋은 기운이 하루 종일 따라다닙니다.","새로운 도전이 잘 통하는 날입니다.","사람들과의 관계에서 특히 운이 좋습니다.","오늘은 원하는 것을 얻기 좋은 날입니다.","예상보다 훨씬 잘 풀리는 하루입니다.","결정하는 일마다 좋은 결과로 이어집니다.","오늘은 적극적으로 나서면 좋은 날입니다.","주변 사람들에게 좋은 인상을 남기는 날입니다.","계획했던 일이 순조롭게 진행됩니다."],
+  events:["원하던 자리에 딱 앉게 됩니다.","제안했던 일이 흔쾌히 받아들여집니다.","예상보다 좋은 소식을 듣습니다.","우연히 만난 사람과 좋은 대화를 나눕니다.","찾던 정보를 쉽게 발견합니다.","계획한 일정이 순조롭게 마무리됩니다.","생각보다 큰 할인 혜택을 받습니다.","중요한 연락이 좋은 타이밍에 옵니다.","발표나 시험이 예상보다 잘 풀립니다.","예상치 못한 선물이나 보상을 받습니다.","오랜만의 만남이 반갑게 이루어집니다.","생각지도 못한 기회가 찾아옵니다."],
+  items:["행운의 네잎클로버","새로 산 운동화","맑고 파란 하늘","잘 맞는 시계","포근한 코트","산뜻한 아침 공기","달콤한 디저트","좋아하는 향의 커피","산뜻한 새 노트북","예쁜 색의 우산","잘 어울리는 옷","따뜻한 조명"],
+  quotes:["오늘은 마음껏 도전해도 좋은 날입니다.","좋은 기운을 놓치지 말고 밀어붙이세요.","자신감을 가지고 하루를 시작하세요.","오늘의 성공이 내일의 자신감이 됩니다.","적극적으로 움직이면 더 좋은 결과가 옵니다.","오늘은 인복도 함께 따르는 날입니다.","이 좋은 흐름, 마음껏 즐기세요.","오늘의 기세를 몰아 계속 나아가세요.","원하는 것에 과감히 다가가 보세요.","좋은 하루엔 좋은 사람과 함께하세요.","오늘은 웃음이 끊이지 않는 날입니다.","이 행운을 오래 기억해두세요."]},
+{min:86,max:95,label:"매우 좋음",
+  desc:["거의 모든 일이 뜻대로 풀리는 굉장한 하루입니다.","오늘은 무엇을 해도 잘 되는 날입니다.","행운이 하루 종일 당신 곁을 지킵니다.","평소라면 어려웠을 일도 술술 풀립니다.","오늘 하루는 특별한 기운이 감돕니다.","주변 사람들까지 당신의 운을 나눠 받는 날입니다.","오늘은 원하는 것을 거의 다 이루는 날입니다.","예상을 뛰어넘는 좋은 일이 연이어 일어납니다.","오늘 하루는 승승장구 그 자체입니다.","모든 타이밍이 완벽하게 맞아떨어지는 날입니다.","오늘은 무모한 도전조차 성공하는 날입니다.","오늘 하루 전체가 축복받은 느낌입니다."],
+  events:["생각지도 못한 큰 행운이 찾아옵니다.","노력한 프로젝트가 크게 인정받습니다.","예상보다 훨씬 좋은 제안을 받습니다.","우연히 만난 인연이 큰 도움이 됩니다.","복권 급의 작은 행운을 경험합니다.","오랫동안 바라던 일이 갑자기 이루어집니다.","예상치 못한 큰 칭찬이나 인정을 받습니다.","모든 약속과 일정이 완벽하게 맞아떨어집니다.","예상보다 훨씬 좋은 결과를 통보받습니다.","특별한 선물 같은 하루가 펼쳐집니다.","생각지도 못한 곳에서 귀인을 만납니다.","오늘 하루가 통째로 하이라이트입니다."],
+  items:["황금빛 노을","반짝이는 별자리","완벽한 타이밍의 신호등","특별한 행운의 부적","빛나는 무지개","따뜻한 축하 인사","완벽한 날씨","예상치 못한 보너스","행운의 편지","반짝이는 새 물건","완벽한 컨디션","특별한 인연"],
+  quotes:["오늘 하루를 오래도록 기억하게 될 겁니다.","이런 날은 무엇을 해도 후회 없습니다.","오늘의 행운, 마음껏 누리세요.","특별한 하루엔 특별한 선택을 해보세요.","이 기운을 주변에도 나눠주세요.","오늘 같은 날은 도전을 미루지 마세요.","행운이 넘치는 하루, 감사히 받아들이세요.","오늘의 성취를 마음껏 자랑해도 됩니다.","이 행운의 파도에 올라타세요.","오늘 하루가 인생의 하이라이트일지도 모릅니다.","이런 날은 사진으로 남겨두세요.","오늘의 기억, 내일의 힘이 될 겁니다."]},
+{min:96,max:99,label:"초행운",
+  desc:["이 정도면 운명이 당신을 편애하는 수준입니다.","오늘 하루는 거의 주인공 보정을 받는 날입니다.","우연이라 하기엔 지나치게 완벽한 하루입니다.","오늘의 당신은 실패라는 단어를 모릅니다.","행운이 아니라 필연처럼 느껴지는 하루입니다.","오늘 하루, 세상이 당신을 위해 돌아갑니다.","이 정도 행운이면 반칙이라고 봐도 됩니다.","오늘은 원하는 모든 것이 이루어지는 날입니다.","당신을 위한 특별 이벤트가 펼쳐지는 하루입니다.","오늘의 행운은 통계적으로 설명이 안 됩니다.","오늘 하루는 인생 최고의 순간 후보입니다.","우주가 오늘만큼은 당신 편입니다."],
+  events:["여러 개의 행운이 동시에 겹쳐서 일어납니다.","생각지도 못한 큰 성과를 얻습니다.","인생에 몇 번 없을 기회가 찾아옵니다.","예상 밖의 큰 행운이 연달아 일어납니다.","주변 사람 모두가 오늘 당신을 부러워합니다.","복잡했던 문제가 순식간에 해결됩니다.","생각지도 못한 특별한 선물을 받습니다.","오랫동안 바라던 꿈같은 일이 실현됩니다.","모든 것이 완벽한 타이밍에 이루어집니다.","예상을 훨씬 뛰어넘는 결과를 얻습니다.","인생 최고의 하루라고 느껴질 순간이 옵니다.","오늘 하루의 모든 선택이 정답이 됩니다."],
+  items:["반짝이는 황금 열쇠","완벽한 별자리 정렬","무지개 두 개","황금빛 클로버 밭","행운의 유성","완벽한 우연","특별한 초대장","빛나는 트로피","완벽한 하루의 증거","인생 최고의 순간","특별한 행운의 편지","황금빛 하루"],
+  quotes:["오늘 하루는 로또를 사도 좋을 정도입니다.","이 정도 운이면 오늘을 기념일로 삼으세요.","오늘의 당신은 무적입니다.","이런 하루는 평생 몇 번 없습니다.","오늘 하루를 마음껏, 후회 없이 쓰세요.","이 행운을 오래도록 간직하세요.","오늘은 도전하지 않을 이유가 없습니다.","당신의 하루가 곧 전설이 됩니다.","오늘의 행운, 온 우주가 증인입니다.","이런 날은 그냥 즐기는 게 답입니다.","오늘 하루가 앞으로의 자신감이 될 겁니다.","이 순간을 온전히 만끽하세요."]}
+];
+const GOD_EASTER_EGGS = [
+  {desc:"운빨 알고리즘이 정지했습니다. 상위 관리자(신)가 직접 개입했습니다.",
+   event:"오늘 하루, 당신이 원하는 모든 일이 이유 없이 다 이루어집니다.",
+   item:"신의 인장이 찍힌 황금 우산",
+   quote:"※ 시스템 오류가 아닙니다. 이건 그냥 신의 취향입니다."},
+  {desc:"확률 계산이 불가능한 값이 나왔습니다. 그냥 100입니다.",
+   event:"당신이 오늘 만나는 모든 신호등이 초록불입니다.",
+   item:"우주 저편에서 온 부적",
+   quote:"※ 저희도 이 결과가 왜 나왔는지 모릅니다."},
+  {desc:"오늘 하루만큼은 당신이 이 사이트의 주인공입니다.",
+   event:"오늘 하루, 안 좋은 일은 물리적으로 발생하지 않습니다.",
+   item:"반짝이는 100% 뱃지",
+   quote:"※ 내일부터는 다시 평범해집니다. 오늘만 즐기세요."}
+];
+function generateLuck(rng){
+  const roll = randInt(1,100,rng);
+  if(roll === 100){
+    const egg = pick(GOD_EASTER_EGGS, rng);
+    return {
+      type:"luck", pct:100, label:"신의 개입", isGod:true,
+      desc: egg.desc, event: egg.event, item: egg.item, quote: egg.quote,
+      time: pick(TIMES, rng), number: randInt(1,100,rng)
+    };
+  }
+  const tier = LUCK_TIERS.find(t => roll >= t.min && roll <= t.max);
+  const odd = rng() < 0.15 ? pick(ODD_EVENTS, rng) : null;
+  return {
+    type:"luck", pct: roll, label: tier.label, isGod:false,
+    desc: pick(tier.desc, rng),
+    event: pick(tier.events, rng),
+    item: pick(tier.items, rng),
+    quote: pick(tier.quotes, rng),
+    time: pick(TIMES, rng),
+    number: randInt(1,99,rng),
+    odd
+  };
+}
+function renderLuck(r){
+  let html = `
+  <div class="r-card">
+    <div class="luck-big">
+      <div class="pct">${r.pct}%</div>
+      <div class="grade">${r.label}</div>
+    </div>
+    <div class="r-para">${r.desc}</div>
+    ${r.odd ? `<div class="r-analysis">${r.odd}</div>` : ``}
+  </div>
+  <div class="r-card">
+    <div class="r-row"><div class="k">오늘의 사건</div><div class="v">${r.event}</div></div>
+    <div class="r-row"><div class="k">${r.isGod||r.pct>=56 ? "행운의 아이템" : "불운의 요소"}</div><div class="v">${r.item}</div></div>
+    <div class="r-row"><div class="k">행운의 시간</div><div class="v">${r.time}</div></div>
+    <div class="r-row"><div class="k">행운의 숫자</div><div class="v">${r.number}</div></div>
+  </div>
+  <div class="r-quote">${r.quote}</div>`;
+  return html;
+}
+
+/* =========================================================
+   2. 화요일 — 전생에 당신은?
+   ========================================================= */
+const PAST_ERA = ["조선 후기","고려 초기","삼국시대","구석기 시대","1920년대 경성","1847년 어느 마을","빅토리아 시대 런던","고대 이집트","바이킹 전성기","르네상스 시대 피렌체","에도 시대 일본","1980년대 서울","공룡이 멸종하기 직전","냉전 시대 어느 도시","산업혁명 초기 영국","대항해시대 어느 항구","조선 초기","신라 통일 직후","1960년대 뉴욕","알 수 없는 미래 어느 시점"];
+const PAST_REGION = ["작은 어촌 마을","깊은 산골 마을","번화한 시장 골목","외딴 섬","국경 근처 마을","궁궐 뒷골목","대도시 하수구 근처","작은 항구 도시","사막 한가운데 오아시스","숲 속 오두막촌","강변의 나루터 마을","높은 산 위 사원","도시 외곽의 여관촌","작은 대장간 마을","이름 없는 변두리 마을","눈 덮인 국경 지대","번화한 온천 마을","작은 등대 마을","도시 중심가 시장","한적한 강촌 마을"];
+const PAST_JOB = ["우물 관리인","떠돌이 약장수","동네 소문 담당자","궁중 요리사의 조수","이름 없는 파수꾼","시장의 저울 관리인","여관의 심부름꾼","대장간의 불씨 지킴이","마을 서기관","떠돌이 곡예사","작은 서점의 점원","항구의 짐꾼","마을의 종치기","떠돌이 이야기꾼","궁궐의 문지기","여인숙의 요리사","떠돌이 지도 제작자","마을의 편지 배달부","작은 극단의 배우","동네 대서방 필경사"];
+const PAST_PERSONALITY = ["지나치게 신중했던","은근히 허세가 심했던","의외로 겁이 많았던","쓸데없이 정의로웠던","소문 내는 걸 좋아했던","묘하게 게을렀던","이상하게 고집이 셌던","다정하지만 눈치가 없었던","말은 없지만 속은 시끄러웠던","작은 일에 진심이었던","의심이 유난히 많았던","웃음이 헤펐던","묘하게 예민했던","쓸데없이 부지런했던","혼자 있는 걸 좋아했던","은근히 낭만적이었던","이상하게 계산이 빨랐던","눈물이 많았던","허풍이 조금 심했던","의외로 손이 야무졌던"];
+const PAST_ACHIEVEMENT = ["마을의 물 부족 사태를 해결했습니다","엉뚱한 소문을 퍼뜨려 마을을 혼란에 빠뜨렸습니다","작은 화재를 혼자 힘으로 진압했습니다","시장의 저울을 정확하게 고쳐 신뢰를 얻었습니다","길 잃은 여행자를 여러 번 구했습니다","마을 축제를 성공적으로 기획했습니다","도둑을 잡으려다 오히려 놓쳤습니다","우연히 마을의 보물을 발견했습니다","이웃 마을과의 갈등을 중재했습니다","자신도 모르게 전설이 되었습니다","맛있는 음식으로 마을 사람들의 마음을 사로잡았습니다","작은 다리를 혼자 힘으로 보수했습니다","길고양이 같은 존재로 마을에 사랑받았습니다","실수로 큰 소동을 일으켰지만 잘 수습했습니다","아무도 몰랐던 지름길을 발견했습니다","우연히 시 한 편으로 마을을 감동시켰습니다","작은 다툼을 유머로 풀어낸 적이 있습니다","이름 모를 병을 우연히 낫게 한 적이 있습니다","마을 최초로 먼 곳까지 여행을 다녀왔습니다","엉뚱한 발명품으로 잠깐 유명해졌습니다"];
+const PAST_QUIRK = ["이상하게 비 오는 날마다 실종되곤 했습니다","왼손잡이인 척 오른손을 썼습니다","고양이만 보면 정색했습니다","이상하게 새벽마다 노래를 불렀습니다","자신의 이름을 자주 잊어버렸습니다","이상하게 계란을 먹지 않았습니다","보름달이 뜨면 이상하게 들떴습니다","항상 짝이 안 맞는 신발을 신었습니다","이상하게 숫자 7을 싫어했습니다","묘하게 그림자를 무서워했습니다","이상하게 밤에만 기운이 넘쳤습니다","항상 같은 방향으로만 걸었습니다","이상하게 물을 무서워했습니다","혼잣말을 유난히 많이 했습니다","이상하게 거울을 오래 쳐다봤습니다","항상 왼쪽 주머니에 돌을 넣고 다녔습니다","이상하게 붉은색 옷을 피했습니다","걸을 때마다 콧노래를 흥얼거렸습니다","이상하게 문지방을 밟지 않았습니다","해질녘마다 이유 없이 슬퍼했습니다"];
+const PAST_TRACE = ["그래서인지 지금도 물을 보면 이상하게 편안해집니다","그 영향인지 지금도 소문에 유난히 민감합니다","그 기억 때문인지 요리에 묘하게 진심입니다","그래서 지금도 낯선 사람을 잘 챙깁니다","그 영향으로 지금도 정리정돈에 집착합니다","그래서인지 지금도 새벽에 유독 잠이 안 옵니다","그 기억 때문인지 물건을 잘 못 버립니다","그래서 지금도 이상하게 고집이 셉니다","그 영향으로 지금도 낯선 곳에서 길을 잘 찾습니다","그래서인지 지금도 사람 많은 곳을 피하고 싶어합니다","그 기억 때문인지 불을 보면 마음이 편안해집니다","그래서 지금도 밤에 유난히 기운이 납니다","그 영향으로 지금도 저울이나 숫자에 예민합니다","그래서인지 지금도 계란 요리를 잘 안 먹습니다","그 기억 때문인지 지금도 거울을 자주 봅니다","그래서 지금도 이유 없이 노래를 흥얼거립니다","그 영향으로 지금도 문지방을 잘 안 밟습니다","그래서인지 지금도 붉은색 옷을 잘 안 삽니다","그 기억 때문인지 지금도 여행을 유난히 좋아합니다","그래서 지금도 해질녘엔 조금 센치해집니다"];
+function generatePast(rng){
+  const era = pick(PAST_ERA, rng), region = pick(PAST_REGION, rng), job = pick(PAST_JOB, rng);
+  const personality = pick(PAST_PERSONALITY, rng), achievement = pick(PAST_ACHIEVEMENT, rng);
+  const quirk = pick(PAST_QUIRK, rng), trace = pick(PAST_TRACE, rng);
+  const para = `당신은 ${era}, ${region}에서 활동하던 ${personality} ${job}이었습니다. 그 시절 당신은 ${achievement}. 다만 ${quirk}. ${trace}.`;
+  return {type:"past", era, region, job, personality, achievement, quirk, trace, para};
+}
+function renderPast(r){
+  return `
+  <div class="r-card">
+    <div class="r-para">${r.para}</div>
+  </div>
+  <div class="r-card">
+    <div class="r-row"><div class="k">시대</div><div class="v">${r.era}</div></div>
+    <div class="r-row"><div class="k">지역</div><div class="v">${r.region}</div></div>
+    <div class="r-row"><div class="k">신분</div><div class="v">${r.job}</div></div>
+    <div class="r-row"><div class="k">특징</div><div class="v">${r.quirk}</div></div>
+  </div>`;
+}
+
+/* =========================================================
+   3. 수요일 — 당신에게 숨겨진 능력
+   ========================================================= */
+const ABILITIES = [
+{name:"리모컨 감지", desc:"3m 이내에 있는 리모컨의 위치를 정확히 감지할 수 있습니다.", condition:"소파에 눕는 순간 발동", pro:"채널을 잃어버리는 일이 없습니다", con:"리모컨 말고는 아무것도 못 찾습니다", level:2},
+{name:"택배 예지력", desc:"택배가 도착하기 5분 전, 이상하게 예감이 옵니다.", condition:"현관 근처에 있을 때", pro:"택배를 놓치는 일이 없습니다", con:"택배가 없는 날에도 괜히 현관을 쳐다봅니다", level:3},
+{name:"침묵의 압박", desc:"어색한 침묵 속에서 먼저 말을 거는 능력이 있습니다.", condition:"3초 이상 정적이 흐를 때", pro:"어색한 분위기를 자주 풀어줍니다", con:"가끔 안 해도 될 말을 합니다", level:2},
+{name:"주차 감각", desc:"복잡한 도로에서도 빈 주차 공간을 귀신같이 찾아냅니다.", condition:"운전대를 잡는 순간", pro:"주차 스트레스가 거의 없습니다", con:"걸어 다닐 때는 전혀 발동하지 않습니다", level:4},
+{name:"라면 타이밍", desc:"라면이 가장 맛있는 순간을 정확히 압니다.", condition:"물이 끓기 시작할 때", pro:"매번 완벽한 면발을 즐깁니다", con:"그 순간이 아니면 만족을 못합니다", level:3},
+{name:"알람 예측", desc:"알람이 울리기 몇 초 전에 저절로 눈이 떠집니다.", condition:"알람을 맞춰둔 날", pro:"상쾌하게 하루를 시작합니다", con:"알람이 없는 날엔 오히려 늦잠을 잡니다", level:2},
+{name:"줄서기 감각", desc:"어느 줄이 더 빨리 줄어들지 본능적으로 압니다.", condition:"두 개 이상의 줄이 있을 때", pro:"기다리는 시간이 확연히 줄어듭니다", con:"혼자 있을 땐 전혀 쓸모가 없습니다", level:3},
+{name:"와이파이 탐지", desc:"근처 어디에 무료 와이파이가 있는지 본능적으로 느낍니다.", condition:"데이터가 부족할 때", pro:"데이터 걱정 없이 어디든 다닙니다", con:"비밀번호까지는 알 수 없습니다", level:2},
+{name:"엘리베이터 소환", desc:"버튼을 누르는 타이밍만으로 엘리베이터를 빨리 부릅니다.", condition:"급하게 이동할 때", pro:"기다리는 시간이 확실히 줄어듭니다", con:"가끔 다른 사람들의 부러움을 삽니다", level:2},
+{name:"눈치 레이더", desc:"방 안 분위기가 안 좋아지는 순간을 미리 감지합니다.", condition:"사람이 세 명 이상 모였을 때", pro:"눈치 없는 발언을 피할 수 있습니다", con:"괜히 혼자 긴장하는 일이 많습니다", level:3},
+{name:"할인 감지", desc:"어디선가 세일이 시작되면 이유 없이 그곳으로 발이 향합니다.", condition:"쇼핑몰이나 시장 근처", pro:"항상 좋은 가격에 물건을 삽니다", con:"필요 없는 물건도 자꾸 사게 됩니다", level:3},
+{name:"날씨 예감", desc:"일기예보보다 먼저 비가 올지 안 올지 느낍니다.", condition:"외출 준비를 할 때", pro:"우산을 안 챙겨서 낭패보는 일이 없습니다", con:"가끔 근거 없이 불안해합니다", level:4},
+{name:"단톡방 타이밍", desc:"단체 채팅방에서 가장 적절한 타이밍에 메시지를 보냅니다.", condition:"대화가 애매하게 끊길 때", pro:"분위기를 자연스럽게 이어갑니다", con:"가끔 너무 늦게 답장을 확인합니다", level:2},
+{name:"낮잠 조절력", desc:"정확히 20분 후에 스스로 깨어나는 낮잠을 잡니다.", condition:"피곤함이 몰려올 때", pro:"컨디션을 완벽하게 회복합니다", con:"밤잠을 설치는 경우가 많습니다", level:3},
+{name:"편의점 신메뉴 감지", desc:"새로 나온 편의점 신상품을 누구보다 빨리 발견합니다.", condition:"편의점에 들어서는 순간", pro:"트렌드에 항상 앞서 있습니다", con:"지갑 사정이 항상 위태롭습니다", level:2},
+{name:"버스 타이밍", desc:"정류장에 도착하는 순간 버스도 함께 도착합니다.", condition:"약속에 늦었을 때만 발동 안 함", pro:"기다리는 시간이 거의 없습니다", con:"급할 때만 이상하게 안 통합니다", level:3},
+{name:"떡밥 회수력", desc:"몇 달 전 나눈 대화도 정확히 기억해서 다시 꺼냅니다.", condition:"오랜만에 사람을 만났을 때", pro:"상대방을 감동시키는 일이 많습니다", con:"본인 스케줄은 자주 까먹습니다", level:3},
+{name:"음소거 감지", desc:"회의 중 누가 음소거를 깜빡했는지 바로 알아챕니다.", condition:"화상 회의 중", pro:"민망한 상황을 미리 막아줍니다", con:"정작 본인이 자주 음소거를 깜빡합니다", level:2},
+{name:"떡락 예지", desc:"어떤 주식을 사려는 순간 그 주식이 떨어질 걸 예감합니다.", condition:"투자 앱을 켤 때", pro:"위험한 투자를 미리 피할 수 있습니다", con:"정작 오를 주식도 못 사게 됩니다", level:1},
+{name:"신호등 동기화", desc:"걷는 속도에 맞춰 신호등이 계속 초록불로 바뀝니다.", condition:"급하게 걸을 때", pro:"거의 멈추지 않고 목적지에 도착합니다", con:"천천히 걸을 땐 전혀 발동하지 않습니다", level:4}
+];
+function generateAbility(rng){
+  const a = pick(ABILITIES, rng);
+  return {type:"ability", ...a};
+}
+function renderAbility(r){
+  const stars = "★".repeat(r.level) + "☆".repeat(5-r.level);
+  return `
+  <div class="r-card">
+    <div class="r-row"><div class="k" style="width:auto;">능력</div><div class="v" style="font-size:22px;font-weight:800;">${r.name}</div></div>
+    <div class="r-para" style="margin-top:12px;">${r.desc}</div>
+    <div class="skill-block">
+      <div class="sb-label">발동 조건</div><div class="sb-text">${r.condition}</div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-label">장점</div><div class="sb-text">${r.pro}</div>
+    </div>
+    <div class="skill-block">
+      <div class="sb-label">단점</div><div class="sb-text">${r.con}</div>
+    </div>
+  </div>
+  <div class="r-card">
+    <div class="r-row"><div class="k">실용성</div><div class="v" style="color:var(--gold); letter-spacing:2px;">${stars}</div></div>
+  </div>`;
+}
+
+/* =========================================================
+   4. 목요일 — 인생 난이도
+   ========================================================= */
+function difficultyLabel(n){
+  if(n<=15) return "EASY";
+  if(n<=35) return "NORMAL";
+  if(n<=55) return "HARD";
+  if(n<=75) return "VERY HARD";
+  if(n<=90) return "NIGHTMARE";
+  if(n<=99) return "HELL";
+  return "GOD MODE";
+}
+const DIFF_STATUS = ["레벨업 정체기","경험치 획득 중","버그성 행운 발생 중","스탯 재분배 필요","히든 퀘스트 진행 중","자동 회복 모드","일시적 디버프 상태","숨겨진 스킬 각성 직전","랜덤 이벤트 대기 중","체력 게이지 요동 중","경험치 두 배 이벤트 중","치트키 없이 정공법 진행 중","연속 로그인 보상 수령 중","스킬 쿨타임 초기화 중","의외의 서브 퀘스트 발견","메인 퀘스트 정체 중","파티원 모집 중","장비 강화 시도 중","히든 보스전 임박","세이브 포인트 도달"];
+const DIFF_PROS = ["위기 대처 능력이 은근히 좋음","의외로 회복이 빠름","작은 행운을 잘 캐치함","포기하지 않는 근성이 있음","주변 사람 복이 많음","의외로 판단력이 빠름","눈치가 빠른 편임","위기일수록 침착해짐","은근히 운빨 스탯이 높음","적응력이 뛰어난 편임","의외의 순간에 강한 멘탈","작은 것에도 감사할 줄 앎","협동 플레이에 능함","꾸준함이 최대 무기임","의외로 손재주가 좋음","위기 속에서 유머감각이 살아남","실패를 빨리 털어내는 편임","의외로 체력 스탯이 높음","눈에 띄지 않게 성장 중임","숨겨진 포텐셜이 아직 남아있음"];
+const DIFF_PENALTY = ["가끔 이유 없이 피곤함","작은 실수가 잦음","의욕 게이지가 들쑥날쑥함","선택 장애 디버프 걸림","월요일마다 체력 -20%","가끔 눈치를 과하게 봄","미루기 스킬이 지나치게 강함","현실 자각 타임이 자주 옴","의외로 겁이 많음","가끔 과도하게 완벽주의가 됨","SNS 확인 중독 상태","야식 유혹에 취약함","작은 실패에도 크게 흔들림","집중력 지속시간이 짧음","계획은 잘 세우고 실행이 약함","가끔 현타 디버프에 걸림","알람을 5번은 꺼야 일어남","마감 직전에만 초집중함","작심삼일 패시브 보유","가끔 아무 이유 없이 소심해짐"];
+const DIFF_EVENT = ["가끔 아무 이유 없이 일이 잘 풀림","예상치 못한 서포터 캐릭터 등장","숨겨진 보상 아이템 획득","랜덤 버프 이벤트 발생","의외의 사람에게 도움을 받음","전혀 예상 못한 기회가 찾아옴","히든 스테이지 발견","랜덤 디버프가 갑자기 해제됨","우연히 강력한 아이템 습득","깜짝 서프라이즈 퀘스트 발생","예상보다 쉬운 보스전 등장","숨겨진 NPC와의 만남","특별 이벤트 던전 오픈","랜덤 경험치 폭탄 획득","의외의 인맥 찬스 발생","우연히 발견한 치트급 정보","숨겨진 업적 달성","전설급 운빨 이벤트 발동","예상치 못한 응원군 등장","랜덤 타임어택 성공"];
+const DIFF_BONUS = ["의외로 사람들에게 인기가 있음","숨겨진 손재주 보유","위기 상황에서 빛나는 재능","알고 보면 은근히 똑똑함","숨겨진 유머 스탯 만렙","의외로 리더십이 있음","숨겨진 체력 회복력 보유","은근한 눈치 스탯 보유","숨겨진 관찰력 만렙","의외로 손이 빠름","숨겨진 설득력 보유","은근한 인복 스탯 보유","숨겨진 위기관리 능력 보유","의외로 기억력이 좋음","숨겨진 창의력 만렙","은근한 끈기 스탯 보유","숨겨진 눈썰미 보유","의외로 협상력이 좋음","숨겨진 침착함 스탯 보유","은근한 행운 보정치 보유"];
+function generateDifficulty(rng){
+  const n = randInt(1,100,rng);
+  const label = difficultyLabel(n);
+  return {type:"difficulty", n, label,
+    status: pick(DIFF_STATUS, rng), pro: pick(DIFF_PROS, rng),
+    penalty: pick(DIFF_PENALTY, rng), event: pick(DIFF_EVENT, rng), bonus: pick(DIFF_BONUS, rng)};
+}
+function renderDifficulty(r){
+  return `
+  <div class="r-card">
+    <div class="luck-big">
+      <div style="font-size:13px;color:var(--dim);font-weight:700;">현재 인생 난이도</div>
+      <div class="pct" style="font-size:44px;margin-top:6px;">${r.label}</div>
+      <div class="grade">난이도 지수 ${r.n}</div>
+    </div>
+  </div>
+  <div class="r-card">
+    <div class="r-row"><div class="k">현재 상태</div><div class="v">${r.status}</div></div>
+    <div class="r-row"><div class="k">장점</div><div class="v">${r.pro}</div></div>
+    <div class="r-row"><div class="k">패널티</div><div class="v">${r.penalty}</div></div>
+    <div class="r-row"><div class="k">특수 이벤트</div><div class="v">${r.event}</div></div>
+    <div class="r-row"><div class="k">숨겨진 보너스</div><div class="v">${r.bonus}</div></div>
+  </div>`;
+}
+
+/* =========================================================
+   5. 금요일 — 당신이 게임 캐릭터라면
+   ========================================================= */
+const CH_GENRE = ["판타지 RPG","포스트 아포칼립스","무협 액션","사이버펑크","전략 시뮬레이션","로그라이크 던전","좀비 서바이벌","우주 SF","일상 시뮬레이션","격투 액션","오픈월드 어드벤처","호러 서바이벌","턴제 전략","MMORPG","카드 배틀","플랫포머 액션","스텔스 액션","비주얼 노벨","레이싱 배틀","리듬 액션"];
+const CH_JOB = ["방랑 검사","견습 마법사","전직 용병","은퇴한 암살자","떠돌이 상인","숲의 수호자","기계공학자","고대 유물 사냥꾼","떠돌이 음유시인","비밀 조직의 첩보원","마을의 대장장이","전설의 요리사","숨겨진 왕족","길드의 신입","드래곤 조련사","시간 여행자","별을 읽는 점성술사","폐허의 탐험가","전직 왕실 근위병","떠돌이 치유사"];
+const CH_RARITY = [["커먼",30],["언커먼",22],["레어",18],["에픽",12],["유니크",8],["레전더리",5],["신화",3],["한정판",1.4],["고대",0.5],["???",0.1]];
+const CH_PASSIVE = ["주변 몬스터가 미묘하게 약해짐","이동 속도가 살짝 빨라짐","야간에 시야가 넓어짐","체력 회복 속도가 증가함","아이템 습득 확률이 높아짐","공격 시 가끔 크리티컬 발동","방어 시 가끔 반격 발동","레벨업 시 추가 스탯 획득","특정 지형에서 능력치 상승","팀원과 함께 있으면 버프 발동","위기 시 자동 회복 발동","특정 시간대에 능력치 상승","저체력 시 방어력 상승","연속 공격 시 속도 증가","아군 근처에서 방어력 상승","특정 몬스터에게 추가 피해","회피율이 은근히 높음","상태이상 저항력 보유","경험치 획득량 소폭 증가","특정 조건에서 스킬 쿨타임 감소"];
+const CH_ACTIVE = ["강력한 일격을 날린다","순간적으로 사라졌다 나타난다","주변에 회복 오라를 펼친다","적을 일시적으로 마비시킨다","방어막을 생성한다","아군 전체를 강화시킨다","적의 능력치를 약화시킨다","넓은 범위에 피해를 입힌다","순간이동으로 위치를 바꾼다","적을 도발해 시선을 끈다","은신 상태로 전환한다","강력한 화염구를 발사한다","얼음으로 적을 가둔다","전기 충격으로 적을 마비시킨다","독을 살포해 지속 피해를 준다","방패로 돌진해 적을 밀친다","활을 연사해 다수를 공격한다","단검을 던져 급소를 노린다","대지를 흔들어 균형을 무너뜨린다","빛의 화살로 정확히 저격한다"];
+const CH_ULTIMATE = ["하늘에서 거대한 운석을 떨어뜨린다","시간을 잠시 멈춘다","전장 전체에 강력한 폭발을 일으킨다","죽음의 문턱에서 완전히 부활한다","모든 아군을 무적 상태로 만든다","고대 드래곤을 소환한다","최후의 일격으로 모든 적을 관통한다","자신을 희생해 아군을 완전 회복시킨다","전장을 얼음으로 뒤덮는다","전설의 검으로 하늘을 가른다","별의 힘을 빌려 전체 공격을 가한다","시공간을 왜곡시켜 적을 무력화한다","최대 출력으로 자폭에 가까운 일격을 날린다","분신을 소환해 함께 싸운다","전장에 거대한 결계를 펼친다","모든 스킬 쿨타임을 초기화한다","적 전체의 방어력을 무너뜨린다","궁극의 화염 폭풍을 일으킨다","신의 축복을 받아 전 스탯이 극대화된다","봉인된 고대의 힘을 해방한다"];
+const CH_WEAKNESS = ["물속에서 능력치가 크게 떨어짐","특정 소리에 매우 취약함","마나가 떨어지면 무력해짐","좁은 공간에서 실력을 발휘 못함","특정 색의 빛에 약함","장시간 전투 시 급격히 지침","숫자가 많은 적에게 약함","특정 냄새에 정신이 흐트러짐","높은 곳을 극도로 무서워함","기계류 몬스터에게 특히 약함","어둠 속에서 능력치가 감소함","배가 고프면 집중력이 떨어짐","특정 계절에 능력치가 감소함","팀원 없이는 실력 발휘가 어려움","고온 환경에서 급격히 약해짐","특정 무기에만 유독 약함","정신계 공격에 취약함","방어구가 무거우면 속도가 느려짐","오랜 시간 침묵하면 스킬이 약화됨","자신보다 강해 보이는 상대 앞에서 위축됨"];
+const CH_DESC = ["과거를 숨긴 채 오늘도 묵묵히 길을 걷는다","한때는 이름난 영웅이었지만 지금은 평범함을 원한다","작은 마을 출신이지만 큰 꿈을 품고 있다","말보다 행동으로 증명하는 편이다","동료를 위해서라면 위험도 마다하지 않는다","혼자 다니는 것을 좋아하지만 외로움을 잘 탄다","실력은 확실하지만 인정받는 데는 관심이 없다","농담을 잘 하지만 전투에서는 누구보다 진지하다","오랜 방랑 끝에 자신만의 길을 찾았다","겉보기와 달리 섬세하고 다정한 성격이다","전설로만 전해지던 존재가 실제로 나타났다","실수가 많지만 그만큼 성장도 빠르다","한 번 정한 목표는 끝까지 이뤄내는 성격이다","적에게는 냉정하지만 아군에게는 한없이 다정하다","과거의 실패를 딛고 다시 일어선 인물이다","작은 것에도 감사할 줄 아는 마음을 가졌다","누구보다 빠르지만 그만큼 신중하지 못하다","말수는 적지만 결정적인 순간엔 앞장선다","호기심이 많아 늘 새로운 모험을 찾아다닌다","평범한 일상 속에서 특별한 힘을 숨기고 있다"];
+function generateCharacter(rng){
+  return {type:"character",
+    genre: pick(CH_GENRE, rng), job: pick(CH_JOB, rng), rarity: pickWeighted(CH_RARITY, rng),
+    level: randInt(1,99,rng), hp: randInt(80,9999,rng), atk: randInt(10,999,rng), def: randInt(5,500,rng), luck: randInt(1,100,rng),
+    passive: pick(CH_PASSIVE, rng), active: pick(CH_ACTIVE, rng), ultimate: pick(CH_ULTIMATE, rng),
+    weakness: pick(CH_WEAKNESS, rng), description: pick(CH_DESC, rng)};
+}
+function renderCharacter(r){
+  return `
+  <div class="r-card">
+    <div class="r-row"><div class="k">장르</div><div class="v">${r.genre}</div></div>
+    <div class="r-row"><div class="k">직업</div><div class="v">${r.job}</div></div>
+    <div class="r-row"><div class="k">희귀도</div><div class="v" style="color:var(--gold);">${r.rarity}</div></div>
+    <div class="r-para" style="margin-top:12px;">${r.description}</div>
+  </div>
+  <div class="r-card">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="sk">LV</div><div class="sv">${r.level}</div></div>
+      <div class="stat-box"><div class="sk">HP</div><div class="sv">${r.hp}</div></div>
+      <div class="stat-box"><div class="sk">ATK</div><div class="sv">${r.atk}</div></div>
+      <div class="stat-box"><div class="sk">DEF</div><div class="sv">${r.def}</div></div>
+      <div class="stat-box"><div class="sk">LUCK</div><div class="sv">${r.luck}</div></div>
+    </div>
+    <div class="skill-block"><div class="sb-label">패시브 스킬</div><div class="sb-text">${r.passive}</div></div>
+    <div class="skill-block"><div class="sb-label">액티브 스킬</div><div class="sb-text">${r.active}</div></div>
+    <div class="skill-block"><div class="sb-label">궁극기</div><div class="sb-text">${r.ultimate}</div></div>
+    <div class="skill-block"><div class="sb-label">약점</div><div class="sb-text">${r.weakness}</div></div>
+  </div>`;
+}
+
+/* =========================================================
+   6. 토요일 — 좀비 사태라면?
+   ========================================================= */
+const ZB_ROLE = ["물자 조달 담당","은신 전문가","분위기 메이커","즉흥 전략가","경계 담당","응급처치 담당","루트 개척자","협상 담당","정찰병","짐꾼","요리 담당","심리 상담 담당","무기 정비 담당","길찾기 담당","보급품 관리자","신참 교육 담당","은신처 설계자","정보 수집가","동료 격려 담당","마스코트"];
+const ZB_PRO = ["위기 상황에서 의외로 침착함","작은 소리도 잘 감지함","체력이 은근히 좋음","눈치가 빨라 위험을 잘 피함","손재주가 좋아 도구를 잘 만듦","동료들을 잘 다독임","길눈이 밝아 지름길을 잘 찾음","은근히 힘이 셈","위기 속에서 유머를 잃지 않음","의외로 달리기가 빠름","작은 것도 허투루 버리지 않음","협동심이 뛰어남","냉정하게 상황 판단을 잘함","의외로 손이 야무짐","눈썰미가 좋아 위험을 미리 알아챔","체력 회복이 빠른 편임","위기에서 리더십을 발휘함","동료의 상태를 잘 살핌","작은 자원으로도 잘 버팀","의외로 담이 큼"];
+const ZB_CON = ["중요한 순간에 간식을 찾으러 감","소리에 지나치게 예민해서 겁을 먹음","가끔 방향 감각을 잃음","위기 상황에서 갑자기 배가 고파짐","중요한 물건을 자꾸 두고 옴","가끔 너무 큰 소리로 말함","낯선 소리에 과민 반응함","결정적인 순간에 발이 걸려 넘어짐","무기보다 먼저 핸드폰을 챙김","가끔 엉뚱한 곳에서 잠이 듦","중요한 순간에 딴생각을 함","체력이 금방 떨어짐","낯선 사람을 너무 쉽게 믿음","가끔 혼자 튀는 행동을 함","무서운 상황에서 얼어붙음","계획보다 즉흥적으로 움직임","중요한 순간에 재채기가 나옴","가끔 과도하게 조심스러워짐","작은 일에도 크게 당황함","위기 상황에서 자꾸 농담을 함"];
+const ZB_FIRST = ["일단 냉장고부터 확인한다","가장 튼튼해 보이는 문을 잠근다","동네에서 제일 높은 건물로 향한다","라디오부터 켜서 상황을 파악한다","가장 친한 친구부터 연락한다","집에 있는 통조림을 모두 꺼낸다","동네 마트로 달려간다","조용히 숨어서 상황을 지켜본다","가족들에게 먼저 연락한다","무기가 될 만한 물건을 찾는다","가장 가까운 편의점으로 향한다","일단 짐을 싸기 시작한다","동네 사람들을 모으려고 한다","안전해 보이는 곳으로 이동한다","핸드폰 배터리부터 충전한다","물과 식량을 최대한 확보한다","창문과 문을 모두 확인한다","차에 기름부터 채운다","가장 신뢰하는 사람을 찾는다","조용히 상황을 정리해 계획을 세운다"];
+const ZB_BEST = ["필요한 물건을 이상하게 잘 찾음","숨는 장소를 기가 막히게 찾음","분위기를 순식간에 풀어줌","즉흥적으로 그럴듯한 계획을 세움","작은 소리도 놓치지 않고 캐치함","다친 사람을 능숙하게 돌봄","아무도 모르는 길을 개척함","적대적인 상대와도 대화를 풀어감","위험 지역을 미리 감지함","무거운 짐도 거뜬히 나름","제한된 재료로 훌륭한 음식을 만듦","동료의 불안을 잘 다독임","무기를 능숙하게 정비함","길을 절대 잃지 않음","자원을 효율적으로 분배함","신참을 빠르게 적응시킴","은신처를 완벽하게 설계함","정보를 빠르게 수집함","지친 동료를 응원함","분위기 메이커 역할을 완벽히 해냄"];
+const ZB_WORST = ["중요한 순간에 간식을 찾으러 감","큰 소리로 재채기를 함","낯선 소리에 과하게 반응함","무서운 장면 앞에서 얼어붙음","방향 감각이 심각하게 없음","체력 안배를 전혀 못함","낯선 사람을 너무 쉽게 믿음","계획을 세워도 금방 잊어버림","위기 상황에서 갑자기 졸림","중요한 물건을 자꾸 놓고 옴","조용히 하는 것을 못함","무기 다루는 법을 전혀 모름","혼자 있는 걸 극도로 무서워함","결정적인 순간에 망설임","체력이 금방 바닥남","위험을 과소평가함","팀워크보다 혼자 행동함","작은 일에도 크게 당황함","중요한 순간에 딴생각을 함","무서운 상황에서 농담부터 함"];
+const ZB_TEAM = ["팀 전체의 사기를 크게 올려줌","불안한 분위기를 진정시켜줌","팀의 판단 속도를 높여줌","동료들의 경계심을 유지시켜줌","팀에 필요한 웃음을 제공함","다친 동료를 빠르게 회복시킴","팀의 방향성을 잡아줌","동료들의 신뢰를 얻음","팀의 결속력을 높여줌","위기 상황에서 침착함을 전파함","팀의 정보력을 크게 높여줌","동료들의 체력 소모를 줄여줌","팀의 전략을 다양하게 만들어줌","위험을 미리 알려 팀을 보호함","팀의 물자 부족을 해결해줌","동료들에게 안정감을 줌","팀의 갈등을 중재해줌","새로운 아이디어를 계속 제공함","팀의 생존 확률을 높여줌","가끔 예상치 못한 사고를 유발함"];
+const ZB_STRAT = ["높은 곳에서 상황을 파악한 뒤 움직인다","최소한의 소음으로 이동한다","믿을 수 있는 소수의 팀만 유지한다","물자를 여러 곳에 분산 보관한다","낮에는 이동하고 밤에는 은신한다","넓은 공터보다 좁은 길을 이용한다","항상 탈출로를 두 개 이상 확보한다","불필요한 전투는 최대한 피한다","정기적으로 상황을 재점검한다","신뢰할 수 있는 정보만 따른다","체력을 아끼며 이동한다","팀원 간 신호 체계를 만든다","위험 지역은 미리 표시해둔다","식량은 최소한으로 아껴 먹는다","낯선 사람은 신중하게 판단한다","은신처는 자주 옮긴다","항상 최악의 상황을 가정한다","팀의 역할을 명확히 나눈다","작은 소음에도 즉시 반응한다","희망을 잃지 않되 방심하지 않는다"];
+const ZB_END = ["결국 안전한 마을을 찾아 정착한다","의외로 오래도록 살아남아 전설이 된다","팀의 리더로 성장해 많은 이들을 구한다","조용한 곳에 은신처를 차려 평화롭게 지낸다","우연히 만난 사람들과 새로운 공동체를 만든다","끝까지 가족을 지켜내는 데 성공한다","위기 속에서 진짜 친구를 얻는다","예상외로 사태를 해결하는 데 기여한다","마지막까지 유쾌함을 잃지 않고 버틴다","안전지대를 발견해 많은 이들을 이끈다","결국 혼자만의 생존법을 완성한다","동료들과 함께 무사히 생존한다","뜻밖의 영웅으로 기억된다","사태가 진정된 후 평범한 일상으로 돌아간다","작은 마을의 수호자가 된다","살아남아 사람들에게 생존기를 전한다","의외로 사태 해결의 실마리를 제공한다","끝까지 낙천적인 태도로 버텨낸다","작은 공동체의 정신적 지주가 된다","모든 위기를 넘기고 새 삶을 시작한다"];
+function generateZombie(rng){
+  return {type:"zombie", survival: randInt(1,99,rng),
+    role: pick(ZB_ROLE, rng), pro: pick(ZB_PRO, rng), con: pick(ZB_CON, rng),
+    first: pick(ZB_FIRST, rng), best: pick(ZB_BEST, rng), worst: pick(ZB_WORST, rng),
+    team: pick(ZB_TEAM, rng), strategy: pick(ZB_STRAT, rng), ending: pick(ZB_END, rng)};
+}
+function renderZombie(r){
+  return `
+  <div class="r-card">
+    <div class="luck-big">
+      <div style="font-size:13px;color:var(--dim);font-weight:700;">생존 가능성</div>
+      <div class="pct">${r.survival}%</div>
+      <div class="grade">역할: ${r.role}</div>
+    </div>
+  </div>
+  <div class="r-card">
+    <div class="r-row"><div class="k">장점</div><div class="v">${r.pro}</div></div>
+    <div class="r-row"><div class="k">단점</div><div class="v">${r.con}</div></div>
+    <div class="r-row"><div class="k">첫 행동</div><div class="v">${r.first}</div></div>
+    <div class="r-row"><div class="k">가장 잘함</div><div class="v">${r.best}</div></div>
+    <div class="r-row"><div class="k">가장 못함</div><div class="v">${r.worst}</div></div>
+    <div class="r-row"><div class="k">동료 효과</div><div class="v">${r.team}</div></div>
+    <div class="r-row"><div class="k">생존 전략</div><div class="v">${r.strategy}</div></div>
+    <div class="r-row"><div class="k">예상 결말</div><div class="v">${r.ending}</div></div>
+  </div>`;
+}
+
+/* =========================================================
+   7. 일요일 — 당신의 일주일
+   ========================================================= */
+const WD_NAMES = ["월","화","수","목","금","토","일"];
+function generateWeek(rng){
+  const days = [];
+  for(let i=0;i<7;i++){
+    const roll = randInt(1,99,rng);
+    const tier = LUCK_TIERS.find(t => roll >= t.min && roll <= t.max);
+    days.push({name: WD_NAMES[i], pct: roll, label: tier.label, desc: pick(tier.desc, rng), event: pick(tier.events, rng)});
+  }
+  const best = days.reduce((a,b)=> b.pct>a.pct?b:a);
+  const worst = days.reduce((a,b)=> b.pct<a.pct?b:a);
+  const luckyNumber = randInt(1,99,rng);
+  const totalAvg = Math.round(days.reduce((s,d)=>s+d.pct,0)/7);
+  const summaries = [
+    "전체적으로 무난하지만 방심은 금물인 한 주입니다.",
+    "굴곡이 있지만 결국 평균으로 수렴하는 한 주입니다.",
+    "초반은 힘들어도 후반에 빛을 보는 한 주입니다.",
+    "예측 불가능한 반전이 숨어있는 한 주입니다.",
+    "전체적으로 안정적인 흐름을 타는 한 주입니다.",
+    "일희일비하지 말고 꾸준히 나아가야 하는 한 주입니다.",
+    "생각보다 나쁘지 않게 흘러가는 한 주입니다."
+  ];
+  return {type:"week", days, best, worst, luckyNumber, totalAvg, summary: pick(summaries, rng)};
+}
+function renderWeek(r){
+  let rows = r.days.map(d => `
+    <div class="week-day-row">
+      <div class="wd-name">${d.name}</div>
+      <div class="wd-pct">${d.pct}%</div>
+      <div class="wd-desc">${d.desc}</div>
+    </div>`).join("");
+  return `
+  <div class="r-card">${rows}</div>
+  <div class="r-card">
+    <div class="r-row"><div class="k">최고의 날</div><div class="v">${r.best.name}요일 (${r.best.pct}%)</div></div>
+    <div class="r-row"><div class="k">최악의 날</div><div class="v">${r.worst.name}요일 (${r.worst.pct}%)</div></div>
+    <div class="r-row"><div class="k">행운의 숫자</div><div class="v">${r.luckyNumber}</div></div>
+    <div class="r-row"><div class="k">주간 평균</div><div class="v">${r.totalAvg}%</div></div>
+  </div>
+  <div class="r-quote">${r.summary}</div>`;
+}
+
+/* =========================================================
+   생성/렌더 라우터
+   ========================================================= */
+function generateResult(key, rng){
+  switch(key){
+    case "luck": return generateLuck(rng);
+    case "past": return generatePast(rng);
+    case "ability": return generateAbility(rng);
+    case "difficulty": return generateDifficulty(rng);
+    case "character": return generateCharacter(rng);
+    case "zombie": return generateZombie(rng);
+    case "week": return generateWeek(rng);
+  }
+}
+function renderResultBody(key, r){
+  switch(key){
+    case "luck": return renderLuck(r);
+    case "past": return renderPast(r);
+    case "ability": return renderAbility(r);
+    case "difficulty": return renderDifficulty(r);
+    case "character": return renderCharacter(r);
+    case "zombie": return renderZombie(r);
+    case "week": return renderWeek(r);
+  }
+}
+
+/* =========================================================
+   앱 로직
+   ========================================================= */
+const homeEl = document.getElementById("home");
+const loadingEl = document.getElementById("loading");
+const resultEl = document.getElementById("result");
+const loadingTextEl = document.getElementById("loadingText");
+const dayLabelEl = document.getElementById("dayLabel");
+const contentNameEl = document.getElementById("contentName");
+const contentDescEl = document.getElementById("contentDesc");
+const nextPreviewEl = document.getElementById("nextPreview");
+const dayDotsEl = document.getElementById("dayDots");
+const startBtn = document.getElementById("startBtn");
+const toastEl = document.getElementById("toast");
+
+let selectedDayIdx = new Date().getDay(); // 0=일 ... 6=토
+let isSharedResult = false;
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function renderHome(){
+  const info = WEEKDAY_INFO[selectedDayIdx];
+  const todayIdx = new Date().getDay();
+  const isToday = selectedDayIdx === todayIdx;
+  dayLabelEl.textContent = isToday ? `오늘은 ${info.name}` : `${info.name} 콘텐츠 미리보기`;
+  contentNameEl.textContent = info.title;
+  contentDescEl.textContent = info.desc;
+  const nextIdx = (selectedDayIdx + 1) % 7;
+  nextPreviewEl.textContent = isToday
+    ? `내일은 ${WEEKDAY_INFO[nextIdx].title}이(가) 공개됩니다.`
+    : `${WEEKDAY_INFO[selectedDayIdx].name}에는 이 콘텐츠를 즐길 수 있어요.`;
+  startBtn.textContent = "운명 확인하기";
+
+  dayDotsEl.innerHTML = "";
+  WEEKDAY_INFO.forEach((info2, idx) => {
+    const dot = document.createElement("div");
+    dot.className = "day-dot" + (idx === selectedDayIdx ? " active" : "");
+    dot.textContent = info2.name[0];
+    dot.addEventListener("click", () => { selectedDayIdx = idx; renderHome(); });
+    dayDotsEl.appendChild(dot);
+  });
+}
+
+function runFlow(key){
+  showScreen("loading");
+  let count = 0;
+  const shuffled = [...LOADING_PHRASES].sort(() => Math.random() - 0.5);
+  loadingTextEl.style.opacity = 1;
+  loadingTextEl.textContent = shuffled[0];
+  const totalSteps = 4;
+  const interval = setInterval(() => {
+    count++;
+    loadingTextEl.style.opacity = 0;
+    setTimeout(() => {
+      loadingTextEl.textContent = shuffled[count % shuffled.length];
+      loadingTextEl.style.opacity = 1;
+    }, 120);
+    if(count >= totalSteps){
+      clearInterval(interval);
+      setTimeout(() => {
+        const seed = Math.floor(Math.random() * 4294967295);
+        showResult(key, seed, false);
+      }, 380);
+    }
+  }, 420);
+}
+
+function showResult(key, seed, shared){
+  isSharedResult = shared;
+  const rng = mulberry32(seed);
+  const r = generateResult(key, rng);
+  const info = WEEKDAY_INFO.find(w => w.key === key);
+  const body = renderResultBody(key, r);
+  resultEl.innerHTML = `
+    <div class="r-head">
+      <div class="r-tag">${info.title.toUpperCase()}</div>
+      <div class="r-title">${info.title}</div>
+      ${shared ? `<div class="shared-badge">친구가 공유한 결과입니다</div>` : ``}
+    </div>
+    ${body}
+    <div class="disclaimer">※ ${pick(DISCLAIMERS, mulberry32(seed ^ 0x9E3779B9))}<br>※ ${pick(DISCLAIMERS, mulberry32((seed ^ 0x85EBCA6B) >>> 0))}</div>
+    <div class="r-actions">
+      <button class="btn" id="retryBtn" type="button">다시 하기</button>
+      <button class="btn primary" id="shareBtn" type="button">친구에게 결과 보내기</button>
+    </div>
+    <div class="home-link" id="homeLink">처음 화면으로</div>
+  `;
+  showScreen("result");
+
+  const retryBtn = document.getElementById("retryBtn");
+  const shareBtn = document.getElementById("shareBtn");
+  const homeLink = document.getElementById("homeLink");
+
+  if(retryBtn){
+    retryBtn.addEventListener("click", () => {
+      try{
+        if(location.hash) history.replaceState(null, "", location.pathname + location.search);
+        // 같은 콘텐츠로 즉시 다시 뽑기 (로딩 연출 재생)
+        runFlow(key);
+      }catch(err){
+        console.error("retry error:", err);
+        showToast("다시 시도해주세요");
+      }
+    });
+  }
+
+  if(shareBtn){
+    shareBtn.addEventListener("click", () => {
+      try{ shareResult(key, seed, info.title); }
+      catch(err){
+        console.error("share error:", err);
+        showToast("공유에 실패했습니다. 링크를 직접 복사해주세요.");
+      }
+    });
+  }
+
+  if(homeLink){
+    homeLink.addEventListener("click", () => {
+      if(location.hash) history.replaceState(null, "", location.pathname + location.search);
+      renderHome();
+      showScreen("home");
+    });
+  }
+}
+
+async function shareResult(key, seed, title){
+  const payload = btoa(encodeURIComponent(JSON.stringify({c:key, s:seed})));
+  // location.origin can be the literal string "null" when opened from a local
+  // file (file://), which breaks the URL. Build from location.href instead.
+  const base = location.href.split("#")[0];
+  const url = `${base}#r=${payload}`;
+  const shareText = `《운빨》 — ${title} 결과가 나왔어요. 세상은 운빨이고 이 사이트는 거짓입니다.`;
+
+  // 1) Web Share API (모바일 브라우저 등, HTTPS 환경에서만 동작)
+  if(navigator.share){
+    try{
+      await navigator.share({ title: "운빨", text: shareText, url });
+      return;
+    }catch(err){
+      if(err && err.name === "AbortError") return; // 사용자가 공유를 취소함
+      // 그 외 오류는 아래 복사 방식으로 폴백
+    }
+  }
+
+  // 2) Clipboard API
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    try{
+      await navigator.clipboard.writeText(url);
+      showToast("링크가 복사되었습니다");
+      return;
+    }catch(err){ /* 폴백으로 진행 */ }
+  }
+
+  // 3) execCommand 복사 폴백 (HTTPS가 아니어도 대부분 동작)
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = url;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, url.length);
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    if(ok){ showToast("링크가 복사되었습니다"); return; }
+  }catch(err){ /* 폴백으로 진행 */ }
+
+  // 4) 최후의 수단 — 링크를 직접 보여준다
+  window.prompt("아래 링크를 복사해서 친구에게 보내주세요", url);
+}
+
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  setTimeout(() => toastEl.classList.remove("show"), 2200);
+}
+
+startBtn.addEventListener("click", () => runFlow(WEEKDAY_INFO[selectedDayIdx].key));
+
+/* ---------- 공유 링크 진입 처리 ---------- */
+function tryLoadSharedResult(){
+  const hash = location.hash;
+  if(hash && hash.startsWith("#r=")){
+    try{
+      const payload = JSON.parse(decodeURIComponent(atob(hash.slice(3))));
+      if(payload && payload.c && typeof payload.s === "number"){
+        showResult(payload.c, payload.s, true);
+        return true;
+      }
+    }catch(e){ /* 잘못된 링크 -> 홈으로 */ }
+  }
+  return false;
+}
+
+/* ---------- 초기화 ---------- */
+(function init(){
+  renderHome();
+  if(!tryLoadSharedResult()){
+    showScreen("home");
+  }
+})();
+</script>
+</body>
+</html>
