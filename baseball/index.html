@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이닝 노트 · 야구 연습 기록</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&family=Teko:wght@400;500;600;700&display=swap');
+
+:root{
+  --night:#0B1620;
+  --green-deep:#132A1C;
+  --green:#1F3D2B;
+  --green-light:#2A4A36;
+  --clay:#B5651D;
+  --clay-light:#C97A34;
+  --chalk:#F4EFE3;
+  --chalk-dim:#C9C3B4;
+  --navy:#12233B;
+  --navy-light:#1C3457;
+  --mustard:#E7A33E;
+  --mustard-dark:#C77F1E;
+  --danger:#C0554A;
+  --line: rgba(244,239,227,0.14);
+  --font-display:'Black Han Sans', 'Noto Sans KR', sans-serif;
+  --font-body:'Noto Sans KR', sans-serif;
+  --font-digit:'Teko', 'Noto Sans KR', sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  min-height:100vh;
+  font-family:var(--font-body);
+  color:var(--chalk);
+  background:
+    radial-gradient(ellipse 700px 400px at 12% -10%, rgba(231,163,62,0.16), transparent 60%),
+    radial-gradient(ellipse 700px 400px at 100% 0%, rgba(181,101,29,0.14), transparent 60%),
+    linear-gradient(160deg, var(--night) 0%, var(--green-deep) 45%, var(--navy) 100%);
+  background-attachment:fixed;
+  display:flex;
+  justify-content:center;
+}
+#app{
+  width:100%;
+  max-width:560px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+button{font-family:inherit;}
+:focus-visible{outline:3px solid var(--mustard); outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+
+.pad{padding:24px 22px 32px;}
+.badge-pill{
+  display:inline-block;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.02em;
+  color:var(--night);
+  background:var(--mustard);
+  padding:5px 14px;
+  border-radius:999px;
+}
+.back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  color:var(--chalk-dim);
+  background:none;
+  border:none;
+  font-size:15px;
+  padding:6px 2px;
+  cursor:pointer;
+}
+.back-link:hover{color:var(--mustard);}
+h1,h2,h3{margin:0; font-family:var(--font-display); font-weight:400; letter-spacing:.01em;}
+p{line-height:1.6;}
+
+.btn{
+  border:none;
+  border-radius:999px;
+  font-family:var(--font-body);
+  font-weight:700;
+  cursor:pointer;
+  padding:15px 24px;
+  font-size:16px;
+  transition:transform .12s ease, filter .12s ease;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{background:var(--mustard); color:var(--night);}
+.btn-primary:hover{filter:brightness(1.07);}
+.btn-primary:disabled{background:#7a715c; color:#bdb8ac; cursor:not-allowed;}
+.btn-ghost{background:transparent; color:var(--chalk); border:1.5px solid var(--line);}
+.btn-ghost:hover{border-color:var(--mustard); color:var(--mustard);}
+.btn-danger{background:transparent; color:var(--danger); border:1.5px solid var(--danger);}
+.btn-danger:hover{background:var(--danger); color:var(--chalk);}
+.btn-block{width:100%; display:block;}
+.btn-sm{padding:8px 14px; font-size:13px; border-radius:999px;}
+
+.error-banner{
+  background:rgba(192,85,74,0.16);
+  border:1px solid var(--danger);
+  color:#F3D6D1;
+  padding:12px 14px;
+  border-radius:6px;
+  font-size:14px;
+  margin-bottom:16px;
+}
+.hint-banner{
+  background:rgba(231,163,62,0.12);
+  border:1px solid rgba(231,163,62,0.4);
+  color:var(--mustard);
+  padding:12px 14px;
+  border-radius:6px;
+  font-size:14px;
+  margin-bottom:16px;
+}
+
+.scoreboard-bar{
+  background:var(--navy);
+  border-top:3px double var(--mustard-dark);
+  border-bottom:3px double var(--mustard-dark);
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+.scoreboard-bar .mode-label{
+  font-family:var(--font-digit);
+  font-size:20px;
+  letter-spacing:.04em;
+  color:var(--mustard);
+}
+.scoreboard-bar .actions{display:flex; gap:8px;}
+
+.hero{padding:64px 26px 14px; text-align:center;}
+.hero h1{
+  font-size:clamp(50px,13vw,86px);
+  color:var(--mustard);
+  text-shadow: 3px 3px 0 rgba(18,35,59,0.6);
+  line-height:0.95;
+}
+.hero .sub{margin:18px auto 0; max-width:340px; color:var(--chalk-dim); font-size:15.5px;}
+.stitch{display:flex; justify-content:center; margin:26px 0; opacity:.85;}
+.feature-tags{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-top:22px;}
+.feature-tag{border:1px solid var(--line); border-radius:999px; padding:6px 13px; font-size:12.5px; color:var(--chalk-dim);}
+.hero-cta{margin-top:34px; display:flex; flex-direction:column; align-items:center; gap:12px;}
+.hero-cta .btn{font-size:19px; padding:18px 46px;}
+.hero-cta .btn-ghost{font-size:14px; padding:11px 26px;}
+
+.mode-card{
+  display:flex; align-items:center; gap:16px; width:100%; text-align:left;
+  background:var(--green-light); border:1px solid var(--line); border-radius:4px;
+  padding:18px 16px; margin-bottom:14px; cursor:pointer; color:var(--chalk);
+}
+.mode-card:hover{border-color:var(--mustard);}
+.mode-card .icon{flex:0 0 auto; width:52px; height:52px; display:flex; align-items:center; justify-content:center; background:var(--navy); border-radius:4px;}
+.mode-card .txt h3{font-size:20px; color:var(--mustard); margin-bottom:4px;}
+.mode-card .txt p{font-size:13.5px; color:var(--chalk-dim); margin:0;}
+
+.lineup-card{background:var(--green-light); border:1px solid var(--line); border-radius:4px; padding:18px 16px;}
+.lineup-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.lineup-num{font-family:var(--font-digit); font-size:22px; color:var(--mustard); width:26px; text-align:center; flex:0 0 auto;}
+.lineup-row input{flex:1; background:var(--navy); border:1px solid var(--line); border-radius:4px; color:var(--chalk); padding:11px 12px; font-size:15px; font-family:var(--font-body);}
+.lineup-row input::placeholder{color:#7c8a99;}
+.row-remove{background:none; border:none; color:var(--chalk-dim); font-size:18px; cursor:pointer; flex:0 0 auto; width:26px;}
+.row-remove:hover{color:var(--danger);}
+.add-row-btn{background:none; border:1px dashed var(--line); color:var(--chalk-dim); border-radius:4px; width:100%; padding:10px; font-size:14px; cursor:pointer; margin-top:4px;}
+.add-row-btn:hover{border-color:var(--mustard); color:var(--mustard);}
+.add-row-btn:disabled{opacity:.4; cursor:not-allowed;}
+
+.formation-panel{background:var(--navy); border:1px solid var(--line); border-radius:4px; margin:18px 0; overflow:hidden;}
+.formation-svg{width:100%; height:auto; display:block;}
+.vlabel{fill:var(--chalk); font-size:12px; font-family:var(--font-body);}
+.polygon-empty{padding:44px 20px; text-align:center; color:var(--chalk-dim); font-size:14px; line-height:1.6;}
+
+.roster-item{border:1px solid var(--line); border-radius:4px; margin-bottom:10px; overflow:hidden;}
+.roster-head{display:flex; align-items:center; justify-content:space-between; padding:13px 14px; cursor:pointer; background:var(--green-light);}
+.roster-head.is-active{background:rgba(231,163,62,0.14); border-bottom:1px solid var(--line);}
+.roster-head .name{font-size:15.5px; font-weight:700;}
+.status-chip{font-size:12px; padding:4px 11px; border-radius:999px; border:1px solid var(--line); color:var(--chalk-dim);}
+.status-chip.on{background:var(--mustard); color:var(--night); border-color:var(--mustard); font-weight:700;}
+.score-zone{padding:13px 14px; background:var(--navy-light);}
+.score-grid{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+.score-btn{width:34px; height:34px; border-radius:999px; border:1px solid var(--line); background:var(--green); color:var(--chalk); font-family:var(--font-digit); font-size:16px; cursor:pointer;}
+.score-btn:hover{border-color:var(--mustard); color:var(--mustard);}
+.score-meta{display:flex; align-items:center; justify-content:space-between; font-size:13px; color:var(--chalk-dim);}
+.score-meta .avgnum{font-family:var(--font-digit); font-size:18px; color:var(--mustard);}
+.undo-btn{background:none; border:none; color:var(--chalk-dim); font-size:12.5px; cursor:pointer; text-decoration:underline;}
+.undo-btn:hover{color:var(--danger);}
+.roster-item.disabled .roster-head{opacity:.45; cursor:not-allowed;}
+.note-input{width:100%; background:var(--green); border:1px solid var(--line); border-radius:4px; color:var(--chalk); padding:8px 10px; font-size:13px; margin-bottom:9px; font-family:var(--font-body);}
+.note-input::placeholder{color:#8b9aa6;}
+.note-list{margin-top:9px; display:flex; flex-direction:column; gap:4px;}
+.note-item{font-size:12px; color:var(--chalk-dim); background:var(--green); border-radius:4px; padding:5px 8px;}
+
+.role-slot{border:1px solid var(--line); border-radius:4px; margin-bottom:12px; overflow:hidden;}
+.role-slot.empty{border-style:dashed;}
+.role-slot-head{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:var(--green-light);}
+.role-slot-head .role-tag{font-family:var(--font-digit); font-size:15px; letter-spacing:.03em; color:var(--mustard); width:56px; flex:0 0 auto;}
+.role-slot-head .who{font-size:15px; font-weight:700; flex:1;}
+.role-slot-head .who.placeholder{color:var(--chalk-dim); font-weight:400;}
+.change-btn{background:none; border:1px solid var(--line); border-radius:999px; color:var(--chalk-dim); font-size:12px; padding:4px 10px; cursor:pointer;}
+.change-btn:hover{border-color:var(--mustard); color:var(--mustard);}
+
+.section-label{font-family:var(--font-digit); font-size:19px; letter-spacing:.03em; color:var(--chalk-dim); margin:22px 0 10px;}
+.section-label:first-of-type{margin-top:0;}
+
+.result-row{display:flex; align-items:center; gap:14px; padding:12px 4px; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+.result-row:last-child{border-bottom:none;}
+.result-rank{font-family:var(--font-digit); font-size:26px; color:var(--chalk-dim); width:34px; text-align:center; flex:0 0 auto;}
+.result-row:nth-child(1) .result-rank{color:var(--mustard);}
+.result-row:nth-child(2) .result-rank{color:#C9A876;}
+.result-row:nth-child(3) .result-rank{color:#B5651D;}
+.result-name{flex:1; font-size:15.5px; font-weight:700;}
+.result-count{font-size:12px; color:var(--chalk-dim); display:block; margin-top:2px; font-weight:400;}
+.result-avg{font-family:var(--font-digit); font-size:26px; color:var(--mustard); flex:0 0 auto;}
+.results-panel{background:var(--green-light); border:1px solid var(--line); border-radius:4px; padding:14px 16px; margin-bottom:8px;}
+.results-actions{display:flex; gap:10px; margin-top:14px;}
+.results-actions .btn{flex:1;}
+.export-row{display:flex; gap:10px; margin-top:20px;}
+.export-row .btn{flex:1;}
+
+.footer-space{height:20px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ state ============ */
+let uidCounter = 1;
+const uid = () => uidCounter++;
+
+const state = {
+  screen: 'home',
+  mode: null,            // 'catch' | 'pitch' | 'bat'
+  players: [],
+  nameDraft: ['', ''],
+  nameError: '',
+  activeIds: new Set(),
+  catchScores: {},
+  currentRoles: { pitcher: null, catcher: null, batter: null },
+  roleScores: { pitcher: {}, catcher: {}, batter: {} },
+  finalResults: null,
+  pendingNotes: {},
+  historyTab: 'games',
+  historyGames: null,
+  historyStats: null
+};
+
+function resetGameData(){
+  state.players = [];
+  state.activeIds = new Set();
+  state.catchScores = {};
+  state.currentRoles = { pitcher: null, catcher: null, batter: null };
+  state.roleScores = { pitcher: {}, catcher: {}, batter: {} };
+  state.finalResults = null;
+  state.nameError = '';
+  state.pendingNotes = {};
+}
+
+/* ============ helpers ============ */
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function avgOf(arr){
+  if(!arr || arr.length===0) return null;
+  const sum = arr.reduce((a,e)=>a+e.v,0);
+  return sum/arr.length;
+}
+function fmtAvg(v){ return v===null || v===undefined ? '—' : v.toFixed(1); }
+function ensureArr(obj,id){ if(!obj[id]) obj[id]=[]; return obj[id]; }
+function sortDescByAvg(a,b){
+  const av = a.avg===null||a.avg===undefined ? -Infinity : a.avg;
+  const bv = b.avg===null||b.avg===undefined ? -Infinity : b.avg;
+  return bv-av;
+}
+function modeName(m){
+  return m==='catch' ? '캐치볼 모드' : m==='pitch' ? '투구 연습 모드' : '배팅 연습 모드';
+}
+function roleOrder(){
+  return state.mode==='bat' ? ['pitcher','catcher','batter'] : ['pitcher','catcher'];
+}
+function roleLabel(r){
+  return r==='pitcher' ? '투수' : r==='catcher' ? '포수' : '타자';
+}
+function stitchDivider(){
+  return `<div class="stitch"><svg width="120" height="14" viewBox="0 0 120 14">
+    <line x1="0" y1="7" x2="120" y2="7" stroke="var(--chalk-dim)" stroke-width="1" opacity="0.5"/>
+    ${[10,26,42,58,74,90,106].map(x=>`<line x1="${x}" y1="2" x2="${x-5}" y2="12" stroke="var(--clay-light)" stroke-width="1.5"/>`).join('')}
+  </svg></div>`;
+}
+function noteInputHtml(key){
+  return `<input type="text" class="note-input" maxlength="40" placeholder="메모 (선택, 예: 제구 좋음)" value="${escapeHtml(state.pendingNotes[key]||'')}" data-note-key="${key}">`;
+}
+function notesListHtml(arr){
+  const withNotes = (arr||[]).filter(e=>e.note).slice(-3).reverse();
+  if(withNotes.length===0) return '';
+  return `<div class="note-list">${withNotes.map(e=>`<div class="note-item">${e.v}점 · ${escapeHtml(e.note)}</div>`).join('')}</div>`;
+}
+function resultRowsHtml(rows){
+  return rows.map((row,i)=>`
+    <div class="result-row">
+      <span class="result-rank">${i+1}</span>
+      <span class="result-name">${escapeHtml(row.name)}<span class="result-count">${row.count}회 기록</span></span>
+      <span class="result-avg">${fmtAvg(row.avg)}</span>
+    </div>
+  `).join('');
+}
+
+/* ============ storage helpers ============ */
+function slugify(name){
+  return String(name).trim().toLowerCase().replace(/[\s\/\\'"]+/g,'_').replace(/[^a-z0-9가-힣_\-]/g,'').slice(0,60) || 'player';
+}
+async function saveGameRecord(record){
+  try{ await window.storage.set('games:'+record.id, JSON.stringify(record), false); }catch(e){}
+}
+async function updatePlayerStat(name, category, addSum, addCount){
+  if(addCount<=0) return;
+  const key = 'stats:' + slugify(name);
+  let rec = null;
+  try{
+    const r = await window.storage.get(key, false);
+    rec = r && r.value ? JSON.parse(r.value) : null;
+  }catch(e){ rec = null; }
+  if(!rec) rec = { name, catch:{sum:0,count:0}, pitcher:{sum:0,count:0}, catcher:{sum:0,count:0}, batter:{sum:0,count:0} };
+  rec.name = name;
+  rec[category].sum += addSum;
+  rec[category].count += addCount;
+  try{ await window.storage.set(key, JSON.stringify(rec), false); }catch(e){}
+}
+async function refreshHistoryGames(){
+  try{
+    const listRes = await window.storage.list('games:', false);
+    const keys = (listRes && listRes.keys) ? listRes.keys : [];
+    const games = [];
+    for(const k of keys){
+      try{
+        const r = await window.storage.get(k, false);
+        if(r && r.value) games.push(JSON.parse(r.value));
+      }catch(e){}
+    }
+    games.sort((a,b)=>b.ts-a.ts);
+    state.historyGames = games.slice(0,30);
+  }catch(e){
+    state.historyGames = [];
+  }
+  render();
+}
+async function refreshHistoryStats(){
+  try{
+    const listRes = await window.storage.list('stats:', false);
+    const keys = (listRes && listRes.keys) ? listRes.keys : [];
+    const out = [];
+    for(const k of keys){
+      try{
+        const r = await window.storage.get(k, false);
+        if(!r || !r.value) continue;
+        const s = JSON.parse(r.value);
+        const cats = ['catch','pitcher','catcher','batter'];
+        let totalSum=0, totalCount=0;
+        const catAvg = {};
+        cats.forEach(c=>{
+          const cs = s[c] || {sum:0,count:0};
+          catAvg[c] = { avg: cs.count>0 ? cs.sum/cs.count : 0, count: cs.count };
+          totalSum += cs.sum; totalCount += cs.count;
+        });
+        if(totalCount>0){
+          out.push({ name: s.name, combinedAvg: totalSum/totalCount, combinedCount: totalCount, catch:catAvg.catch, pitcher:catAvg.pitcher, catcher:catAvg.catcher, batter:catAvg.batter });
+        }
+      }catch(e){}
+    }
+    out.sort((a,b)=>b.combinedAvg-a.combinedAvg);
+    state.historyStats = out;
+  }catch(e){
+    state.historyStats = [];
+  }
+  render();
+}
+
+/* ============ export helpers ============ */
+function downloadCSV(filename, table){
+  const csvEscape = v => { v=String(v===null||v===undefined?'':v); return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; };
+  const csv = table.map(row=>row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function exportCatchCSV(){
+  const rows = state.finalResults.rows;
+  const table = [['순위','이름','평균','기록횟수']];
+  rows.forEach((r,i)=> table.push([i+1, r.name, r.avg===null?'':r.avg.toFixed(1), r.count]));
+  downloadCSV('캐치볼_결과.csv', table);
+}
+function exportRoleCSV(){
+  const { overallRows, roleRows } = state.finalResults;
+  const roles = roleOrder();
+  const table = [['구분','순위','이름','평균','기록횟수']];
+  overallRows.forEach((r,i)=> table.push(['종합', i+1, r.name, r.avg===null?'':r.avg.toFixed(1), r.count]));
+  roles.forEach(r=>{
+    roleRows[r].forEach((row,i)=> table.push([roleLabel(r), i+1, row.name, row.avg.toFixed(1), row.count]));
+  });
+  downloadCSV(`${state.mode==='bat'?'배팅':'투구'}_결과.csv`, table);
+}
+function exportImage(containerId, filename){
+  const el = document.getElementById(containerId);
+  if(!el || typeof html2canvas==='undefined') return;
+  html2canvas(el, { backgroundColor: '#12233B', scale: 2 }).then(canvas=>{
+    canvas.toBlob(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    });
+  }).catch(()=>{});
+}
+
+/* ============ render dispatcher ============ */
+const app = document.getElementById('app');
+function render(){
+  let html = '';
+  switch(state.screen){
+    case 'home': html = renderHome(); break;
+    case 'modeSelect': html = renderModeSelect(); break;
+    case 'nameInput': html = renderNameInput(); break;
+    case 'catchGame': html = renderCatchGame(); break;
+    case 'roleGame': html = renderRoleGame(); break;
+    case 'catchResults': html = renderCatchResults(); break;
+    case 'roleResults': html = renderRoleResults(); break;
+    case 'history': html = renderHistory(); break;
+    default: html = renderHome();
+  }
+  app.innerHTML = html;
+}
+
+/* ============ HOME ============ */
+function renderHome(){
+  return `
+  <div class="hero">
+    <h1>PLAY&nbsp;BALL</h1>
+    <p class="sub">캐치볼, 투구, 배팅 연습을 스코어보드처럼 기록하고<br>선수별 평균 점수와 순위를 바로 확인하세요.</p>
+    ${stitchDivider()}
+    <div class="feature-tags">
+      <span class="feature-tag">캐치볼</span>
+      <span class="feature-tag">투구 연습</span>
+      <span class="feature-tag">배팅 연습</span>
+    </div>
+    <div class="hero-cta">
+      <button class="btn btn-primary" data-action="go-mode-select">시작하기</button>
+      <button class="btn btn-ghost" data-action="go-history">지난 기록 보기</button>
+    </div>
+  </div>
+  <div class="footer-space"></div>
+  `;
+}
+
+/* ============ MODE SELECT ============ */
+function renderModeSelect(){
+  const iconCatch = `<svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="4" r="3" fill="var(--mustard)"/><circle cx="4" cy="19" r="3" fill="var(--mustard)"/><circle cx="22" cy="19" r="3" fill="var(--mustard)"/><path d="M13 4 L4 19 M13 4 L22 19 M4 19 L22 19" stroke="var(--chalk-dim)" stroke-width="1"/></svg>`;
+  const iconPitch = `<svg width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="8" r="4" fill="var(--mustard)"/><rect x="7" y="19" width="12" height="3" fill="var(--chalk-dim)"/><line x1="13" y1="12" x2="13" y2="19" stroke="var(--chalk-dim)" stroke-width="1.5"/></svg>`;
+  const iconBat = `<svg width="26" height="26" viewBox="0 0 26 26"><line x1="4" y1="22" x2="18" y2="6" stroke="var(--clay-light)" stroke-width="4" stroke-linecap="round"/><circle cx="21" cy="4" r="3" fill="var(--mustard)"/></svg>`;
+
+  return `
+  <div class="pad">
+    <button class="back-link" data-action="go-home">← 처음으로</button>
+    <div style="margin-top:18px;">
+      <span class="badge-pill">모드 선택</span>
+      <h2 style="font-size:26px; margin-top:10px;">어떤 연습을 할까요?</h2>
+    </div>
+    <div style="margin-top:22px;">
+      <button class="mode-card" data-action="select-mode" data-mode="catch">
+        <span class="icon">${iconCatch}</span>
+        <span class="txt"><h3>캐치볼 모드</h3><p>선수들과 공을 주고받으며 서로 점수를 매겨요</p></span>
+      </button>
+      <button class="mode-card" data-action="select-mode" data-mode="pitch">
+        <span class="icon">${iconPitch}</span>
+        <span class="txt"><h3>투구 연습 모드</h3><p>투수와 포수를 정해 라운드마다 점수를 기록해요</p></span>
+      </button>
+      <button class="mode-card" data-action="select-mode" data-mode="bat">
+        <span class="icon">${iconBat}</span>
+        <span class="txt"><h3>배팅 연습 모드</h3><p>투수·포수·타자를 정해 타격까지 함께 평가해요</p></span>
+      </button>
+    </div>
+  </div>
+  `;
+}
+
+/* ============ NAME INPUT ============ */
+function renderNameInput(){
+  const rows = state.nameDraft.map((val,i)=>`
+    <div class="lineup-row">
+      <span class="lineup-num">${i+1}</span>
+      <input type="text" maxlength="12" placeholder="선수 이름" value="${escapeHtml(val)}" data-name-index="${i}">
+      ${state.nameDraft.length>1 ? `<button class="row-remove" data-action="remove-name-field" data-index="${i}">✕</button>` : ''}
+    </div>
+  `).join('');
+
+  const canAdd = state.nameDraft.length < 10;
+
+  return `
+  <div class="pad">
+    <button class="back-link" data-action="go-mode-select">← 모드 선택으로</button>
+    <div style="margin-top:18px;">
+      <span class="badge-pill">${modeName(state.mode)}</span>
+      <h2 style="font-size:24px; margin-top:10px;">선수 이름을 입력하세요</h2>
+      <p style="color:var(--chalk-dim); font-size:13.5px; margin-top:4px;">최대 10명까지 등록할 수 있어요.</p>
+    </div>
+    <div style="margin-top:20px;">
+      ${state.nameError ? `<div class="error-banner">${escapeHtml(state.nameError)}</div>` : ''}
+      <div class="lineup-card">
+        ${rows}
+        <button class="add-row-btn" data-action="add-name-field" ${canAdd?'':'disabled'}>+ 선수 추가 (${state.nameDraft.length}/10)</button>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:18px;" data-action="submit-names">다음</button>
+    </div>
+  </div>
+  `;
+}
+
+/* ============ CATCH GAME ============ */
+function renderCatchGame(){
+  const activeIds = [...state.activeIds];
+  const polygon = catchPolygonSVG();
+
+  const rosterHtml = state.players.map(p=>{
+    const isActive = state.activeIds.has(p.id);
+    const arr = state.catchScores[p.id] || [];
+    const avg = avgOf(arr);
+    let scoreZone = '';
+    if(isActive){
+      const key = 'catch-'+p.id;
+      scoreZone = `
+        <div class="score-zone">
+          <div class="score-grid">
+            ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="score-btn" data-action="catch-score" data-id="${p.id}" data-score="${n}">${n}</button>`).join('')}
+          </div>
+          ${noteInputHtml(key)}
+          <div class="score-meta">
+            <span>기록 ${arr.length}회 · 평균 <span class="avgnum">${fmtAvg(avg)}</span></span>
+            ${arr.length>0 ? `<button class="undo-btn" data-action="catch-undo" data-id="${p.id}">최근 기록 취소</button>` : ''}
+          </div>
+          ${notesListHtml(arr)}
+        </div>
+      `;
+    }
+    return `
+      <div class="roster-item">
+        <div class="roster-head ${isActive?'is-active':''}" data-action="toggle-active" data-id="${p.id}">
+          <span class="name">${escapeHtml(p.name)}</span>
+          <span class="status-chip ${isActive?'on':''}">${isActive?'활성':'대기'}</span>
+        </div>
+        ${scoreZone}
+      </div>
+    `;
+  }).join('');
+
+  return `
+  <div class="scoreboard-bar">
+    <span class="mode-label">캐치볼</span>
+    <span class="actions"><button class="btn btn-danger btn-sm" data-action="end-catch-game">게임 종료</button></span>
+  </div>
+  <div class="pad">
+    ${activeIds.length===0 ? `<div class="hint-banner">아래 선수 이름을 눌러 활성화할 선수를 선택하세요.</div>` : ''}
+    <div class="formation-panel">${polygon}</div>
+    ${rosterHtml}
+  </div>
+  `;
+}
+
+function catchPolygonSVG(){
+  const ids = [...state.activeIds];
+  const n = ids.length;
+  const w=320,h=220,cx=160,cy=112;
+  if(n===0){
+    return `<div class="polygon-empty">선수를 활성화하면<br>대형이 여기에 표시돼요</div>`;
+  }
+  if(n===1){
+    const p = state.players.find(pp=>pp.id===ids[0]);
+    return `<svg viewBox="0 0 ${w} ${h}" class="formation-svg" role="img" aria-label="활성 선수 대형">
+      <circle cx="${cx}" cy="${cy}" r="7" fill="var(--mustard)"/>
+      <text x="${cx}" y="${cy-16}" class="vlabel" text-anchor="middle">${escapeHtml(p.name)}</text>
+    </svg>`;
+  }
+  const r = n<=4 ? 68 : n<=6 ? 80 : 92;
+  let pts=[]; let labels='';
+  for(let i=0;i<n;i++){
+    const angle = -Math.PI/2 + i*(2*Math.PI/n);
+    const x = cx + r*Math.cos(angle);
+    const y = cy + r*Math.sin(angle);
+    pts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+    const lx = cx + (r+28)*Math.cos(angle);
+    const ly = cy + (r+28)*Math.sin(angle);
+    const anchor = lx < cx-12 ? 'end' : lx > cx+12 ? 'start' : 'middle';
+    const p = state.players.find(pp=>pp.id===ids[i]);
+    labels += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="6" fill="var(--mustard)"/><text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" class="vlabel" text-anchor="${anchor}">${escapeHtml(p.name)}</text>`;
+  }
+  const poly = `<polygon points="${pts.join(' ')}" fill="rgba(231,163,62,0.10)" stroke="var(--mustard)" stroke-width="2"/>`;
+  return `<svg viewBox="0 0 ${w} ${h}" class="formation-svg" role="img" aria-label="활성 선수 대형">${poly}${labels}</svg>`;
+}
+
+/* ============ ROLE GAME (pitch / bat) ============ */
+function renderRoleGame(){
+  const roles = roleOrder();
+  const assignedIds = new Set(roles.map(r=>state.currentRoles[r]).filter(v=>v!==null && v!==undefined));
+
+  const slotsHtml = roles.map(r=>{
+    const pid = state.currentRoles[r];
+    if(pid===null || pid===undefined){
+      return `
+        <div class="role-slot empty">
+          <div class="role-slot-head">
+            <span class="role-tag">${roleLabel(r)}</span>
+            <span class="who placeholder">선수를 선택하세요</span>
+          </div>
+        </div>
+      `;
+    }
+    const p = state.players.find(pp=>pp.id===pid);
+    const arr = state.roleScores[r][pid] || [];
+    const avg = avgOf(arr);
+    const key = `role-${r}-${pid}`;
+    return `
+      <div class="role-slot">
+        <div class="role-slot-head">
+          <span class="role-tag">${roleLabel(r)}</span>
+          <span class="who">${escapeHtml(p.name)}</span>
+          <button class="change-btn" data-action="unassign-role" data-role="${r}">변경</button>
+        </div>
+        <div class="score-zone">
+          <div class="score-grid">
+            ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="score-btn" data-action="role-score" data-role="${r}" data-id="${pid}" data-score="${n}">${n}</button>`).join('')}
+          </div>
+          ${noteInputHtml(key)}
+          <div class="score-meta">
+            <span>기록 ${arr.length}회 · 평균 <span class="avgnum">${fmtAvg(avg)}</span></span>
+            ${arr.length>0 ? `<button class="undo-btn" data-action="role-undo" data-role="${r}" data-id="${pid}">최근 기록 취소</button>` : ''}
+          </div>
+          ${notesListHtml(arr)}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const openRoles = roles.filter(r=> state.currentRoles[r]===null || state.currentRoles[r]===undefined);
+  const hasOpenSlot = openRoles.length>0;
+
+  const rosterHtml = state.players.map(p=>{
+    const taken = assignedIds.has(p.id);
+    const disabled = taken || !hasOpenSlot;
+    return `
+      <div class="roster-item ${disabled?'disabled':''}">
+        <div class="roster-head" ${disabled ? '' : `data-action="select-role" data-id="${p.id}"`}>
+          <span class="name">${escapeHtml(p.name)}</span>
+          <span class="status-chip ${taken?'on':''}">${taken?'배정됨':'대기'}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const hintText = hasOpenSlot ? `아래 선수 명단에서 ${openRoles.map(roleLabel).join(', ')}${openRoles.length>1?' 순서로':''} 선택하세요.` : '';
+
+  return `
+  <div class="scoreboard-bar">
+    <span class="mode-label">${state.mode==='bat'?'배팅':'투구'} 연습</span>
+    <span class="actions">
+      <button class="btn btn-ghost btn-sm" data-action="end-round">라운드 종료</button>
+      <button class="btn btn-danger btn-sm" data-action="end-role-game">게임 종료</button>
+    </span>
+  </div>
+  <div class="pad">
+    ${hasOpenSlot ? `<div class="hint-banner">${hintText}</div>` : ''}
+    ${slotsHtml}
+    <div class="section-label">선수 명단</div>
+    ${rosterHtml}
+  </div>
+  `;
+}
+
+/* ============ RESULTS ============ */
+function renderCatchResults(){
+  const rows = state.finalResults.rows;
+
+  return `
+  <div class="pad">
+    <div id="catchResultsCapture">
+      <span class="badge-pill">캐치볼 모드 · 결과</span>
+      <h2 style="font-size:26px; margin-top:12px;">게임이 끝났어요</h2>
+      <p style="color:var(--chalk-dim); font-size:13.5px; margin-top:4px;">평균 점수 순으로 정렬했어요.</p>
+      <div class="results-panel" style="margin-top:18px;">${resultRowsHtml(rows)}</div>
+    </div>
+    <div class="export-row">
+      <button class="btn btn-ghost btn-sm" data-action="export-catch-csv">CSV 내보내기</button>
+      <button class="btn btn-ghost btn-sm" data-action="export-catch-image">이미지 저장</button>
+    </div>
+    <div class="results-actions">
+      <button class="btn btn-ghost" data-action="go-mode-select">다른 모드 선택</button>
+      <button class="btn btn-primary" data-action="go-home">처음으로</button>
+    </div>
+  </div>
+  `;
+}
+
+function renderRoleResults(){
+  const { overallRows, roleRows } = state.finalResults;
+  const roles = roleOrder();
+
+  const roleSections = roles.map(r=>{
+    const list = roleRows[r];
+    if(list.length===0){
+      return `<div class="section-label">${roleLabel(r)} 순위</div><div class="results-panel"><p style="color:var(--chalk-dim); font-size:13.5px; margin:6px 2px;">기록이 없어요.</p></div>`;
+    }
+    return `<div class="section-label">${roleLabel(r)} 순위</div><div class="results-panel">${resultRowsHtml(list)}</div>`;
+  }).join('');
+
+  return `
+  <div class="pad">
+    <div id="roleResultsCapture">
+      <span class="badge-pill">${modeName(state.mode)} · 결과</span>
+      <h2 style="font-size:26px; margin-top:12px;">게임이 끝났어요</h2>
+      <div class="section-label" style="margin-top:20px;">종합 평균</div>
+      <div class="results-panel">${resultRowsHtml(overallRows)}</div>
+      ${roleSections}
+    </div>
+    <div class="export-row">
+      <button class="btn btn-ghost btn-sm" data-action="export-role-csv">CSV 내보내기</button>
+      <button class="btn btn-ghost btn-sm" data-action="export-role-image">이미지 저장</button>
+    </div>
+    <div class="results-actions">
+      <button class="btn btn-ghost" data-action="go-mode-select">다른 모드 선택</button>
+      <button class="btn btn-primary" data-action="go-home">처음으로</button>
+    </div>
+  </div>
+  `;
+}
+
+/* ============ HISTORY ============ */
+function renderHistory(){
+  const tabsHtml = `
+    <div style="display:flex; gap:8px; margin:18px 0;">
+      <button class="btn ${state.historyTab==='games'?'btn-primary':'btn-ghost'} btn-sm" data-action="history-tab" data-tab="games">게임 기록</button>
+      <button class="btn ${state.historyTab==='stats'?'btn-primary':'btn-ghost'} btn-sm" data-action="history-tab" data-tab="stats">선수 통계</button>
+    </div>`;
+
+  let body = '';
+  if(state.historyTab==='games'){
+    if(state.historyGames===null) body = `<p style="color:var(--chalk-dim); font-size:14px;">불러오는 중...</p>`;
+    else if(state.historyGames.length===0) body = `<p style="color:var(--chalk-dim); font-size:14px;">아직 저장된 게임 기록이 없어요.</p>`;
+    else body = state.historyGames.map(g=>renderHistoryGameCard(g)).join('');
+  } else {
+    if(state.historyStats===null) body = `<p style="color:var(--chalk-dim); font-size:14px;">불러오는 중...</p>`;
+    else if(state.historyStats.length===0) body = `<p style="color:var(--chalk-dim); font-size:14px;">아직 누적된 통계가 없어요.</p>`;
+    else body = `<div class="results-panel">${renderStatsRows(state.historyStats)}</div>`;
+  }
+
+  return `<div class="pad">
+    <button class="back-link" data-action="go-home">← 처음으로</button>
+    <h2 style="font-size:24px; margin-top:14px;">지난 기록</h2>
+    <p style="color:var(--chalk-dim); font-size:13px; margin-top:4px;">이 브라우저에 저장된 나의 기록이에요.</p>
+    ${tabsHtml}
+    ${body}
+  </div>`;
+}
+
+function renderHistoryGameCard(g){
+  const date = new Date(g.ts);
+  const dateLabel = `${date.getMonth()+1}/${date.getDate()} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+  let inner = '';
+  if(g.mode==='catch'){
+    inner = resultRowsHtml(g.rows);
+  } else {
+    inner = `<div style="font-size:12px; color:var(--chalk-dim); margin-bottom:6px;">종합 평균</div>` + resultRowsHtml(g.overallRows);
+  }
+  return `<div class="results-panel" style="margin-bottom:14px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <span class="badge-pill" style="font-size:11px;">${modeName(g.mode)}</span>
+      <span style="font-size:12px; color:var(--chalk-dim);">${dateLabel}</span>
+    </div>
+    ${inner}
+  </div>`;
+}
+
+function renderStatsRows(stats){
+  const catLabel = c => c==='catch' ? '캐치볼' : c==='pitcher' ? '투구' : c==='catcher' ? '포구' : '타격';
+  return stats.map((s,i)=>{
+    const cats = ['catch','pitcher','catcher','batter'].filter(c=>s[c].count>0);
+    const badges = cats.map(c=>`<span class="feature-tag" style="font-size:11px;">${catLabel(c)} ${s[c].avg.toFixed(1)} (${s[c].count})</span>`).join('');
+    return `<div class="result-row">
+      <span class="result-rank">${i+1}</span>
+      <span class="result-name" style="flex-basis:100%;">
+        ${escapeHtml(s.name)}<span class="result-count">총 ${s.combinedCount}회 기록</span>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:7px;">${badges}</div>
+      </span>
+      <span class="result-avg">${s.combinedAvg.toFixed(1)}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ============ event handling ============ */
+app.addEventListener('click', async (e)=>{
+  const el = e.target.closest('[data-action]');
+  if(!el) return;
+  const action = el.dataset.action;
+
+  switch(action){
+    case 'go-home': {
+      state.screen='home'; state.mode=null; resetGameData(); state.nameDraft=['','']; render(); break;
+    }
+    case 'go-mode-select': {
+      state.screen='modeSelect'; render(); break;
+    }
+    case 'go-history': {
+      state.screen='history'; state.historyTab='games'; state.historyGames=null; state.historyStats=null;
+      render();
+      refreshHistoryGames();
+      refreshHistoryStats();
+      break;
+    }
+    case 'history-tab': {
+      state.historyTab = el.dataset.tab; render(); break;
+    }
+    case 'select-mode': {
+      state.mode = el.dataset.mode;
+      resetGameData();
+      state.nameDraft = ['',''];
+      state.screen = 'nameInput';
+      render();
+      break;
+    }
+    case 'add-name-field': {
+      if(state.nameDraft.length<10) state.nameDraft.push('');
+      render();
+      break;
+    }
+    case 'remove-name-field': {
+      const idx = +el.dataset.index;
+      state.nameDraft.splice(idx,1);
+      if(state.nameDraft.length===0) state.nameDraft.push('');
+      render();
+      break;
+    }
+    case 'submit-names': {
+      const names = state.nameDraft.map(s=>s.trim()).filter(Boolean);
+      const minNeeded = state.mode==='bat' ? 3 : 2;
+      const unique = new Set(names);
+      if(names.length < minNeeded){
+        state.nameError = `${modeName(state.mode)}에는 최소 ${minNeeded}명이 필요해요.`;
+        render();
+        break;
+      }
+      if(unique.size !== names.length){
+        state.nameError = '선수 이름이 중복되지 않게 입력해주세요.';
+        render();
+        break;
+      }
+      state.nameError = '';
+      state.players = names.map(n=>({ id: uid(), name: n }));
+      if(state.mode==='catch'){
+        state.activeIds = new Set();
+        state.catchScores = {};
+        state.screen = 'catchGame';
+      }else{
+        state.currentRoles = { pitcher:null, catcher:null, batter: state.mode==='bat' ? null : undefined };
+        state.roleScores = { pitcher:{}, catcher:{}, batter:{} };
+        state.screen = 'roleGame';
+      }
+      render();
+      break;
+    }
+    case 'toggle-active': {
+      const id = +el.dataset.id;
+      if(state.activeIds.has(id)) state.activeIds.delete(id);
+      else state.activeIds.add(id);
+      render();
+      break;
+    }
+    case 'catch-score': {
+      const id = +el.dataset.id;
+      const score = +el.dataset.score;
+      const key = 'catch-'+id;
+      const note = (state.pendingNotes[key]||'').trim();
+      ensureArr(state.catchScores, id).push({ v: score, note });
+      state.pendingNotes[key] = '';
+      render();
+      break;
+    }
+    case 'catch-undo': {
+      const id = +el.dataset.id;
+      const arr = state.catchScores[id];
+      if(arr && arr.length) arr.pop();
+      render();
+      break;
+    }
+    case 'end-catch-game': {
+      const rows = state.players.map(p=>{
+        const arr = state.catchScores[p.id] || [];
+        return { name: p.name, avg: avgOf(arr), count: arr.length };
+      }).sort(sortDescByAvg);
+      state.finalResults = { rows };
+      state.screen = 'catchResults';
+      render();
+
+      const savedRows = rows.filter(r=>r.count>0);
+      if(savedRows.length>0){
+        await saveGameRecord({ id: 'c'+Date.now(), mode:'catch', ts: Date.now(), rows: savedRows });
+      }
+      for(const p of state.players){
+        const arr = state.catchScores[p.id]||[];
+        if(arr.length>0){
+          const sum = arr.reduce((a,e)=>a+e.v,0);
+          await updatePlayerStat(p.name, 'catch', sum, arr.length);
+        }
+      }
+      break;
+    }
+    case 'select-role': {
+      const id = +el.dataset.id;
+      const roles = roleOrder();
+      const openRole = roles.find(r => state.currentRoles[r]===null || state.currentRoles[r]===undefined);
+      if(openRole) state.currentRoles[openRole] = id;
+      render();
+      break;
+    }
+    case 'unassign-role': {
+      const r = el.dataset.role;
+      state.currentRoles[r] = null;
+      render();
+      break;
+    }
+    case 'role-score': {
+      const r = el.dataset.role;
+      const id = +el.dataset.id;
+      const score = +el.dataset.score;
+      const key = `role-${r}-${id}`;
+      const note = (state.pendingNotes[key]||'').trim();
+      ensureArr(state.roleScores[r], id).push({ v: score, note });
+      state.pendingNotes[key] = '';
+      render();
+      break;
+    }
+    case 'role-undo': {
+      const r = el.dataset.role;
+      const id = +el.dataset.id;
+      const arr = state.roleScores[r][id];
+      if(arr && arr.length) arr.pop();
+      render();
+      break;
+    }
+    case 'end-round': {
+      const roles = roleOrder();
+      roles.forEach(r=> state.currentRoles[r] = null);
+      render();
+      break;
+    }
+    case 'end-role-game': {
+      const roles = roleOrder();
+      const overallRows = state.players.map(p=>{
+        let all = [];
+        roles.forEach(r=>{
+          const arr = state.roleScores[r][p.id];
+          if(arr) all = all.concat(arr);
+        });
+        return { name: p.name, avg: avgOf(all), count: all.length };
+      }).sort(sortDescByAvg);
+
+      const roleRows = {};
+      roles.forEach(r=>{
+        roleRows[r] = state.players.map(p=>{
+          const arr = state.roleScores[r][p.id] || [];
+          return { name: p.name, avg: avgOf(arr), count: arr.length };
+        }).filter(row=>row.count>0).sort(sortDescByAvg);
+      });
+
+      state.finalResults = { overallRows, roleRows };
+      state.screen = 'roleResults';
+      render();
+
+      const savedOverall = overallRows.filter(r=>r.count>0);
+      if(savedOverall.length>0){
+        const record = { id: (state.mode==='bat'?'b':'p')+Date.now(), mode: state.mode, ts: Date.now(), overallRows: savedOverall, roleRows: {} };
+        roles.forEach(r=>{ record.roleRows[r] = roleRows[r]; });
+        await saveGameRecord(record);
+      }
+      for(const p of state.players){
+        for(const r of roles){
+          const arr = state.roleScores[r][p.id]||[];
+          if(arr.length>0){
+            const sum = arr.reduce((a,e)=>a+e.v,0);
+            await updatePlayerStat(p.name, r, sum, arr.length);
+          }
+        }
+      }
+      break;
+    }
+    case 'export-catch-csv': exportCatchCSV(); break;
+    case 'export-catch-image': exportImage('catchResultsCapture', '캐치볼_결과.png'); break;
+    case 'export-role-csv': exportRoleCSV(); break;
+    case 'export-role-image': exportImage('roleResultsCapture', `${state.mode==='bat'?'배팅':'투구'}_결과.png`); break;
+  }
+});
+
+app.addEventListener('input', (e)=>{
+  const t = e.target;
+  if(t.matches('[data-name-index]')){
+    state.nameDraft[+t.dataset.nameIndex] = t.value;
+  } else if(t.matches('[data-note-key]')){
+    state.pendingNotes[t.dataset.noteKey] = t.value;
+  }
+});
+
+/* ============ boot ============ */
+render();
+</script>
+</body>
+</html>
