@@ -114,6 +114,15 @@ h1{
     background:#222;
 }
 
+/* ========================= */
+/* 문장 공유 버튼 */
+/* ========================= */
+.sentence{
+    position:absolute;
+    top:75px;
+    left:25px;
+}
+
 .japanvoca{
     position:absolute;
     top:75px;
@@ -462,6 +471,11 @@ h1{
         font-size:13px;
     }
 
+    .sentence{
+        top:65px;
+        left:18px;
+    }
+
     .japanvoca{
         top:65px;
         right:18px;
@@ -610,6 +624,10 @@ const CURRENT_DAY = getCurrentDay();
 <!-- ========================= -->
 <button class="log" onclick="location.href='dayreport/'" >
     📜 일별 활동내역
+</button>
+
+<button class="log sentence" onclick="location.href='sentence/'" >
+    문장 공유
 </button>
 
 <!-- ========================= -->
