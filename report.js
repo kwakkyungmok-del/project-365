@@ -252,4 +252,148 @@ bgm이 망한 거 같아서 다음에 고치기로
 운빨 추가
 `
 },
+
+{
+    day:30,
+    title:"Day 30",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:31,
+    title:"Day 31",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:32,
+    title:"Day 32",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:33,
+    title:"Day 33",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:34,
+    title:"Day 34",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:35,
+    title:"Day 35",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:36,
+    title:"Day 36",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:37,
+    title:"Day 37",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:38,
+    title:"Day 38",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:39,
+    title:"Day 39",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:40,
+    title:"Day 40",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:41,
+    title:"Day 41",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:42,
+    title:"Day 42",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:43,
+    title:"Day 43",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:44,
+    title:"Day 44",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:45,
+    title:"Day 45",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:46,
+    title:"Day 46",
+    content:`
+일정상 못했거나 쉼
+`
+},
+
+{
+    day:47,
+    title:"Day 47",
+    content:`
+일정상 못했거나 쉼
+`
+},
 ];
