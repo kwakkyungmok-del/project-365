@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project 365 · 메시지 공유</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#f4f1e8; color:#191919; overflow:hidden;
+}
+.home{
+  position:fixed; left:22px; top:20px; z-index:20;
+  padding:10px 16px; border:2px solid #191919; border-radius:12px;
+  background:#fff; color:#191919; text-decoration:none; font-weight:800;
+  box-shadow:4px 4px 0 #191919;
+}
+.home:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #191919}
+.card{
+  width:min(560px,calc(100% - 32px)); padding:34px;
+  background:#fff; border:3px solid #191919; border-radius:28px;
+  box-shadow:10px 10px 0 #191919; text-align:center;
+}
+h1{margin:0 0 8px;font-size:42px}
+.sub{margin:0 0 26px;color:#666}
+input{
+  width:100%; padding:17px 18px; font-size:17px;
+  border:2px solid #191919; border-radius:14px; outline:none;
+}
+button{
+  margin-top:14px; width:100%; padding:16px; border:2px solid #191919;
+  border-radius:14px; background:#191919;color:#fff;font-size:17px;
+  font-weight:800;cursor:pointer;
+}
+button:hover{transform:translateY(-2px)}
+.status{min-height:24px;margin-top:14px;font-weight:700}
+.character{
+  position:fixed; left:50%; bottom:-220px; transform:translateX(-50%);
+  width:150px;height:150px;border:5px solid #191919;border-radius:42% 42% 48% 48%;
+  background:#ffd84d;z-index:10;box-shadow:8px 8px 0 #191919;
+}
+.character:before,.character:after{
+  content:"";position:absolute;top:48px;width:18px;height:25px;
+  background:#191919;border-radius:50%;
+}
+.character:before{left:39px}.character:after{right:39px}
+.mouth{
+  position:absolute;left:50%;top:88px;transform:translateX(-50%);
+  width:45px;height:24px;border-bottom:5px solid #191919;border-radius:50%;
+}
+.note{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) scale(.4) rotate(-8deg);
+  max-width:min(700px,82vw);padding:24px 30px;background:#fff;border:4px solid #191919;
+  border-radius:22px;box-shadow:9px 9px 0 #191919;font-size:clamp(22px,5vw,42px);
+  font-weight:900;text-align:center;opacity:0;z-index:30;word-break:keep-all;
+}
+.play .character{animation:pop 1.2s cubic-bezier(.2,.9,.2,1) forwards}
+.play .note{animation:notePop 1.3s .35s cubic-bezier(.2,1.4,.3,1) forwards}
+@keyframes pop{
+  0%{bottom:-220px;transform:translateX(-50%) rotate(0)}
+  65%{bottom:42%;transform:translateX(-50%) rotate(-8deg)}
+  82%{bottom:35%;transform:translateX(-50%) rotate(8deg)}
+  100%{bottom:38%;transform:translateX(-50%) rotate(-3deg)}
+}
+@keyframes notePop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(-8deg)}
+  55%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(3deg)}
+  75%{transform:translate(-50%,-50%) scale(.96) rotate(-2deg)}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}
+}
+</style>
+</head>
+<body>
+<a class="home" href="../">← 홈으로</a>
+
+<div id="app">
+  <main class="card" id="editor">
+    <h1>PROJECT 365</h1>
+    <p class="sub">메시지를 적고, 웃기게 등장시켜 보세요.</p>
+    <input id="message" maxlength="120" placeholder="여기에 하고 싶은 말을 적으세요">
+    <button id="share">공유하기</button>
+    <div class="status" id="status"></div>
+  </main>
+</div>
+
+<div class="character"><div class="mouth"></div></div>
+<div class="note" id="note"></div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const shared = params.get("m");
+const editor = document.getElementById("editor");
+const message = document.getElementById("message");
+const share = document.getElementById("share");
+const status = document.getElementById("status");
+const note = document.getElementById("note");
+
+function play(text){
+  note.textContent = text;
+  document.body.classList.remove("play");
+  void document.body.offsetWidth;
+  document.body.classList.add("play");
+}
+
+if(shared){
+  editor.style.display = "none";
+  play(shared);
+}
+
+share.addEventListener("click", async ()=>{
+  const text = message.value.trim();
+  if(!text){
+    status.textContent = "먼저 메시지를 적어주세요.";
+    message.focus();
+    return;
+  }
+
+  const url = new URL(location.href);
+  url.search = "";
+  url.searchParams.set("m", text);
+
+  try{
+    await navigator.clipboard.writeText(url.toString());
+    status.textContent = "링크가 복사되었습니다!";
+  }catch{
+    prompt("아래 링크를 복사하세요.", url.toString());
+  }
+});
+</script>
+</body>
+</html>
