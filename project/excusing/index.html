@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>랜덤 핑계 생성기</title>
+<style>
+  :root{
+    --paper:#f7f2e2;
+    --line:#b9cbe0;
+    --margin:#e8a3a3;
+    --ink:#33323a;
+    --pencil:#5b5a63;
+    --accent:#d1495b;
+    --accent2:#3a6b8a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;min-height:100%;}
+  body{
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(
+        var(--paper) 0px, var(--paper) 31px,
+        var(--line) 32px
+      ),
+      linear-gradient(90deg, transparent 0 54px, var(--margin) 54px 56px, transparent 56px);
+    background-attachment:fixed;
+    font-family:"Segoe Print","Bradley Hand","Comic Sans MS","Apple SD Gothic Neo","Malgun Gothic",cursive,sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding:24px 16px 60px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* subtle paper noise */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(rgba(0,0,0,0.015) 1px, transparent 1px);
+    background-size:3px 3px;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+  }
+
+  .home-btn{
+    position:fixed;
+    top:16px; left:16px;
+    z-index:50;
+    background:var(--paper);
+    border:2px solid var(--ink);
+    border-radius:14px 10px 16px 8px / 10px 14px 8px 16px;
+    padding:8px 14px;
+    font-family:inherit;
+    font-size:1rem;
+    color:var(--ink);
+    cursor:pointer;
+    transform:rotate(-2deg);
+    box-shadow:2px 3px 0px rgba(0,0,0,0.15);
+    transition:transform .15s ease;
+  }
+  .home-btn:hover{ transform:rotate(1deg) scale(1.04); }
+  .home-btn:active{ transform:rotate(-1deg) scale(0.97); }
+
+  .wrap{
+    max-width:640px;
+    margin:64px auto 0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  h1{
+    font-size:clamp(1.8rem, 6vw, 2.6rem);
+    margin:0 0 6px;
+    transform:rotate(-1.5deg);
+    text-shadow:1px 1px 0 rgba(0,0,0,0.06);
+    text-align:center;
+  }
+  .subtitle{
+    font-size:0.95rem;
+    color:var(--pencil);
+    margin-bottom:22px;
+    transform:rotate(0.5deg);
+    text-align:center;
+  }
+
+  .card{
+    width:100%;
+    background:rgba(255,255,255,0.35);
+    border:2px dashed var(--ink);
+    border-radius:18px 14px 20px 10px / 14px 18px 10px 20px;
+    padding:22px 20px 26px;
+    transform:rotate(0.6deg);
+    box-shadow:3px 4px 0 rgba(0,0,0,0.08);
+  }
+
+  .section-label{
+    font-size:1.1rem;
+    margin:0 0 10px 4px;
+    color:var(--accent2);
+    transform:rotate(-0.8deg);
+  }
+  .section-label:not(:first-child){ margin-top:18px; }
+
+  .choices{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  .choice{
+    position:relative;
+    background:transparent;
+    border:2px solid var(--ink);
+    border-radius:10px 14px 10px 14px / 14px 10px 14px 10px;
+    padding:8px 14px;
+    font-family:inherit;
+    font-size:0.98rem;
+    color:var(--ink);
+    cursor:pointer;
+    transition:transform .12s ease;
+  }
+  .choice:hover{ transform:rotate(-2deg) translateY(-1px); }
+  .choice.selected{
+    color:var(--accent);
+    font-weight:bold;
+  }
+  .choice.selected::after{
+    content:"";
+    position:absolute;
+    left:-10%; top:-25%;
+    width:120%; height:150%;
+    border:2.5px solid var(--accent);
+    border-radius:50% 45% 50% 45% / 45% 50% 45% 50%;
+    transform:rotate(-4deg);
+    pointer-events:none;
+    animation:circleIn .25s ease;
+  }
+  @keyframes circleIn{
+    from{ opacity:0; transform:rotate(-4deg) scale(0.8); }
+    to{ opacity:1; transform:rotate(-4deg) scale(1); }
+  }
+
+  .generate-btn{
+    display:block;
+    margin:26px auto 0;
+    background:var(--accent);
+    color:#fff8f0;
+    border:none;
+    border-radius:16px 20px 16px 20px / 20px 16px 20px 16px;
+    padding:14px 34px;
+    font-family:inherit;
+    font-size:1.15rem;
+    cursor:pointer;
+    box-shadow:2px 3px 0 rgba(0,0,0,0.25);
+    transform:rotate(-1deg);
+    transition:transform .15s ease;
+  }
+  .generate-btn:hover{ transform:rotate(1.5deg) scale(1.05); }
+  .generate-btn:active{ transform:rotate(-1deg) scale(0.96); }
+  .generate-btn:disabled{
+    background:#c9c2b4; cursor:not-allowed; transform:none; box-shadow:none;
+  }
+
+  .result-zone{
+    min-height:40px;
+    margin-top:26px;
+  }
+  .result-card{
+    position:relative;
+    background:rgba(255,255,255,0.5);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:22px 20px;
+    font-size:1.25rem;
+    line-height:1.6;
+    text-align:center;
+    transform:rotate(-0.4deg);
+    animation:popIn .35s ease;
+  }
+  @keyframes popIn{
+    0%{ opacity:0; transform:rotate(-3deg) scale(0.9) translateY(6px); }
+    60%{ opacity:1; transform:rotate(1deg) scale(1.02); }
+    100%{ opacity:1; transform:rotate(-0.4deg) scale(1); }
+  }
+  .result-card .tag{
+    font-size:0.8rem;
+    color:var(--pencil);
+    margin-bottom:10px;
+    display:block;
+  }
+  .doodle{
+    position:absolute;
+    color:var(--accent);
+    font-size:1.4rem;
+    pointer-events:none;
+    user-select:none;
+  }
+  .doodle.star1{ top:-14px; left:-10px; transform:rotate(-15deg); }
+  .doodle.star2{ bottom:-16px; right:-6px; transform:rotate(20deg); }
+  .doodle.arrow{ bottom:-26px; left:20px; font-size:1.1rem; transform:rotate(10deg); color:var(--accent2); }
+
+  .hint{
+    text-align:center;
+    color:var(--pencil);
+    font-size:0.85rem;
+    margin-top:10px;
+  }
+
+  @media (max-width:480px){
+    .wrap{ margin-top:56px; }
+    .card{ padding:18px 14px 20px; }
+    .choice{ padding:7px 11px; font-size:0.9rem; }
+    .generate-btn{ padding:12px 26px; font-size:1.05rem; }
+    .result-card{ font-size:1.08rem; padding:18px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<button class="home-btn" onclick="location.href='../'">← 메인으로</button>
+
+<div class="wrap">
+  <h1>랜덤 핑계 생성기</h1>
+  <p class="subtitle">Project-365 · 오늘도 핑계가 필요한 당신을 위해</p>
+
+  <div class="card">
+    <p class="section-label">1. 어떤 상황이야?</p>
+    <div class="choices" id="situationChoices"></div>
+
+    <p class="section-label">2. 어떤 분위기로?</p>
+    <div class="choices" id="moodChoices"></div>
+
+    <button class="generate-btn" id="genBtn" disabled>핑계 생성</button>
+
+    <div class="result-zone" id="resultZone"></div>
+  </div>
+
+  <p class="hint">버튼을 누르면 매번 다른 핑계가 나와요 (진짜로 쓰는 건 비추천 😅)</p>
+</div>
+
+<script>
+const situations = [
+  {key:"deadline", label:"마감을 못 지킴"},
+  {key:"lateFriend", label:"친구와의 약속에 늦음"},
+  {key:"lateSchool", label:"학교에 지각함"},
+  {key:"noHomework", label:"숙제를 못함"},
+  {key:"lateReply", label:"답장을 늦게 함"},
+  {key:"noSupplies", label:"준비물을 안 가져옴"},
+  {key:"forgotTask", label:"일을 깜빡함"},
+  {key:"etc", label:"기타"}
+];
+
+const moods = [
+  {key:"honest", label:"정직"},
+  {key:"indirect", label:"돌려서 말하기"},
+  {key:"cheerful", label:"유쾌"},
+  {key:"playful", label:"장난"}
+];
+
+const excuses = {
+  deadline:{
+    honest:["마감을 계산 착오로 놓쳤어. 미리 못 알려서 미안해.","생각보다 일이 많아서 시간 안에 다 못 끝냈어.","집중이 잘 안 돼서 마감을 넘겨버렸어."],
+    indirect:["마감이 저를 기다려주지 않고 먼저 가버렸어요.","시간이 제 편이 아니었던 것 같아요.","마감과 저 사이에 약간의 시차가 생겼어요."],
+    cheerful:["시간을 너무 아꼈더니 마감까지 아껴버렸어.","내 시계만 5분 느리게 가고 있었나봐.","마감이랑 술래잡기하다가 내가 졌어."],
+    playful:["타임머신이 고장나서 미래에서 못 돌아왔어.","마감 시간을 지키려다 시공간이 뒤틀렸어.","지구가 자전을 너무 빨리 해서 못 맞췄어."]
+  },
+  lateFriend:{
+    honest:["늦잠을 자서 늦었어, 미안.","준비하는데 생각보다 시간이 오래 걸렸어.","나오기 전에 급한 일이 생겨서 늦었어."],
+    indirect:["시간 개념이 오늘따라 나를 배신했어.","집 문이 나를 좀 오래 붙잡고 있었어.","오늘따라 모든 신호등이 나를 미워했어."],
+    cheerful:["거울 보다가 내 매력에 빠져서 늦었어.","길에서 귀여운 고양이랑 눈싸움하다 늦었어.","발걸음이 너무 여유로웠나봐, 미안!"],
+    playful:["우주정거장에서 지구로 재진입하는데 시간이 좀 걸렸어.","평행세계에서 길을 잃었다가 겨우 찾아왔어.","시간여행 중에 신호가 꼬여서 늦었어."]
+  },
+  lateSchool:{
+    honest:["알람을 못 듣고 늦잠을 잤어요.","버스를 놓쳐서 늦었어요.","준비물 챙기다가 시간이 늦어졌어요."],
+    indirect:["아침이 저를 붙잡고 놔주지 않았어요.","오늘따라 시간이 유독 빨리 흘렀어요.","등굣길이 평소보다 길게 느껴졌어요."],
+    cheerful:["이불이 오늘따라 너무 다정해서 못 떠났어요.","잠이 저를 조금 더 사랑해줬나봐요.","알람이 저랑 숨바꼭질을 했어요."],
+    playful:["학교로 가는 길에 시공간 왜곡이 있었어요.","제 방에서 학교까지 순간이동을 시도하다 실패했어요.","지각 요정이 제 신발끈을 묶어놨어요."]
+  },
+  noHomework:{
+    honest:["깜빡하고 숙제를 안 했어요.","다른 일정 때문에 시간이 부족했어요.","미루다가 결국 다 못 끝냈어요."],
+    indirect:["숙제와 저 사이에 거리가 좀 생겼어요.","책상 위에서 숙제가 저를 피해다녔어요.","오늘은 숙제와 타이밍이 안 맞았어요."],
+    cheerful:["숙제가 저보다 늦잠을 더 오래 잤나봐요.","연필이 저보다 쉬고 싶어했어요.","숙제장이 저랑 잠깐 숨바꼭질했어요."],
+    playful:["숙제가 다른 차원으로 순간이동했나봐요.","집에 있는 블랙홀이 숙제를 삼켰어요.","숙제가 저 몰래 가출을 했나봐요."]
+  },
+  lateReply:{
+    honest:["메시지를 늦게 확인했어.","바빠서 답장할 타이밍을 놓쳤어.","알림을 못 보고 지나쳤어."],
+    indirect:["메시지가 제 알림함 깊은 곳에 숨어 있었어요.","답장할 타이밍이 자꾸 저를 피해갔어요.","핸드폰과 저 사이에 약간의 거리가 있었어요."],
+    cheerful:["핸드폰이 저 몰래 방해금지 모드를 켰나봐.","메시지가 도착하는 소리를 내 귀가 무시했어.","손가락이 답장 버튼 앞에서 망설였어."],
+    playful:["메시지가 다른 행성을 거쳐서 도착했나봐.","와이파이가 제 답장을 인질로 잡고 있었어요.","핸드폰이 잠깐 명상에 들어갔었어."]
+  },
+  noSupplies:{
+    honest:["챙긴다고 했는데 깜빡 잊고 나왔어요.","가방을 급하게 싸다가 빠뜨렸어요.","전날 준비를 못 해서 놓쳤어요."],
+    indirect:["준비물이 제 가방을 슬쩍 빠져나갔어요.","오늘따라 가방이 유독 가벼웠어요.","준비물과 저 사이에 이별이 있었어요."],
+    cheerful:["준비물이 집에서 더 놀고 싶어했나봐요.","가방이 다이어트를 하고 싶었나봐요.","준비물이 저보다 늦게 일어났어요."],
+    playful:["준비물이 순간이동 능력을 각성했나봐요.","집에 있는 요정이 제 준비물을 숨겼어요.","가방 속 블랙홀이 준비물을 흡수했어요."]
+  },
+  forgotTask:{
+    honest:["완전히 깜빡하고 놓쳤어요.","다른 일에 정신이 팔려서 잊어버렸어요.","메모를 안 해뒀다가 잊어버렸어요."],
+    indirect:["그 일이 제 기억 저편으로 여행을 떠났어요.","머릿속 할 일 목록에서 살짝 지워졌어요.","생각이 잠깐 다른 곳에 다녀왔어요."],
+    cheerful:["제 기억력이 오늘 하루 휴가를 갔나봐요.","머릿속 메모장이 자동 삭제됐나봐요.","뇌가 잠깐 로딩 중이었어요."],
+    playful:["누군가 제 기억을 지우개로 지워버렸어요.","그 일은 평행우주의 저만 기억하고 있어요.","기억 서버가 다운됐다가 복구가 늦었어요."]
+  },
+  etc:{
+    honest:["솔직히 그냥 깜빡했어요, 죄송해요.","상황이 생각보다 복잡해서 못 지켰어요.","제 실수였어요, 다음엔 신경 쓸게요."],
+    indirect:["오늘 하루가 저를 좀 바쁘게 만들었어요.","여러 가지 일들이 겹쳐서 조금 헤맸어요.","계획과 실제 사이에 거리가 좀 있었어요."],
+    cheerful:["오늘의 저는 조금 느긋한 모드였나봐요.","계획이 저를 잠깐 놓쳤나봐요.","예상치 못한 하루의 변수가 있었어요."],
+    playful:["지구 자전축이 오늘 살짝 기울었나봐요.","우주의 기운이 저를 방해했어요.","시간의 신이 오늘 장난을 쳤어요."]
+  }
+};
+
+let selectedSituation = null;
+let selectedMood = null;
+
+const sitContainer = document.getElementById("situationChoices");
+const moodContainer = document.getElementById("moodChoices");
+const genBtn = document.getElementById("genBtn");
+const resultZone = document.getElementById("resultZone");
+
+situations.forEach(s=>{
+  const btn = document.createElement("button");
+  btn.className = "choice";
+  btn.textContent = s.label;
+  btn.dataset.key = s.key;
+  btn.addEventListener("click", ()=>{
+    [...sitContainer.children].forEach(c=>c.classList.remove("selected"));
+    btn.classList.add("selected");
+    selectedSituation = s.key;
+    updateButton();
+  });
+  sitContainer.appendChild(btn);
+});
+
+moods.forEach(m=>{
+  const btn = document.createElement("button");
+  btn.className = "choice";
+  btn.textContent = m.label;
+  btn.dataset.key = m.key;
+  btn.addEventListener("click", ()=>{
+    [...moodContainer.children].forEach(c=>c.classList.remove("selected"));
+    btn.classList.add("selected");
+    selectedMood = m.key;
+    updateButton();
+  });
+  moodContainer.appendChild(btn);
+});
+
+function updateButton(){
+  genBtn.disabled = !(selectedSituation && selectedMood);
+}
+
+let lastExcuse = "";
+genBtn.addEventListener("click", ()=>{
+  if(!selectedSituation || !selectedMood) return;
+  const pool = excuses[selectedSituation][selectedMood];
+  let pick = pool[Math.floor(Math.random()*pool.length)];
+  if(pool.length > 1){
+    while(pick === lastExcuse){
+      pick = pool[Math.floor(Math.random()*pool.length)];
+    }
+  }
+  lastExcuse = pick;
+
+  const sitLabel = situations.find(s=>s.key===selectedSituation).label;
+  const moodLabel = moods.find(m=>m.key===selectedMood).label;
+
+  resultZone.innerHTML = `
+    <div class="result-card">
+      <span class="doodle star1">✦</span>
+      <span class="doodle star2">✧</span>
+      <span class="doodle arrow">↳ 이거 쓰자</span>
+      <span class="tag">${sitLabel} · ${moodLabel} 톤</span>
+      "${pick}"
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>
