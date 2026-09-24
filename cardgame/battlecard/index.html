@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>카드 배틀 아레나</title>
+<style>
+  :root{
+    --bg-0:#0a0b12;
+    --bg-1:#12141f;
+    --bg-2:#191d2b;
+    --line:#2a2f42;
+    --text:#eef0f8;
+    --sub:#8d93ab;
+    --accent:#7c9cff;
+    --accent-2:#ff8a5c;
+    --hp-good:#4ade80;
+    --hp-mid:#fbbf24;
+    --hp-bad:#f87171;
+    --gold:#e8c15a;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;width:100%;height:100%;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, #1c2140 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 10%, #241831 0%, transparent 55%),
+      linear-gradient(180deg,var(--bg-0),var(--bg-1) 40%, var(--bg-0));
+    color:var(--text);
+    font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",-apple-system,BlinkMacSystemFont,sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* ---------- main button ---------- */
+  .main-btn{
+    position:fixed;
+    top:12px; left:12px;
+    z-index:500;
+    background:rgba(20,22,34,0.85);
+    border:1px solid var(--line);
+    color:var(--sub);
+    font-size:13px;
+    letter-spacing:.5px;
+    padding:7px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    backdrop-filter:blur(6px);
+    transition:all .15s ease;
+  }
+  .main-btn:hover{ color:var(--text); border-color:var(--accent); }
+
+  /* ---------- screens ---------- */
+  .screen{ display:none; min-height:100vh; width:100%; padding:56px 14px 24px; }
+  .screen.active{ display:flex; flex-direction:column; align-items:center; }
+
+  /* ---------- select screen ---------- */
+  .select-header{ text-align:center; margin-bottom:18px; }
+  .select-header h1{ margin:0 0 6px; font-size:22px; letter-spacing:1px; font-weight:700; }
+  .select-header p{ margin:0; color:var(--sub); font-size:13px; line-height:1.6; }
+  .select-count{
+    margin-top:10px; font-size:15px; font-weight:700; color:var(--gold);
+    background:rgba(232,193,90,0.08); border:1px solid rgba(232,193,90,0.3);
+    padding:4px 14px; border-radius:20px; display:inline-block;
+  }
+
+  #selectGrid{
+    width:100%; max-width:920px;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(92px,1fr));
+    gap:12px;
+    margin-top:20px;
+  }
+  .sel-card{ aspect-ratio:3/4.2; perspective:800px; cursor:pointer; }
+  .sel-card.selected{ cursor:default; pointer-events:none; }
+  .sel-card-inner{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.34,1.56,.64,1);
+  }
+  .sel-card.flipped .sel-card-inner{ transform:rotateY(180deg); }
+  .sel-card-back, .sel-card-front{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:10px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+  }
+  .sel-card-back{
+    background:
+      repeating-linear-gradient(135deg,#20243a 0 8px,#1b1e30 8px 16px);
+    border:1px solid var(--line);
+    color:var(--sub); font-size:26px;
+    box-shadow:0 4px 10px rgba(0,0,0,.4);
+  }
+  .sel-card:not(.selected):hover .sel-card-back{ border-color:var(--accent); box-shadow:0 0 0 2px rgba(124,156,255,.25); }
+  .sel-card-front{
+    background:linear-gradient(160deg,#1c2032,#12141f);
+    border:2px solid var(--accent);
+    transform:rotateY(180deg);
+    padding:6px 4px;
+    text-align:center;
+  }
+  .sel-card.selected .sel-card-front{ box-shadow:0 0 14px rgba(232,193,90,.35); border-color:var(--gold); }
+  .sc-emoji{ font-size:26px; }
+  .sc-name{ font-size:12.5px; font-weight:700; margin-top:2px; }
+  .sc-elem{ font-size:10.5px; color:var(--sub); margin-top:1px; }
+  .sc-stats{ font-size:9px; color:var(--sub); margin-top:4px; line-height:1.5; }
+
+  /* ---------- battle screen ---------- */
+  #screen-battle{ padding-top:52px; max-width:760px; margin:0 auto; width:100%; }
+  .event-banner{
+    width:100%; text-align:center; font-size:12.5px; color:var(--gold);
+    background:rgba(232,193,90,0.07); border:1px solid rgba(232,193,90,0.25);
+    border-radius:8px; padding:6px 10px; margin-bottom:10px;
+  }
+  .arena{ width:100%; display:flex; flex-direction:column; gap:6px; }
+  .fighter{ display:flex; align-items:center; gap:12px; }
+  .pc-fighter{ flex-direction:row; }
+  .player-fighter{ flex-direction:row-reverse; }
+  .fighter-card{
+    width:64px; height:64px; min-width:64px;
+    border-radius:12px;
+    background:linear-gradient(160deg,#232741,#171a29);
+    border:2px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-size:32px;
+    box-shadow:0 4px 10px rgba(0,0,0,.35);
+  }
+  .fighter-info{ flex:1; min-width:0; }
+  .player-fighter .fighter-info{ text-align:right; }
+  .f-name{ font-size:15px; font-weight:700; }
+  .f-elem{ font-size:11px; color:var(--sub); margin-bottom:4px; }
+  .hp-bar{ width:100%; height:10px; background:#1a1c29; border-radius:6px; overflow:hidden; border:1px solid var(--line); }
+  .hp-fill{ height:100%; width:100%; background:linear-gradient(90deg,var(--hp-good),#22c55e); transition:width .5s ease, background .3s ease; }
+  .hp-fill.mid{ background:linear-gradient(90deg,var(--hp-mid),#f59e0b); }
+  .hp-fill.bad{ background:linear-gradient(90deg,var(--hp-bad),#ef4444); }
+  .hp-text{ font-size:10.5px; color:var(--sub); margin-top:2px; }
+
+  .vs-mid{ margin:8px 0; }
+  .battle-log{
+    height:100px; overflow-y:auto;
+    background:rgba(10,11,18,0.55);
+    border:1px solid var(--line); border-radius:10px;
+    padding:8px 10px; font-size:12px; color:var(--sub); line-height:1.7;
+  }
+  .battle-log div{ color:var(--text); }
+  .battle-log div:last-child{ color:var(--accent); }
+
+  .action-bar{ display:flex; gap:8px; margin-top:12px; width:100%; }
+  .act-btn{
+    flex:1; padding:12px 6px; font-size:14px; font-weight:700;
+    background:linear-gradient(160deg,#2a3050,#1a1d2e);
+    border:1px solid var(--line); color:var(--text);
+    border-radius:10px; cursor:pointer; letter-spacing:.5px;
+    transition:transform .1s ease, border-color .15s ease;
+  }
+  .act-btn:hover{ border-color:var(--accent); transform:translateY(-1px); }
+  .act-btn:active{ transform:translateY(1px); }
+  .act-btn.small{ flex:none; padding:9px 18px; font-size:12.5px; margin-top:12px; }
+  .action-bar.locked .act-btn{ pointer-events:none; opacity:.4; }
+
+  .deck-strip{ display:flex; gap:6px; margin-top:14px; width:100%; justify-content:center; flex-wrap:wrap; }
+  .mini-card{
+    width:44px; height:58px; border-radius:8px;
+    background:linear-gradient(160deg,#20233a,#151726);
+    border:1px solid var(--line);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:18px; position:relative; opacity:.55;
+  }
+  .mini-card.active{ opacity:1; border-color:var(--gold); box-shadow:0 0 10px rgba(232,193,90,.4); }
+  .mini-card.fainted{ opacity:.25; filter:grayscale(1); }
+  .mini-card .mc-hp{ width:80%; height:3px; background:#333; border-radius:2px; margin-top:3px; overflow:hidden;}
+  .mini-card .mc-hp-fill{ height:100%; background:var(--hp-good); }
+  .mini-card .mc-x{ position:absolute; font-size:20px; color:var(--hp-bad); }
+
+  /* ---------- animations ---------- */
+  @keyframes hitShake{
+    0%{ transform:translateX(0); filter:brightness(1); }
+    20%{ transform:translateX(-8px); filter:brightness(1.6) drop-shadow(0 0 8px #f87171); }
+    40%{ transform:translateX(6px); }
+    60%{ transform:translateX(-4px); }
+    100%{ transform:translateX(0); filter:brightness(1); }
+  }
+  .anim-hit{ animation:hitShake .4s ease; }
+  @keyframes healGlow{
+    0%{ box-shadow:0 0 0 rgba(74,222,128,0); }
+    40%{ box-shadow:0 0 20px rgba(74,222,128,.8); }
+    100%{ box-shadow:0 0 0 rgba(74,222,128,0); }
+  }
+  .anim-heal{ animation:healGlow .7s ease; }
+  @keyframes buffGlow{
+    0%{ box-shadow:0 0 0 rgba(124,156,255,0); transform:scale(1); }
+    40%{ box-shadow:0 0 18px rgba(124,156,255,.8); transform:scale(1.08); }
+    100%{ box-shadow:0 0 0 rgba(124,156,255,0); transform:scale(1); }
+  }
+  .anim-buff{ animation:buffGlow .6s ease; }
+  @keyframes debuffPulse{
+    0%{ filter:brightness(1) hue-rotate(0deg); }
+    50%{ filter:brightness(.7) hue-rotate(200deg); }
+    100%{ filter:brightness(1) hue-rotate(0deg); }
+  }
+  .anim-debuff{ animation:debuffPulse .6s ease; }
+  @keyframes switchFade{
+    0%{ opacity:1; transform:scale(1); }
+    45%{ opacity:0; transform:scale(.7) rotate(-8deg); }
+    55%{ opacity:0; transform:scale(.7) rotate(8deg); }
+    100%{ opacity:1; transform:scale(1); }
+  }
+  .anim-switch{ animation:switchFade .55s ease; }
+
+  /* ---------- overlays ---------- */
+  .overlay{
+    position:fixed; inset:0; z-index:600;
+    background:rgba(6,7,12,0.82);
+    display:flex; align-items:center; justify-content:center;
+    backdrop-filter:blur(3px);
+  }
+  .overlay.hidden{ display:none; }
+  .dice-box{ text-align:center; }
+  .dice-num{
+    font-size:74px;
+    animation:diceSpin .1s linear infinite;
+  }
+  @keyframes diceSpin{
+    0%{ transform:rotate(-8deg) scale(1); }
+    50%{ transform:rotate(8deg) scale(1.08); }
+    100%{ transform:rotate(-8deg) scale(1); }
+  }
+  .event-result-name{ font-size:20px; font-weight:700; margin-top:14px; color:var(--gold); min-height:26px; }
+  .event-result-desc{ font-size:13px; color:var(--sub); margin-top:4px; min-height:18px; }
+
+  .modal-box{
+    background:linear-gradient(160deg,#1b1e30,#12141f);
+    border:1px solid var(--line); border-radius:14px;
+    padding:20px; width:90%; max-width:360px; text-align:center;
+  }
+  .modal-title{ font-size:14.5px; font-weight:700; margin-bottom:14px; }
+  .switch-list{ display:flex; flex-direction:column; gap:8px; max-height:280px; overflow-y:auto; }
+  .switch-option{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,.03);
+    border:1px solid var(--line); border-radius:10px;
+    padding:9px 12px; cursor:pointer; transition:border-color .15s ease;
+  }
+  .switch-option:hover{ border-color:var(--accent); }
+  .so-emoji{ font-size:22px; }
+  .so-name{ flex:1; text-align:left; font-size:13.5px; font-weight:600; }
+  .so-hp{ font-size:11.5px; color:var(--sub); }
+
+  /* ---------- result screen ---------- */
+  #screen-result{ justify-content:center; align-items:center; text-align:center; }
+  .result-title{ font-size:36px; font-weight:800; letter-spacing:1px; }
+  .result-title.win{ color:var(--gold); text-shadow:0 0 24px rgba(232,193,90,.5); }
+  .result-title.lose{ color:var(--hp-bad); text-shadow:0 0 24px rgba(248,113,113,.4); }
+  .result-desc{ color:var(--sub); margin:12px 0 24px; font-size:14px; }
+
+  @media (max-width:480px){
+    .fighter-card{ width:52px; height:52px; min-width:52px; font-size:26px; }
+    .f-name{ font-size:13.5px; }
+    .battle-log{ height:86px; font-size:11px; }
+    .act-btn{ font-size:12.5px; padding:11px 4px; }
+    .sc-stats{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<button class="main-btn" onclick="location.href='../'">main</button>
+
+<div id="screen-select" class="screen active">
+  <div class="select-header">
+    <h1>카드 배틀 아레나</h1>
+    <p>뒤집힌 12장의 카드 중 원하는 카드 5장을 선택해 나만의 덱을 만드세요.<br>선택한 카드는 되돌릴 수 없습니다.</p>
+    <div class="select-count">선택 카드 <span id="selectCount">0</span> / 5</div>
+  </div>
+  <div id="selectGrid"></div>
+</div>
+
+<div id="screen-battle" class="screen">
+  <div class="event-banner" id="eventBanner">주사위를 굴리는 중...</div>
+  <div class="arena">
+    <div class="fighter pc-fighter">
+      <div class="fighter-card" id="pcFighterCard"><span id="pcEmoji"></span></div>
+      <div class="fighter-info">
+        <div class="f-name" id="pcName">-</div>
+        <div class="f-elem" id="pcElem">-</div>
+        <div class="hp-bar"><div class="hp-fill" id="pcHpFill"></div></div>
+        <div class="hp-text" id="pcHpText">-</div>
+      </div>
+    </div>
+
+    <div class="vs-mid"><div class="battle-log" id="battleLog"></div></div>
+
+    <div class="fighter player-fighter">
+      <div class="fighter-card" id="plFighterCard"><span id="plEmoji"></span></div>
+      <div class="fighter-info">
+        <div class="f-name" id="plName">-</div>
+        <div class="f-elem" id="plElem">-</div>
+        <div class="hp-bar"><div class="hp-fill" id="plHpFill"></div></div>
+        <div class="hp-text" id="plHpText">-</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar" id="actionBar">
+    <button class="act-btn" id="btnAttack">⚔ 공격</button>
+    <button class="act-btn" id="btnSkill">✨ 스킬</button>
+    <button class="act-btn" id="btnSwitch">🔄 교체</button>
+  </div>
+
+  <div class="deck-strip" id="playerDeckStrip"></div>
+</div>
+
+<div id="screen-result" class="screen">
+  <div class="result-title" id="resultTitle">-</div>
+  <div class="result-desc" id="resultDesc">-</div>
+  <button class="act-btn small" id="btnRestart">다시 시작하기</button>
+</div>
+
+<div class="overlay hidden" id="diceOverlay">
+  <div class="dice-box">
+    <div class="dice-num" id="diceNum">🎲</div>
+    <div class="event-result-name" id="eventResultName"></div>
+    <div class="event-result-desc" id="eventResultDesc"></div>
+  </div>
+</div>
+
+<div class="overlay hidden" id="switchModal">
+  <div class="modal-box">
+    <div class="modal-title">교체할 카드를 선택하세요</div>
+    <div class="switch-list" id="switchList"></div>
+    <button class="act-btn small" id="switchCancelBtn">취소</button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ===================== 데이터 정의 ===================== */
+
+const CARD_TEMPLATES = [
+  {id:1,  name:'블레이즈',  element:'화염', hp:80,  atk:32, spd:70, skillName:'폭염',     skillDesc:'다음 공격의 피해량이 크게 증가한다.',            emoji:'🔥'},
+  {id:2,  name:'프로스트',  element:'얼음', hp:95,  atk:24, spd:45, skillName:'빙결',     skillDesc:'상대의 다음 행동을 느리게 만든다.',              emoji:'❄️'},
+  {id:3,  name:'볼트',      element:'전기', hp:65,  atk:38, spd:95, skillName:'번개질주', skillDesc:'다음 턴에 선공권을 얻는다.',                     emoji:'⚡'},
+  {id:4,  name:'나이트',    element:'암흑', hp:75,  atk:35, spd:65, skillName:'암흑폭주', skillDesc:'HP가 낮을수록 강력한 피해를 입힌다.',            emoji:'🌑'},
+  {id:5,  name:'모스',      element:'자연', hp:120, atk:18, spd:35, skillName:'재생',     skillDesc:'자신의 HP를 회복한다.',                          emoji:'🌿'},
+  {id:6,  name:'골렘',      element:'암석', hp:160, atk:15, spd:20, skillName:'철벽',     skillDesc:'다음에 받는 피해를 크게 줄인다.',                emoji:'🪨'},
+  {id:7,  name:'블러드',    element:'흡혈', hp:85,  atk:28, spd:60, skillName:'흡혈',     skillDesc:'공격 피해의 일부를 HP로 흡수한다.',              emoji:'🩸'},
+  {id:8,  name:'윈드',      element:'바람', hp:70,  atk:27, spd:90, skillName:'질풍',     skillDesc:'상대의 다음 공격을 회피할 확률이 생긴다.',       emoji:'🌪️'},
+  {id:9,  name:'솔라',      element:'광휘', hp:100, atk:30, spd:55, skillName:'광휘',     skillDesc:'암흑 속성 상대에게 추가 피해를 입힌다.',         emoji:'✨'},
+  {id:10, name:'드레이크',  element:'용',   hp:110, atk:36, spd:40, skillName:'용의 포효', skillDesc:'상대에게 추가 피해를 입힌다.',                  emoji:'🐉'},
+  {id:11, name:'조커',      element:'혼돈', hp:75,  atk:30, spd:70, skillName:'???',      skillDesc:'무작위 효과가 발동한다.', atkMin:10, atkMax:50, emoji:'🃏'},
+  {id:12, name:'오큘러스',  element:'정신', hp:70,  atk:25, spd:75, skillName:'정신봉인', skillDesc:'상대의 스킬 사용을 일정 확률로 막는다.',         emoji:'👁️'}
+];
+
+const ELEMENT_COLOR = {
+  '화염':'#ff6b4a','얼음':'#7dd3fc','전기':'#fde047','암흑':'#a78bfa',
+  '자연':'#4ade80','암석':'#c4a37f','흡혈':'#f43f5e','바람':'#5eead4',
+  '광휘':'#fde68a','용':'#818cf8','혼돈':'#f472b6','정신':'#c084fc'
+};
+
+const ADVANTAGE = { '화염':'자연', '자연':'전기', '전기':'바람', '바람':'화염', '광휘':'암흑', '암흑':'광휘' };
+
+const EVENTS = [
+  {name:'화염의 날', desc:'화염 속성 효과가 강화됩니다.', elements:['화염']},
+  {name:'얼음의 날', desc:'얼음 속성 효과가 강화됩니다.', elements:['얼음']},
+  {name:'폭풍',     desc:'전기·바람 속성 효과가 강화됩니다.', elements:['전기','바람']},
+  {name:'광휘',     desc:'광휘 속성 효과가 강화됩니다.', elements:['광휘']},
+  {name:'암흑',     desc:'암흑 속성 효과가 강화됩니다.', elements:['암흑']},
+  {name:'무작위',   desc:'전투 중 피해량이 무작위로 크게 변동합니다.', elements:[], chaos:true}
+];
+
+/* ===================== 유틸 ===================== */
+
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    const tmp=a[i]; a[i]=a[j]; a[j]=tmp;
+  }
+  return a;
+}
+function sleep(ms){ return new Promise(res=>setTimeout(res,ms)); }
+
+let uidCounter = 1;
+function createInstance(t){
+  const atk = t.atkMin ? randInt(t.atkMin, t.atkMax) : t.atk;
+  return {
+    tid:t.id, name:t.name, element:t.element, maxHp:t.hp, curHp:t.hp, atk:atk, spd:t.spd,
+    skillName:t.skillName, skillDesc:t.skillDesc, emoji:t.emoji,
+    uid:'c'+(uidCounter++), fainted:false,
+    atkBuff:1, defBuff:0, evasion:0, sealed:0, priorityNext:false, frozen:false
+  };
+}
+
+function getTypeMultiplier(atkElem, defElem){
+  if(ADVANTAGE[atkElem] === defElem) return 1.25;
+  if(ADVANTAGE[defElem] === atkElem) return 0.85;
+  return 1.0;
+}
+function getEventMultiplier(element){
+  const ev = state.event;
+  if(!ev) return 1;
+  if(ev.chaos) return 0.7 + Math.random()*0.8;
+  return ev.elements.indexOf(element) !== -1 ? 1.25 : 1;
+}
+
+/* ===================== 전역 상태 ===================== */
+
+const state = {
+  player:{ deck:[], active:null },
+  pc:{ deck:[], active:null },
+  event:null,
+  lastPairKey:null,
+  gameOver:false,
+  locked:false
+};
+
+/* ===================== 화면 전환 ===================== */
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(el=>el.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+}
+
+/* ===================== 선택 화면 ===================== */
+
+let selectedTemplates = [];
+
+function buildSelectGrid(){
+  const grid = document.getElementById('selectGrid');
+  grid.innerHTML = '';
+  selectedTemplates = [];
+  document.getElementById('selectCount').textContent = '0';
+  const order = shuffle(CARD_TEMPLATES);
+  order.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'sel-card';
+    const atkLabel = t.atkMin ? (t.atkMin+'~'+t.atkMax) : t.atk;
+    card.innerHTML =
+      '<div class="sel-card-inner">' +
+        '<div class="sel-card-back">?</div>' +
+        '<div class="sel-card-front" style="border-color:'+ELEMENT_COLOR[t.element]+'">' +
+          '<div class="sc-emoji">'+t.emoji+'</div>' +
+          '<div class="sc-name">'+t.name+'</div>' +
+          '<div class="sc-elem">'+t.element+'</div>' +
+          '<div class="sc-stats">HP '+t.hp+'<br>ATK '+atkLabel+'<br>SPD '+t.spd+'</div>' +
+        '</div>' +
+      '</div>';
+    card.addEventListener('click', function(){ onSelectCard(card, t); });
+    grid.appendChild(card);
+  });
+}
+
+function onSelectCard(cardEl, t){
+  if(cardEl.classList.contains('flipped')) return;
+  if(selectedTemplates.length >= 5) return;
+  cardEl.classList.add('flipped');
+  setTimeout(function(){
+    cardEl.classList.add('selected');
+    selectedTemplates.push(t);
+    document.getElementById('selectCount').textContent = String(selectedTemplates.length);
+    if(selectedTemplates.length === 5){
+      setTimeout(startBattlePreparation, 650);
+    }
+  }, 380);
+}
+
+function startBattlePreparation(){
+  state.player.deck = selectedTemplates.map(createInstance);
+  const pcTemplates = shuffle(CARD_TEMPLATES).slice(0,5);
+  state.pc.deck = pcTemplates.map(createInstance);
+  initBattle();
+}
+
+/* ===================== 애니메이션 트리거 ===================== */
+
+function cardEl(side){ return document.getElementById(side === 'player' ? 'plFighterCard' : 'pcFighterCard'); }
+function retrigger(el, cls){
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+}
+function triggerHitAnim(side){ retrigger(cardEl(side), 'anim-hit'); }
+function triggerHealAnim(side){ retrigger(cardEl(side), 'anim-heal'); }
+function triggerBuffAnim(side){ retrigger(cardEl(side), 'anim-buff'); }
+function triggerDebuffAnim(side){ retrigger(cardEl(side), 'anim-debuff'); }
+function triggerSwitchAnim(side){ retrigger(cardEl(side), 'anim-switch'); }
+
+/* ===================== 전투 계산 ===================== */
+
+function computeDamage(attacker, defender, atkValue, bonusFlat, bonusMult){
+  bonusFlat = bonusFlat || 0;
+  bonusMult = bonusMult || 1;
+
+  if(defender.evasion > 0){
+    const dodge = Math.random() < defender.evasion;
+    defender.evasion = 0;
+    if(dodge){ attacker.atkBuff = 1; return {dmg:0, evaded:true}; }
+  }
+
+  let base = atkValue * (0.85 + Math.random()*0.3);
+  base *= getTypeMultiplier(attacker.element, defender.element);
+  base *= getEventMultiplier(attacker.element);
+  base *= (attacker.atkBuff || 1);
+  base *= bonusMult;
+  base += bonusFlat;
+
+  if(defender.defBuff){
+    base *= (1 - defender.defBuff);
+    defender.defBuff = 0;
+  }
+
+  attacker.atkBuff = 1;
+  const dmg = Math.max(1, Math.round(base));
+  defender.curHp = Math.max(0, defender.curHp - dmg);
+  return {dmg:dmg, evaded:false};
+}
+
+function useSkill(userSide){
+  const oppSide = userSide === 'player' ? 'pc' : 'player';
+  const user = state[userSide].active;
+  const target = state[oppSide].active;
+  const logs = [];
+
+  if(user.sealed > 0){
+    const blocked = Math.random() < user.sealed;
+    user.sealed = 0;
+    if(blocked){
+      triggerDebuffAnim(userSide);
+      logs.push(user.name+'의 스킬이 정신봉인에 막혔다!');
+      return logs;
+    }
+  }
+
+  switch(user.tid){
+    case 1:
+      user.atkBuff = 1.6;
+      triggerBuffAnim(userSide);
+      logs.push(user.name+'이(가) 폭염을 사용했다! 다음 공격이 강화된다.');
+      break;
+    case 2:
+      target.frozen = true;
+      triggerDebuffAnim(oppSide);
+      logs.push(user.name+'이(가) 빙결로 '+target.name+'을(를) 얼렸다! 다음 행동이 느려진다.');
+      break;
+    case 3:
+      user.priorityNext = true;
+      triggerBuffAnim(userSide);
+      logs.push(user.name+'이(가) 번개질주! 다음 턴 선공권을 얻는다.');
+      break;
+    case 4: {
+      const bonus = user.atk * (1 - user.curHp/user.maxHp);
+      const r = computeDamage(user, target, user.atk + bonus);
+      if(r.evaded){ logs.push(target.name+'이(가) 공격을 회피했다!'); }
+      else { triggerHitAnim(oppSide); logs.push(user.name+'의 암흑폭주! '+target.name+'에게 '+r.dmg+'의 피해!'); }
+      break;
+    }
+    case 5: {
+      const heal = Math.round(user.maxHp*0.25);
+      user.curHp = Math.min(user.maxHp, user.curHp+heal);
+      triggerHealAnim(userSide);
+      logs.push(user.name+'이(가) 재생으로 HP를 '+heal+' 회복했다!');
+      break;
+    }
+    case 6:
+      user.defBuff = 0.6;
+      triggerBuffAnim(userSide);
+      logs.push(user.name+'이(가) 철벽 태세를 갖췄다! 다음 피해가 크게 줄어든다.');
+      break;
+    case 7: {
+      const r = computeDamage(user, target, user.atk);
+      if(r.evaded){ logs.push(target.name+'이(가) 회피했다!'); }
+      else {
+        const heal = Math.round(r.dmg*0.4);
+        user.curHp = Math.min(user.maxHp, user.curHp+heal);
+        triggerHitAnim(oppSide);
+        triggerHealAnim(userSide);
+        logs.push(user.name+'의 흡혈 공격! '+r.dmg+' 피해, HP '+heal+' 흡수!');
+      }
+      break;
+    }
+    case 8:
+      user.evasion = 0.5;
+      triggerBuffAnim(userSide);
+      logs.push(user.name+'이(가) 질풍으로 회피 태세를 갖췄다!');
+      break;
+    case 9: {
+      const mult = target.element === '암흑' ? 1.6 : 1.15;
+      const r = computeDamage(user, target, user.atk, 0, mult);
+      if(r.evaded){ logs.push(target.name+'이(가) 회피했다!'); }
+      else { triggerHitAnim(oppSide); logs.push(user.name+'의 광휘 일격! '+r.dmg+'의 피해!'); }
+      break;
+    }
+    case 10: {
+      const r = computeDamage(user, target, user.atk, 16);
+      if(r.evaded){ logs.push(target.name+'이(가) 회피했다!'); }
+      else { triggerHitAnim(oppSide); logs.push(user.name+'의 용의 포효! '+r.dmg+'의 피해!'); }
+      break;
+    }
+    case 11: {
+      const roll = Math.random();
+      if(roll < 0.4){
+        const r = computeDamage(user, target, randInt(10,50));
+        if(r.evaded){ logs.push(target.name+'이(가) 회피했다!'); }
+        else { triggerHitAnim(oppSide); logs.push(user.name+'의 혼돈의 일격! '+r.dmg+'의 피해!'); }
+      } else if(roll < 0.65){
+        const heal = randInt(10,30);
+        user.curHp = Math.min(user.maxHp, user.curHp+heal);
+        triggerHealAnim(userSide);
+        logs.push(user.name+'에게 혼돈의 기운이 깃들어 HP '+heal+' 회복!');
+      } else if(roll < 0.85){
+        user.atkBuff = 1.8;
+        triggerBuffAnim(userSide);
+        logs.push(user.name+'에게 혼돈의 힘이 깃들어 다음 공격이 강화된다!');
+      } else {
+        target.frozen = true;
+        triggerDebuffAnim(oppSide);
+        logs.push('혼돈의 기운이 '+target.name+'을(를) 뒤흔들어 다음 행동이 느려진다!');
+      }
+      break;
+    }
+    case 12:
+      target.sealed = 0.6;
+      triggerDebuffAnim(oppSide);
+      logs.push(user.name+'이(가) 정신봉인을 걸었다! '+target.name+'의 다음 스킬이 막힐 수 있다.');
+      break;
+  }
+  return logs;
+}
+
+/* ===================== PC AI ===================== */
+
+function estimateDamage(attacker, defender){
+  let base = attacker.atk;
+  base *= getTypeMultiplier(attacker.element, defender.element);
+  if(state.event){
+    if(state.event.chaos) base *= 1.1;
+    else if(state.event.elements.indexOf(attacker.element) !== -1) base *= 1.25;
+  }
+  base *= (attacker.atkBuff || 1);
+  return base;
+}
+
+function pcDecide(){
+  const pc = state.pc.active, pl = state.player.active;
+  const others = state.pc.deck.filter(function(c){ return !c.fainted && c !== pc; });
+  const estDmg = estimateDamage(pc, pl);
+  const canKill = estDmg >= pl.curHp;
+  const typeMult = getTypeMultiplier(pc.element, pl.element);
+  const disadvantage = typeMult < 1;
+  const lowHp = pc.curHp / pc.maxHp < 0.3;
+
+  let bestSwitch = null, bestMult = typeMult;
+  others.forEach(function(c){
+    const m = getTypeMultiplier(c.element, pl.element);
+    if(m > bestMult){ bestMult = m; bestSwitch = c; }
+  });
+
+  const scores = {
+    attack: 1 + Math.random()*2,
+    skill: 1 + Math.random()*2,
+    switch: bestSwitch ? Math.random()*1.5 : -1
+  };
+  if(canKill) scores.attack += 4;
+  if(disadvantage) scores.skill += 1;
+  if(lowHp) scores.skill += 1;
+  if(bestSwitch && (disadvantage || lowHp)) scores.switch += 3;
+  if(lowHp && !canKill && bestSwitch) scores.switch += 2;
+
+  let bestAction = 'attack', bestScore = -Infinity;
+  for(const k in scores){ if(scores[k] > bestScore){ bestScore = scores[k]; bestAction = k; } }
+
+  return { action:bestAction, switchTarget: bestAction === 'switch' ? bestSwitch : null };
+}
+
+function pickPcReplacement(){
+  const alive = state.pc.deck.filter(function(c){ return !c.fainted; });
+  if(alive.length === 0) return null;
+  const target = state.player.active;
+  const scored = alive.map(function(c){
+    return { c:c, score: getTypeMultiplier(c.element, target.element)*2 + Math.random()*2 + (c.curHp/c.maxHp) };
+  });
+  scored.sort(function(a,b){ return b.score - a.score; });
+  return scored[0].c;
+}
+
+/* ===================== 라운드 진행 ===================== */
+
+function getSpeedScore(card){
+  let s = card.spd;
+  if(card.priorityNext) s += 1000;
+  if(card.frozen) s -= 1000;
+  return s;
+}
+
+function resolveRound(playerActionType, playerPayload){
+  const pcDecision = pcDecide();
+  const pCard = state.player.active, cCard = state.pc.active;
+  const pScore = getSpeedScore(pCard), cScore = getSpeedScore(cCard);
+
+  let order;
+  if(pScore === cScore) order = Math.random() < 0.5 ? ['player','pc'] : ['pc','player'];
+  else order = pScore > cScore ? ['player','pc'] : ['pc','player'];
+
+  pCard.priorityNext = false; pCard.frozen = false;
+  cCard.priorityNext = false; cCard.frozen = false;
+
+  const actions = {
+    player:{ type:playerActionType, payload:playerPayload },
+    pc:{ type:pcDecision.action, payload:pcDecision.switchTarget }
+  };
+
+  let logs = [];
+
+  order.forEach(function(side){
+    const activeCard = state[side].active;
+    if(activeCard.fainted) return;
+    const act = actions[side];
+    const oppSide = side === 'player' ? 'pc' : 'player';
+
+    if(act.type === 'attack'){
+      const target = state[oppSide].active;
+      const r = computeDamage(activeCard, target, activeCard.atk);
+      if(r.evaded){
+        logs.push(target.name+'이(가) '+activeCard.name+'의 공격을 회피했다!');
+      } else {
+        triggerHitAnim(oppSide);
+        logs.push(activeCard.name+'의 공격! '+target.name+'에게 '+r.dmg+'의 피해!');
+      }
+    } else if(act.type === 'skill'){
+      logs = logs.concat(useSkill(side));
+    } else if(act.type === 'switch'){
+      const newCard = act.payload;
+      if(newCard && !newCard.fainted){
+        state[side].active = newCard;
+        triggerSwitchAnim(side);
+        logs.push((side === 'player' ? '플레이어' : '상대')+'가 '+newCard.name+'(으)로 카드를 교체했다!');
+      }
+    }
+
+    ['player','pc'].forEach(function(s){
+      const c = state[s].active;
+      if(c.curHp <= 0 && !c.fainted){
+        c.fainted = true;
+        logs.push(c.name+'이(가) 쓰러졌다!');
+      }
+    });
+  });
+
+  return logs;
+}
+
+/* ===================== 로그 / UI 갱신 ===================== */
+
+async function playLogs(logs){
+  const panel = document.getElementById('battleLog');
+  for(let i=0;i<logs.length;i++){
+    const div = document.createElement('div');
+    div.textContent = logs[i];
+    panel.appendChild(div);
+    panel.scrollTop = panel.scrollHeight;
+    await sleep(480);
+  }
+}
+
+function hpClass(cur,max){
+  const ratio = cur/max;
+  if(ratio <= 0.25) return 'bad';
+  if(ratio <= 0.55) return 'mid';
+  return '';
+}
+
+function updateBattleUI(){
+  const pl = state.player.active, pc = state.pc.active;
+
+  document.getElementById('plName').textContent = pl.name;
+  document.getElementById('plElem').textContent = pl.element+' 속성';
+  document.getElementById('plEmoji').textContent = pl.emoji;
+  const plFill = document.getElementById('plHpFill');
+  plFill.style.width = Math.max(0, pl.curHp/pl.maxHp*100)+'%';
+  plFill.className = 'hp-fill '+hpClass(pl.curHp, pl.maxHp);
+  document.getElementById('plHpText').textContent = pl.curHp+' / '+pl.maxHp;
+
+  document.getElementById('pcName').textContent = pc.name;
+  document.getElementById('pcElem').textContent = pc.element+' 속성';
+  document.getElementById('pcEmoji').textContent = pc.emoji;
+  const pcFill = document.getElementById('pcHpFill');
+  pcFill.style.width = Math.max(0, pc.curHp/pc.maxHp*100)+'%';
+  pcFill.className = 'hp-fill '+hpClass(pc.curHp, pc.maxHp);
+  document.getElementById('pcHpText').textContent = pc.curHp+' / '+pc.maxHp;
+
+  renderDeckStrip();
+}
+
+function renderDeckStrip(){
+  const strip = document.getElementById('playerDeckStrip');
+  strip.innerHTML = '';
+  state.player.deck.forEach(function(c){
+    const div = document.createElement('div');
+    div.className = 'mini-card' + (c === state.player.active ? ' active' : '') + (c.fainted ? ' fainted' : '');
+    div.innerHTML =
+      '<span>'+c.emoji+'</span>' +
+      '<div class="mc-hp"><div class="mc-hp-fill" style="width:'+Math.max(0,c.curHp/c.maxHp*100)+'%"></div></div>' +
+      (c.fainted ? '<span class="mc-x">✕</span>' : '');
+    strip.appendChild(div);
+  });
+}
+
+/* ===================== 주사위 이벤트 ===================== */
+
+function showDiceAsync(){
+  return new Promise(function(resolve){
+    const overlay = document.getElementById('diceOverlay');
+    const numEl = document.getElementById('diceNum');
+    const nameEl = document.getElementById('eventResultName');
+    const descEl = document.getElementById('eventResultDesc');
+    const diceFaces = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+    nameEl.textContent = ''; descEl.textContent = '';
+    overlay.classList.remove('hidden');
+
+    let ticks = 0;
+    const iv = setInterval(function(){
+      numEl.textContent = diceFaces[randInt(0,5)];
+      ticks++;
+      if(ticks > 14){
+        clearInterval(iv);
+        const roll = randInt(1,6);
+        numEl.textContent = diceFaces[roll-1];
+        state.event = EVENTS[roll-1];
+        nameEl.textContent = roll+'. '+state.event.name;
+        descEl.textContent = state.event.desc;
+        document.getElementById('eventBanner').textContent = '현재 이벤트: '+state.event.name+' — '+state.event.desc;
+        setTimeout(function(){
+          overlay.classList.add('hidden');
+          resolve();
+        }, 1200);
+      }
+    }, 90);
+  });
+}
+
+/* ===================== 교체 모달 ===================== */
+
+function promptSwitch(forced){
+  return new Promise(function(resolve){
+    const modal = document.getElementById('switchModal');
+    const list = document.getElementById('switchList');
+    const cancelBtn = document.getElementById('switchCancelBtn');
+    list.innerHTML = '';
+
+    const options = forced
+      ? state.player.deck.filter(function(c){ return !c.fainted; })
+      : state.player.deck.filter(function(c){ return !c.fainted && c !== state.player.active; });
+
+    options.forEach(function(c){
+      const div = document.createElement('div');
+      div.className = 'switch-option';
+      div.innerHTML =
+        '<span class="so-emoji">'+c.emoji+'</span>' +
+        '<span class="so-name">'+c.name+'</span>' +
+        '<span class="so-hp">'+c.curHp+' / '+c.maxHp+'</span>';
+      div.onclick = function(){ modal.classList.add('hidden'); resolve(c); };
+      list.appendChild(div);
+    });
+
+    cancelBtn.style.display = forced ? 'none' : 'inline-block';
+    cancelBtn.onclick = function(){ modal.classList.add('hidden'); resolve(null); };
+    modal.classList.remove('hidden');
+  });
+}
+
+/* ===================== 라운드 / 전투 흐름 ===================== */
+
+async function startRoundAsync(){
+  updateBattleUI();
+  const key = state.player.active.uid+'_'+state.pc.active.uid;
+  if(key !== state.lastPairKey){
+    state.lastPairKey = key;
+    await showDiceAsync();
+  }
+}
+
+async function handleFaints(){
+  if(state.player.active.fainted){
+    const alive = state.player.deck.filter(function(c){ return !c.fainted; });
+    if(alive.length === 0){ endGame('lose'); return; }
+    await playLogs([state.player.active.name+'이(가) 쓰러졌습니다! 다음 카드를 선택하세요.']);
+    const chosen = await promptSwitch(true);
+    state.player.active = chosen;
+    triggerSwitchAnim('player');
+  }
+  if(state.gameOver) return;
+
+  if(state.pc.active.fainted){
+    const aliveP = state.pc.deck.filter(function(c){ return !c.fainted; });
+    if(aliveP.length === 0){ endGame('win'); return; }
+    const next = pickPcReplacement();
+    state.pc.active = next;
+    await playLogs(['상대가 '+next.name+'(으)로 카드를 교체했습니다!']);
+    triggerSwitchAnim('pc');
+  }
+  updateBattleUI();
+}
+
+async function playerAction(type){
+  if(state.locked || state.gameOver) return;
+  state.locked = true;
+  document.getElementById('actionBar').classList.add('locked');
+
+  let payload = null;
+  if(type === 'switch'){
+    payload = await promptSwitch(false);
+    if(!payload){
+      state.locked = false;
+      document.getElementById('actionBar').classList.remove('locked');
+      return;
+    }
+  }
+
+  const logs = resolveRound(type, payload);
+  await playLogs(logs);
+  updateBattleUI();
+
+  if(!state.gameOver){
+    await handleFaints();
+  }
+  if(state.gameOver) return;
+
+  await startRoundAsync();
+  state.locked = false;
+  document.getElementById('actionBar').classList.remove('locked');
+}
+
+function initBattle(){
+  state.gameOver = false;
+  state.lastPairKey = null;
+  state.event = null;
+  state.player.active = state.player.deck[0];
+  state.pc.active = state.pc.deck[0];
+  document.getElementById('battleLog').innerHTML = '';
+  document.getElementById('eventBanner').textContent = '주사위를 굴리는 중...';
+  showScreen('battle');
+
+  state.locked = true;
+  document.getElementById('actionBar').classList.add('locked');
+  startRoundAsync().then(function(){
+    state.locked = false;
+    document.getElementById('actionBar').classList.remove('locked');
+    updateBattleUI();
+  });
+}
+
+function endGame(result){
+  state.gameOver = true;
+  showScreen('result');
+  const title = document.getElementById('resultTitle');
+  const desc = document.getElementById('resultDesc');
+  if(result === 'win'){
+    title.textContent = '승리!';
+    title.className = 'result-title win';
+    desc.textContent = '상대의 카드를 모두 쓰러뜨렸습니다!';
+  } else {
+    title.textContent = '패배...';
+    title.className = 'result-title lose';
+    desc.textContent = '나의 카드가 모두 쓰러졌습니다.';
+  }
+}
+
+function resetGame(){
+  state.player.deck = []; state.pc.deck = [];
+  state.player.active = null; state.pc.active = null;
+  state.event = null; state.lastPairKey = null;
+  state.gameOver = false; state.locked = false;
+  buildSelectGrid();
+  showScreen('select');
+}
+
+/* ===================== 이벤트 바인딩 ===================== */
+
+document.getElementById('btnAttack').addEventListener('click', function(){ playerAction('attack'); });
+document.getElementById('btnSkill').addEventListener('click', function(){ playerAction('skill'); });
+document.getElementById('btnSwitch').addEventListener('click', function(){ playerAction('switch'); });
+document.getElementById('btnRestart').addEventListener('click', resetGame);
+
+/* ===================== 초기화 ===================== */
+
+buildSelectGrid();
+showScreen('select');
+
+})();
+</script>
+</body>
+</html>
