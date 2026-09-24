@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -22,7 +23,6 @@ body{
     overflow-x:hidden;
 }
 
-/* 메인으로 버튼 */
 .home{
     position:fixed;
     top:20px;left:20px;
@@ -87,7 +87,7 @@ h1::after{
     gap:24px;
     flex-wrap:wrap;
     justify-content:center;
-    max-width:760px;
+    max-width:1100px;
 }
 
 .game-card{
@@ -163,6 +163,12 @@ h1::after{
     transform:translateX(4px);
 }
 
+@media(max-width:1050px){
+    .game-grid{
+        max-width:760px;
+    }
+}
+
 @media(max-width:768px){
     h1{font-size:38px;}
     .subtitle{font-size:14px;margin-bottom:40px;}
@@ -210,9 +216,28 @@ h1::after{
             <span class="arrow">→</span>
         </a>
 
+        <a class="game-card" href="battlecard/">
+            <span class="game-icon">🕹</span>
+            <div class="game-title">배틀카드</div>
+            <div class="game-desc">
+                각자 고유한 능력을 가진 카드를 선택해 하나씩 맞붙으세요.
+                카드의 상성과 스킬, 매 배틀마다 결정되는 랜덤 이벤트를 활용해
+                CPU와 전략적인 대결을 펼칩니다.
+            </div>
+            <div class="game-tags">
+                <span class="tag">카드 배틀</span>
+                <span class="tag">상성</span>
+                <span class="tag">전략</span>
+            </div>
+            <span class="arrow">→</span>
+        </a>
+
     </div>
 
 </div>
 
 </body>
 </html>
+```
+
+배틀카드 설명은 **「카드 선택 → 1장씩 대결 → 상성/고유 스킬 → 매 배틀 랜덤 이벤트 → CPU 판단」**이라는 기존 기획을 반영했습니다.
