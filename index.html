@@ -22,7 +22,7 @@ body{
     color:white;
     height:100vh;
     overflow:hidden;
-    font-family: 'Inter', Arial, Helvetica, sans-serif;
+    font-family:'Inter',Arial,Helvetica,sans-serif;
 }
 
 /* ========================= */
@@ -123,6 +123,9 @@ h1{
     left:25px;
 }
 
+/* ========================= */
+/* 우측 버튼들 */
+/* ========================= */
 .japanvoca{
     position:absolute;
     top:75px;
@@ -220,7 +223,7 @@ h1{
 }
 
 /* ========================= */
-/* FUN FACT 버튼 (우측 세로 중앙) */
+/* FUN FACT 버튼 */
 /* ========================= */
 .funfact{
     position:absolute;
@@ -248,12 +251,58 @@ h1{
 }
 
 /* ========================= */
+/* 버튼 누르러 가기 */
+/* ========================= */
+.thebutton-link{
+    position:absolute;
+    top:calc(50% + 48px);
+    right:25px;
+    width:150px;
+    height:42px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    border:1px solid #333;
+    background:#111;
+    color:#777;
+
+    border-radius:10px;
+    cursor:pointer;
+
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:1px;
+
+    transition:.25s;
+}
+
+.thebutton-link:hover{
+    color:white;
+    background:#181818;
+    border-color:#555;
+    transform:translateY(-2px);
+    box-shadow:0 0 18px rgba(255,255,255,.08);
+}
+
+.thebutton-circle{
+    width:20px;
+    height:20px;
+    flex-shrink:0;
+}
+
+/* ========================= */
 /* FUN FACT 모달 */
 /* ========================= */
 .funfact-overlay{
     display:none;
     position:fixed;
-    top:0; left:0; right:0; bottom:0;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
     background:rgba(0,0,0,.7);
     z-index:100;
     align-items:center;
@@ -276,8 +325,15 @@ h1{
 }
 
 @keyframes funfactPop{
-    from{ opacity:0; transform:scale(.95); }
-    to{ opacity:1; transform:scale(1); }
+    from{
+        opacity:0;
+        transform:scale(.95);
+    }
+
+    to{
+        opacity:1;
+        transform:scale(1);
+    }
 }
 
 .funfact-label{
@@ -301,7 +357,8 @@ h1{
     justify-content:center;
 }
 
-.funfact-again, .funfact-close{
+.funfact-again,
+.funfact-close{
     border:none;
     border-radius:10px;
     padding:12px 24px;
@@ -330,43 +387,6 @@ h1{
     color:white;
 }
 
-    /* ========================= */
-/* 버튼 누르러 가기 */
-/* ========================= */
-.thebutton-link{
-    position:absolute;
-    top:calc(50% + 45px);
-    right:25px;
-    width:150px;
-    padding:12px 16px;
-    border:1px solid #333;
-    background:#111;
-    color:#777;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:12px;
-    font-weight:600;
-    letter-spacing:1px;
-    transition:.25s;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-}
-
-.thebutton-link:hover{
-    color:white;
-    background:#181818;
-    border-color:#555;
-    transform:translateY(-2px);
-    box-shadow:0 0 18px rgba(255,0,0,.15);
-}
-
-.thebutton-circle{
-    width:10px;
-    height:10px;
-    flex-shrink:0;
-}
 /* ========================= */
 /* 최근 활동 */
 /* ========================= */
@@ -467,6 +487,7 @@ h1{
 /* 모바일 */
 /* ========================= */
 @media(max-width:768px){
+
     body{
         overflow:auto;
         min-height:100vh;
@@ -535,15 +556,23 @@ h1{
     }
 
     .lucky{
-    top:18px;
-    right:18px;
-    padding:9px 13px;
-    font-size:11px;
+        top:18px;
+        right:18px;
+        padding:9px 13px;
+        font-size:11px;
     }
 
     .funfact{
         right:18px;
         padding:10px 14px;
+        font-size:11px;
+    }
+
+    .thebutton-link{
+        top:calc(50% + 44px);
+        right:18px;
+        width:140px;
+        height:40px;
         font-size:11px;
     }
 
@@ -578,17 +607,12 @@ h1{
         text-align:center;
     }
 }
-.thebutton-link{
-    right:18px;
-    top:calc(50% + 42px);
-    width:140px;
-    padding:10px 14px;
-    font-size:11px;
-}
+
 /* ========================= */
 /* 작은 스마트폰 */
 /* ========================= */
 @media(max-width:480px){
+
     h1{
         font-size:34px;
     }
@@ -612,27 +636,26 @@ h1{
 }
 </style>
 </head>
+
 <body>
 
 <!-- ========================= -->
 <!-- 설정 -->
 <!-- ========================= -->
 <script>
-/*
-    DAY 계산을 하드코딩(예: const CURRENT_DAY = 12)하지 않고,
-    START_DATE를 기준으로 오늘 날짜와의 차이를 매번 계산합니다.
-    -> 자정이 지나면 자동으로 DAY가 하루씩 올라갑니다.
 
-    START_DATE = 1일째가 되는 날짜.
-    예: 2026-08-17이 13일째이므로, 1일째는 2026-08-05 입니다.
+/*
+    DAY 계산을 하드코딩하지 않고
+    START_DATE를 기준으로 오늘 날짜와의 차이를 계산합니다.
 */
-const START_DATE = new Date(2026, 7, 5); // 월(month)은 0부터 시작 -> 7 = 8월
+
+const START_DATE = new Date(2026, 7, 5);
 const TOTAL_DAY = 365;
 
 function getCurrentDay(){
+
     const today = new Date();
 
-    // 시간(시,분,초)을 제거하고 '날짜'만 비교하기 위해 자정 기준으로 새로 생성
     const startMidnight = new Date(
         START_DATE.getFullYear(),
         START_DATE.getMonth(),
@@ -646,14 +669,18 @@ function getCurrentDay(){
     );
 
     const diffDays = Math.round(
-        (todayMidnight - startMidnight) / (1000 * 60 * 60 * 24)
-    ) + 1; // 시작일 자체가 DAY 1
+        (todayMidnight - startMidnight) /
+        (1000 * 60 * 60 * 24)
+    ) + 1;
 
-    // 1 미만이나 TOTAL_DAY 초과로 튀지 않도록 범위 고정
-    return Math.min(Math.max(diffDays, 1), TOTAL_DAY);
+    return Math.min(
+        Math.max(diffDays,1),
+        TOTAL_DAY
+    );
 }
 
 const CURRENT_DAY = getCurrentDay();
+
 </script>
 
 <!-- ========================= -->
@@ -665,59 +692,140 @@ const CURRENT_DAY = getCurrentDay();
 <!-- ========================= -->
 <!-- 일별 활동내역 -->
 <!-- ========================= -->
-<button class="log" onclick="location.href='dayreport/'" >
+<button
+    class="log"
+    onclick="location.href='dayreport/'"
+>
     📜 일별 활동내역
 </button>
 
-<button class="log sentence" onclick="location.href='sentence/'" >
+<!-- ========================= -->
+<!-- 문장 공유 -->
+<!-- ========================= -->
+<button
+    class="log sentence"
+    onclick="location.href='sentence/'"
+>
     문장 공유
 </button>
 
 <!-- ========================= -->
-<!-- 수상한 ASDF 버튼 -->
+<!-- 우측 버튼 -->
 <!-- ========================= -->
-<button class="japanvoca" onclick="location.href='japanvoca/'" >
+
+<button
+    class="japanvoca"
+    onclick="location.href='japanvoca/'"
+>
     일본어 단어장
 </button>
 
-<button class="cardgame" onclick="location.href='cardgame/'" >
+<button
+    class="cardgame"
+    onclick="location.href='cardgame/'"
+>
     카드게임
 </button>
 
-<button class="winner" onclick="location.href='winner/'" >
+<button
+    class="winner"
+    onclick="location.href='winner/'"
+>
     당첨자 뽑기
 </button>
 
-<button class="lucky" onclick="location.href='lucky/'">
+<button
+    class="lucky"
+    onclick="location.href='lucky/'"
+>
     운빨
 </button>
 
-<button class="japanvoca" onclick="location.href='japanvoca/'" >
-    일본어 단어장
-</button>
+<!-- ========================= -->
+<!-- FUN FACT -->
+<!-- ========================= -->
 
-<!-- ========================= -->
-<!-- FUN FACT 버튼 -->
-<!-- ========================= -->
-<button class="funfact" onclick="showFunFact()">
+<button
+    class="funfact"
+    onclick="showFunFact()"
+>
     💡 FUN FACT
 </button>
 
+<!-- ========================= -->
+<!-- 버튼 누르러 가기 -->
+<!-- ========================= -->
+
+<button
+    class="thebutton-link"
+    onclick="location.href='thebutton/'"
+>
+
+    <svg
+        class="thebutton-circle"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+    >
+        <circle
+            cx="10"
+            cy="10"
+            r="8"
+            fill="#ff2020"
+        />
+    </svg>
+
+    버튼 누르러 가기
+
+</button>
+
+<!-- ========================= -->
 <!-- FUN FACT 모달 -->
-<div class="funfact-overlay" id="funfactOverlay" onclick="if(event.target===this) closeFunFact()">
+<!-- ========================= -->
+
+<div
+    class="funfact-overlay"
+    id="funfactOverlay"
+    onclick="if(event.target===this) closeFunFact()"
+>
+
     <div class="funfact-box">
-        <div class="funfact-label">FUN FACT</div>
-        <div class="funfact-text" id="funfactText"></div>
-        <div class="funfact-buttons">
-            <button class="funfact-again" onclick="showFunFact()">다른 사실 보기</button>
-            <button class="funfact-close" onclick="closeFunFact()">닫기</button>
+
+        <div class="funfact-label">
+            FUN FACT
         </div>
+
+        <div
+            class="funfact-text"
+            id="funfactText"
+        ></div>
+
+        <div class="funfact-buttons">
+
+            <button
+                class="funfact-again"
+                onclick="showFunFact()"
+            >
+                다른 사실 보기
+            </button>
+
+            <button
+                class="funfact-close"
+                onclick="closeFunFact()"
+            >
+                닫기
+            </button>
+
+        </div>
+
     </div>
+
 </div>
 
 <!-- ========================= -->
 <!-- 중앙 -->
 <!-- ========================= -->
+
 <div class="center">
 
     <div class="project-label">
@@ -734,7 +842,10 @@ const CURRENT_DAY = getCurrentDay();
         매일 조금씩, 365일 동안 성장하는 웹사이트
     </div>
 
-    <button class="start" onclick="location.href='project/'" >
+    <button
+        class="start"
+        onclick="location.href='project/'"
+    >
         프로젝트 시작
     </button>
 
@@ -743,49 +854,69 @@ const CURRENT_DAY = getCurrentDay();
 <!-- ========================= -->
 <!-- 최근 활동 -->
 <!-- ========================= -->
-<div class="recent" onclick="location.href='dayreport/'" >
+
+<div
+    class="recent"
+    onclick="location.href='dayreport/'"
+>
+
     <div class="recent-title">
         RECENT ACTIVITY
     </div>
+
     <div id="recentActivities"></div>
+
 </div>
 
 <!-- ========================= -->
 <!-- 진행 상황 -->
 <!-- ========================= -->
+
 <div class="day">
+
     <div id="dayText"></div>
+
     <div
         class="version"
         id="versionText"
     ></div>
 
     <div class="progress-container">
+
         <div
             class="progress-text"
             id="percentText"
         ></div>
 
         <div class="progress-bar">
+
             <div
                 class="progress"
                 id="progressBar"
             ></div>
+
         </div>
 
         <div
             class="remaining"
             id="remainingText"
         ></div>
+
     </div>
+
 </div>
 
 <script>
+
 /* ========================= */
 /* 진행률 계산 */
 /* ========================= */
-const percent = (CURRENT_DAY / TOTAL_DAY) * 100;
-const remaining = TOTAL_DAY - CURRENT_DAY;
+
+const percent =
+    (CURRENT_DAY / TOTAL_DAY) * 100;
+
+const remaining =
+    TOTAL_DAY - CURRENT_DAY;
 
 document.getElementById("dayText").textContent =
     `DAY ${String(CURRENT_DAY).padStart(3,"0")} / ${TOTAL_DAY}`;
@@ -799,61 +930,88 @@ document.getElementById("percentText").textContent =
 document.getElementById("remainingText").textContent =
     `${remaining} Days Remaining`;
 
-document.getElementById("progressBar").style.width = percent + "%";
+document.getElementById("progressBar").style.width =
+    percent + "%";
+
 
 /* ========================= */
 /* 최근 활동 표시 */
 /* ========================= */
-const recentContainer = document.getElementById("recentActivities");
+
+const recentContainer =
+    document.getElementById("recentActivities");
 
 const recentReport = reports
     .slice()
     .sort((a,b) => b.day - a.day)[0];
 
 if(recentReport){
-    const activity = document.createElement("div");
-    activity.className = "activity";
 
-    const day = document.createElement("div");
-    day.className = "activity-day";
-    day.textContent = `DAY ${String(recentReport.day).padStart(3,"0")}`;
+    const activity =
+        document.createElement("div");
 
-    const content = document.createElement("div");
-    content.className = "activity-content";
+    activity.className =
+        "activity";
 
-    const firstLine = recentReport.content
+
+    const day =
+        document.createElement("div");
+
+    day.className =
+        "activity-day";
+
+    day.textContent =
+        `DAY ${String(recentReport.day).padStart(3,"0")}`;
+
+
+    const content =
+        document.createElement("div");
+
+    content.className =
+        "activity-content";
+
+
+    const firstLine =
+        recentReport.content
         .trim()
         .split("\n")
         .map(line => line.trim())
         .filter(line => line.length > 0)[0];
 
-    content.textContent = firstLine || recentReport.title;
+
+    content.textContent =
+        firstLine || recentReport.title;
+
 
     activity.appendChild(day);
     activity.appendChild(content);
+
     recentContainer.appendChild(activity);
 }
+
 
 /* ========================= */
 /* FUN FACT 기능 */
 /* ========================= */
+
 function showFunFact(){
-    document.getElementById("funfactText").textContent = getRandomFunFact();
-    document.getElementById("funfactOverlay").classList.add("active");
+
+    document.getElementById("funfactText").textContent =
+        getRandomFunFact();
+
+    document
+        .getElementById("funfactOverlay")
+        .classList.add("active");
 }
 
+
 function closeFunFact(){
-    document.getElementById("funfactOverlay").classList.remove("active");
+
+    document
+        .getElementById("funfactOverlay")
+        .classList.remove("active");
 }
-<!-- ========================= -->
-<!-- 버튼 누르러 가기 -->
-<!-- ========================= -->
-<button class="thebutton-link" onclick="location.href='thebutton/'">
-    <svg class="thebutton-circle" viewBox="0 0 20 20" aria-hidden="true">
-        <circle cx="10" cy="10" r="8" fill="#ff2020"/>
-    </svg>
-    버튼 누르러 가기
-</button>
+
 </script>
 
 </body>
