@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>누르지 마</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b0f;
+    --bg2:#131018;
+    --ink:#eee8e2;
+    --dim-ink:#8b8590;
+    --teal:#4fe3c1;
+    --amber:#ffb454;
+    --red:#ff4d4f;
+    --line: rgba(238,232,226,0.14);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100%;
+    background:
+      radial-gradient(60% 50% at 50% 20%, rgba(79,227,193,0.06), transparent 60%),
+      radial-gradient(50% 40% at 80% 85%, rgba(255,77,79,0.05), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:'Noto Sans KR', 'Space Grotesk', sans-serif;
+    overflow:hidden;
+    position:relative;
+  }
+  #stage{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+  }
+  #home{
+    position:fixed;
+    top: calc(18px + env(safe-area-inset-top,0px));
+    left:18px;
+    z-index:200;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 16px;
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--line);
+    border-radius:999px;
+    color:var(--dim-ink);
+    font-family:'Space Grotesk',sans-serif;
+    font-size:13px;
+    font-weight:500;
+    text-decoration:none;
+    letter-spacing:.01em;
+    backdrop-filter: blur(6px);
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  #home:hover{ color:var(--ink); border-color:rgba(238,232,226,0.35); background:rgba(255,255,255,0.08); }
+  #home:before{ content:"←"; font-size:14px; }
+
+  #msg{
+    position:fixed;
+    top: calc(28% + env(safe-area-inset-top,0px));
+    left:50%;
+    transform:translate(-50%,-50%);
+    z-index:150;
+    max-width:min(86vw,520px);
+    text-align:center;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:600;
+    font-size:clamp(20px,4.2vw,32px);
+    line-height:1.4;
+    color:var(--ink);
+    text-shadow:0 2px 24px rgba(0,0,0,.5);
+    opacity:0;
+    transition:opacity .35s ease, transform .35s ease;
+    pointer-events:none;
+  }
+  #msg.show{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  #sub{
+    position:fixed;
+    top:calc(28% + 46px + env(safe-area-inset-top,0px));
+    left:50%;
+    transform:translateX(-50%);
+    z-index:150;
+    color:var(--dim-ink);
+    font-size:14px;
+    text-align:center;
+    opacity:0;
+    transition:opacity .3s ease;
+    pointer-events:none;
+    max-width:80vw;
+  }
+  #sub.show{opacity:1;}
+
+  .btn{
+    position:absolute;
+    border:none;
+    background:none;
+    padding:0;
+    cursor:pointer;
+    display:flex;
+    filter: drop-shadow(0 10px 24px rgba(255,59,48,.5));
+    transition: left .5s cubic-bezier(.22,1,.36,1), top .5s cubic-bezier(.22,1,.36,1),
+                width .4s ease, height .4s ease, filter .4s ease,
+                opacity .5s ease, transform .15s ease;
+  }
+  .btn svg{ width:100%; height:100%; display:block; }
+  .btn:active{ transform:scale(0.93); }
+  #mainBtn{ width:150px; height:150px; left:50%; top:50%; margin-left:-75px; margin-top:-75px; z-index:60;}
+  .stage-3 .btn{ filter: drop-shadow(0 10px 24px rgba(255,180,84,.55)); }
+  .stage-4 .btn{ width:82px!important; height:82px!important; filter: drop-shadow(0 8px 16px rgba(255,122,82,.6)); }
+  .stage-5 .btn, .stage-6 .btn, .stage-7 .btn{ filter: drop-shadow(0 10px 24px rgba(255,59,48,.6)); }
+
+  #dim{
+    position:fixed; inset:0; background:#000; opacity:0; pointer-events:none;
+    transition:opacity .9s ease; z-index:40;
+  }
+  #dim.on{ opacity:.97; }
+  .dark #mainBtn{ opacity:.05; }
+
+  #sign{
+    position:fixed; top:-140px; left:50%; transform:translateX(-50%);
+    z-index:170; width:min(90vw,460px); padding:22px 26px;
+    background:#1c1710; border:2px solid #4a3a22; border-radius:6px;
+    box-shadow:0 20px 50px rgba(0,0,0,.6);
+    text-align:center; font-family:'Space Grotesk',sans-serif; font-weight:700;
+    font-size:clamp(18px,3.4vw,26px); color:var(--red); letter-spacing:.02em;
+    transition: top .8s cubic-bezier(.34,1.3,.4,1);
+  }
+  #sign.show{ top: calc(46px + env(safe-area-inset-top,0px)); }
+  #sign:before{ content:""; position:absolute; left:50%; top:-16px; transform:translateX(-50%);
+    width:2px; height:16px; background:#4a3a22; }
+
+  .hand{
+    position:absolute; width:46px; height:56px; z-index:80; cursor:pointer;
+    transform-origin:center; transition:opacity .3s ease, transform .3s ease;
+  }
+  .hand svg{ width:100%; height:100%; filter:drop-shadow(0 6px 10px rgba(0,0,0,.5)); }
+  .hand.gone{ opacity:0; transform:scale(.3) rotate(30deg); pointer-events:none; }
+
+  .decoy{
+    position:absolute; width:48px; height:48px; border:none;
+    background:none; padding:0;
+    cursor:pointer;
+    filter: drop-shadow(0 6px 12px rgba(255,59,48,.4));
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .decoy svg{ width:100%; height:100%; display:block; }
+  .decoy:hover{ transform:scale(1.08); }
+  .decoy.gone{ opacity:0; transform:scale(.4); pointer-events:none; }
+
+  #gameover{
+    position:fixed; inset:0; z-index:300; display:none;
+    flex-direction:column; align-items:center; justify-content:center; gap:18px;
+    text-align:center; padding:24px;
+  }
+  #gameover.show{ display:flex; }
+  #gameover h1{
+    font-family:'Space Grotesk',sans-serif; font-weight:700;
+    font-size:clamp(22px,4.6vw,34px); color:var(--red); max-width:640px; line-height:1.45; margin:0;
+  }
+  #reset{
+    margin-top:6px; font-size:13px; color:var(--dim-ink); text-decoration:none;
+    border-bottom:1px dotted var(--dim-ink); padding-bottom:2px;
+  }
+  #reset:hover{ color:var(--ink); }
+
+  #counter{
+    position:fixed; bottom: calc(24px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%);
+    z-index:60; font-family:'Space Grotesk',sans-serif; font-size:13px; color:var(--dim-ink);
+    opacity:0; transition:opacity .4s ease;
+  }
+  #counter.show{opacity:1;}
+
+  @media (prefers-reduced-motion: reduce){
+    .btn, #sign, #msg, #dim, .hand, .decoy{ transition:none!important; }
+  }
+</style>
+</head>
+<body>
+
+<a id="home" href="../">메인으로</a>
+
+<div id="stage" class="stage-0">
+  <div id="dim"></div>
+  <div id="msg"></div>
+  <div id="sub"></div>
+  <div id="sign"></div>
+</div>
+
+<div id="gameover">
+  <h1 id="goText"></h1>
+  <a id="reset" href="#">처음부터 다시</a>
+</div>
+
+<script>
+(function(){
+  const KEY = 'trollButtonGameV1';
+  const stageEl = document.getElementById('stage');
+  const msgEl = document.getElementById('msg');
+  const subEl = document.getElementById('sub');
+  const dimEl = document.getElementById('dim');
+  const signEl = document.getElementById('sign');
+  const goEl = document.getElementById('gameover');
+  const goText = document.getElementById('goText');
+
+  function loadState(){
+    try{
+      const raw = localStorage.getItem(KEY);
+      if(raw) return JSON.parse(raw);
+    }catch(e){}
+    return { storyStage:0, wasKicked:false, multipliedDone:false,
+             freePlayClicks:0, freePlayQualified:false, freePlayFailed:false,
+             stage:'story' };
+  }
+  let state = loadState();
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+  function showMsg(text, sub){
+    msgEl.textContent = text;
+    subEl.textContent = sub || '';
+    msgEl.classList.remove('show'); subEl.classList.remove('show');
+    void msgEl.offsetWidth;
+    msgEl.classList.add('show');
+    if(sub) subEl.classList.add('show'); else subEl.classList.remove('show');
+  }
+
+  function randPos(w,h){
+    const pad = 20;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const x = pad + Math.random() * (vw - w - pad*2);
+    const y = pad + Math.random() * (vh - h - pad*2 - 60) + 40;
+    return {x,y};
+  }
+
+  const BTN_SVG = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+    '<circle cx="50" cy="50" r="47" fill="#ff3b30" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>' +
+    '<text x="50" y="58" text-anchor="middle" font-family="Space Grotesk, sans-serif" ' +
+    'font-size="24" font-weight="700" fill="#ffffff">버튼</text></svg>';
+
+  function makeMainBtn(){
+    let b = document.getElementById('mainBtn');
+    if(!b){
+      b = document.createElement('button');
+      b.id = 'mainBtn';
+      b.className = 'btn';
+      b.innerHTML = BTN_SVG;
+      stageEl.appendChild(b);
+    }
+    return b;
+  }
+
+  let moveTimer = null;
+  function clearMoveTimer(){ if(moveTimer){ clearInterval(moveTimer); moveTimer = null; } }
+
+  function positionBtn(btn, x, y){
+    btn.style.left = x+'px';
+    btn.style.top = y+'px';
+    btn.style.marginLeft = 0;
+    btn.style.marginTop = 0;
+  }
+
+  // ---------- STORY MODE ----------
+  const STORY_MSG = [
+    '눌러보세요',
+    '왜 눌러. 누르지 마',
+    '누르지 말라고. 귀찮아',
+    '안 되겠다',
+    '얘 봐라?',
+    '아이 진짜',
+    '···',
+    '버튼 보호'
+  ];
+
+  function renderStory(){
+    stageEl.className = 'stage-' + state.storyStage;
+    const btn = makeMainBtn();
+    btn.innerHTML = BTN_SVG;
+    btn.onclick = null;
+
+    // clear leftover hand elements
+    document.querySelectorAll('.hand').forEach(h=>h.remove());
+    signEl.classList.remove('show');
+    dimEl.classList.remove('on');
+
+    if(state.storyStage === 0){
+      showMsg('버튼이 하나 있습니다.', '눌러보세요');
+      centerBtn(btn);
+      btn.onclick = ()=> advanceStory(btn);
+    } else if(state.storyStage === 1 || state.storyStage === 2){
+      showMsg(STORY_MSG[state.storyStage]);
+      centerBtn(btn);
+      btn.onclick = ()=> advanceStory(btn);
+    } else if(state.storyStage === 3){
+      showMsg(STORY_MSG[3]);
+      const p = randPos(150,150); positionBtn(btn,p.x,p.y);
+      btn.onclick = ()=> advanceStory(btn);
+    } else if(state.storyStage === 4){
+      showMsg(STORY_MSG[4]);
+      const p = randPos(82,82); positionBtn(btn,p.x,p.y);
+      clearMoveTimer();
+      moveTimer = setInterval(()=>{
+        const np = randPos(82,82); positionBtn(btn,np.x,np.y);
+      }, 550);
+      btn.onclick = ()=> { clearMoveTimer(); advanceStory(btn); };
+    } else if(state.storyStage === 5){
+      showMsg(STORY_MSG[5]);
+      const p = randPos(150,150); positionBtn(btn,p.x,p.y);
+      btn.onclick = null;
+      setTimeout(()=>{
+        stageEl.classList.add('dark');
+        dimEl.classList.add('on');
+        btn.onclick = ()=> advanceStory(btn);
+      }, 1000);
+    } else if(state.storyStage === 6){
+      // lights come back on the moment the button is found and pressed in the dark
+      stageEl.classList.remove('dark');
+      dimEl.classList.remove('on');
+      showMsg(STORY_MSG[6]);
+      setTimeout(()=>{ signEl.textContent = '버튼 누르면 죽인다'; signEl.classList.add('show'); }, 700);
+      btn.onclick = ()=> advanceStory(btn);
+    } else if(state.storyStage === 7){
+      stageEl.classList.remove('dark');
+      dimEl.classList.remove('on');
+      signEl.textContent = '버튼 누르면 죽인다'; signEl.classList.add('show');
+      showMsg(STORY_MSG[7]);
+      const p = randPos(150,150); positionBtn(btn,p.x,p.y);
+      const btnRect = {x:p.x, y:p.y, w:150, h:150};
+      spawnHands(btnRect);
+      btn.onclick = ()=>{
+        if(document.querySelectorAll('.hand').length === 0){
+          showMsg('너는 안 되겠다');
+          btn.onclick = null;
+          state.wasKicked = true; save();
+          setTimeout(()=>{ window.location.href = '../'; }, 1300);
+        }
+      };
+    }
+  }
+
+  function centerBtn(btn){
+    btn.style.left = '50%'; btn.style.top = '50%';
+    btn.style.marginLeft = '-75px'; btn.style.marginTop = '-72px';
+  }
+
+  function advanceStory(btn){
+    state.storyStage = Math.min(state.storyStage + 1, 7);
+    save();
+    renderStory();
+  }
+
+  function spawnHands(rect){
+    const n = 7;
+    const cx = rect.x + rect.w/2, cy = rect.y + rect.h/2;
+    // small radius so the hands overlap the button's own edge and actually grip it
+    const radius = Math.min(rect.w, rect.h)/2 * 0.7;
+    for(let i=0;i<n;i++){
+      const ang = (Math.PI*2/n)*i - Math.PI/2;
+      const hx = cx + Math.cos(ang)*radius - 23;
+      const hy = cy + Math.sin(ang)*radius - 28;
+      const h = document.createElement('div');
+      h.className = 'hand';
+      h.style.left = hx+'px';
+      h.style.top = hy+'px';
+      h.style.transform = 'rotate(' + (ang*180/Math.PI + 90) + 'deg) scale(1.15)';
+      h.innerHTML = '<svg viewBox="0 0 24 28" fill="#1a1a1a"><path d="M8 27c-2 0-3.5-1.5-4-3L1 15c-.4-1.2.4-2.3 1.5-2.3s1.9.7 2.2 1.7L6.5 19V4.8C6.5 3.3 7.6 2 9 2s2.5 1.3 2.5 2.8V13l1-.3V2.5C12.5 1.1 13.6 0 15 0s2.5 1.1 2.5 2.5V12l1-.1V3.3C18.5 2 19.6 1 21 1s2.5 1 2.5 2.3v14c0 5.9-4.3 9.7-9.6 9.7H12c-1.8 0-3-.6-4-2z"/></svg>';
+      h.onclick = (e)=>{
+        e.stopPropagation();
+        h.classList.add('gone');
+        setTimeout(()=> h.remove(), 320);
+      };
+      stageEl.appendChild(h);
+    }
+  }
+
+  // ---------- MULTIPLIED BUTTON PHASE ----------
+  function renderMultiplied(){
+    stageEl.className = 'stage-multi';
+    document.querySelectorAll('.hand,.decoy').forEach(n=>n.remove());
+    const old = document.getElementById('mainBtn'); if(old) old.remove();
+    signEl.classList.remove('show');
+    stageEl.classList.remove('dark'); dimEl.classList.remove('on');
+    showMsg('왜 다시 오는 거야', '진짜 버튼을 찾아서 누르세요');
+
+    const N = 42;
+    const realIndex = Math.floor(Math.random()*N);
+    for(let i=0;i<N;i++){
+      const b = document.createElement('button');
+      b.className = 'decoy';
+      b.innerHTML = BTN_SVG;
+      const p = randPos(48,48);
+      b.style.left = p.x+'px'; b.style.top = p.y+'px';
+      if(i === realIndex){
+        b.onclick = ()=>{
+          document.querySelectorAll('.decoy').forEach(n=>n.remove());
+          showMsg('내 인생에 너보다 끈질긴 놈은 없었다');
+          setTimeout(()=>{
+            showMsg('이제 그냥 마음껏 눌러');
+            state.multipliedDone = true;
+            state.stage = 'freeplay';
+            state.freePlayClicks = 0;
+            state.freePlayQualified = false;
+            save();
+            renderFreeplay();
+          }, 1700);
+        };
+      } else {
+        b.onclick = ()=>{ b.classList.add('gone'); setTimeout(()=>b.remove(),250); };
+      }
+      stageEl.appendChild(b);
+    }
+  }
+
+  // ---------- FREEPLAY ----------
+  function renderFreeplay(){
+    stageEl.className = 'stage-free';
+    document.querySelectorAll('.hand,.decoy,.decoy.gone').forEach(n=>n.remove());
+    let b = document.getElementById('mainBtn');
+    if(!b){ b = makeMainBtn(); }
+    b.innerHTML = BTN_SVG;
+    centerBtn(b);
+    const counter = document.getElementById('counter') || (()=>{
+      const c = document.createElement('div'); c.id='counter'; document.body.appendChild(c); return c;
+    })();
+    counter.classList.add('show');
+    counter.textContent = state.freePlayClicks + '번 눌렀습니다';
+    b.onclick = ()=>{
+      state.freePlayClicks++;
+      if(state.freePlayClicks >= 3){ state.freePlayQualified = true; }
+      save();
+      counter.textContent = state.freePlayClicks + '번 눌렀습니다';
+      b.style.transform = 'scale(0.9)';
+      setTimeout(()=> b.style.transform = '', 120);
+    };
+  }
+
+  function renderGameOver(text){
+    document.querySelectorAll('.btn,.hand,.decoy,#counter').forEach(n=>n.remove());
+    stageEl.style.display = 'none';
+    goText.textContent = text;
+    goEl.classList.add('show');
+  }
+
+  document.getElementById('reset').onclick = function(e){
+    e.preventDefault();
+    localStorage.removeItem(KEY);
+    location.reload();
+  };
+
+  // ---------- ROUTER ----------
+  function boot(){
+    if(state.freePlayFailed){
+      renderGameOver('마음껏 누르랬더니 겨우 ' + state.freePlayClicks + '번 누르고 나가? 넌 자격 없어');
+      return;
+    }
+    if(state.freePlayQualified){
+      renderFreeplay();
+      return;
+    }
+    if(state.stage === 'freeplay'){
+      // returned after leaving with too few clicks
+      const n = state.freePlayClicks || 0;
+      state.freePlayFailed = true;
+      save();
+      renderGameOver('마음껏 누르랬더니 겨우 ' + n + '번 누르고 나가? 넌 자격 없어');
+      return;
+    }
+    if(state.wasKicked && !state.multipliedDone){
+      renderMultiplied();
+      return;
+    }
+    renderStory();
+  }
+
+  boot();
+})();
+</script>
+</body>
+</html>
