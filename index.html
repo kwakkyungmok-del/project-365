@@ -330,6 +330,43 @@ h1{
     color:white;
 }
 
+    /* ========================= */
+/* 버튼 누르러 가기 */
+/* ========================= */
+.thebutton-link{
+    position:absolute;
+    top:calc(50% + 45px);
+    right:25px;
+    width:150px;
+    padding:12px 16px;
+    border:1px solid #333;
+    background:#111;
+    color:#777;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:1px;
+    transition:.25s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.thebutton-link:hover{
+    color:white;
+    background:#181818;
+    border-color:#555;
+    transform:translateY(-2px);
+    box-shadow:0 0 18px rgba(255,0,0,.15);
+}
+
+.thebutton-circle{
+    width:10px;
+    height:10px;
+    flex-shrink:0;
+}
 /* ========================= */
 /* 최근 활동 */
 /* ========================= */
@@ -541,7 +578,13 @@ h1{
         text-align:center;
     }
 }
-
+.thebutton-link{
+    right:18px;
+    top:calc(50% + 42px);
+    width:140px;
+    padding:10px 14px;
+    font-size:11px;
+}
 /* ========================= */
 /* 작은 스마트폰 */
 /* ========================= */
@@ -802,8 +845,16 @@ function showFunFact(){
 function closeFunFact(){
     document.getElementById("funfactOverlay").classList.remove("active");
 }
+<!-- ========================= -->
+<!-- 버튼 누르러 가기 -->
+<!-- ========================= -->
+<button class="thebutton-link" onclick="location.href='thebutton/'">
+    <svg class="thebutton-circle" viewBox="0 0 20 20" aria-hidden="true">
+        <circle cx="10" cy="10" r="8" fill="#ff2020"/>
+    </svg>
+    버튼 누르러 가기
+</button>
 </script>
-
 
 </body>
 </html>
