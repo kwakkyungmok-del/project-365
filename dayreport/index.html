@@ -1,964 +1,435 @@
 <!DOCTYPE html>
 <html lang="ko">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Day Report — Project 365</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-
-/* ========================= */
-/* 기본 */
-/* ========================= */
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+:root{
+    --bg:#0e0f12;
+    --bg-2:#16181d;
+    --card:#1a1d23;
+    --line:#2a2e36;
+    --line-2:#3a404b;
+    --text:#f4f5f7;
+    --muted:#8b919c;
+    --dim:#4a505b;
+    --accent:#8ab4ff;
+    --accent-soft:rgba(138,180,255,.14);
 }
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html{-webkit-text-size-adjust:100%}
 
 body{
-
     background:
-        radial-gradient(
-            circle at top,
-            #181818 0%,
-            #0b0b0b 45%
-        );
-
-    color:#fff;
-
-    font-family:
-        'Inter',
-        Arial,
-        Helvetica,
-        sans-serif;
-
+        radial-gradient(1000px 500px at 50% -120px,#1e222b 0%,transparent 70%),
+        var(--bg);
+    color:var(--text);
+    font-family:'Inter',Arial,Helvetica,sans-serif;
     min-height:100vh;
-
-    padding:40px 25px 60px;
-
+    padding:36px 24px 70px;
+    overflow-x:hidden;
 }
 
+.wrap{max-width:1080px;margin:0 auto}
 
-/* ========================= */
-/* 상단 */
-/* ========================= */
-
-.header{
-
-    max-width:900px;
-
-    margin:0 auto 35px;
-
-    text-align:center;
-
-}
-
-.header-label{
-
-    color:#777;
-
-    font-size:11px;
-
-    font-weight:700;
-
-    letter-spacing:4px;
-
-    margin-bottom:12px;
-
-}
-
-h1{
-
-    font-size:38px;
-
-    font-weight:800;
-
-    letter-spacing:-1.5px;
-
-    margin-bottom:12px;
-
-}
-
-.description{
-
-    color:#777;
-
-    font-size:14px;
-
-}
-
-
-/* ========================= */
-/* 메인 버튼 */
-/* ========================= */
-
+/* ---------- 홈 버튼 ---------- */
 .home{
-
-    position:fixed;
-
-    top:22px;
-    left:22px;
-
-    z-index:10;
-
-    background:#151515;
-
-    color:#ddd;
-
-    border:1px solid #2d2d2d;
-
-    padding:10px 15px;
-
-    border-radius:12px;
-
+    position:fixed;top:20px;left:20px;z-index:20;
+    background:rgba(26,29,35,.85);
+    backdrop-filter:blur(8px);
+    color:var(--text);
+    border:1px solid var(--line);
+    padding:10px 16px;border-radius:12px;
+    font-family:inherit;font-size:13px;font-weight:600;
     cursor:pointer;
+    transition:transform .2s,border-color .2s,background .2s;
+}
+.home:hover{transform:translateY(-2px);border-color:var(--accent);background:var(--card)}
 
-    font-size:13px;
+/* ---------- 헤더 ---------- */
+.header{text-align:center;padding:26px 0 30px;animation:rise .6s ease both}
+.eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    color:var(--accent);font-size:11px;font-weight:700;letter-spacing:5px;
+    margin-bottom:14px;
+}
+.eyebrow::before,.eyebrow::after{content:"";width:26px;height:1px;background:var(--line-2)}
+h1{font-size:34px;font-weight:800;letter-spacing:6px;margin-bottom:10px}
+.description{color:var(--muted);font-size:14px}
 
-    font-weight:600;
+/* ---------- 대시보드 ---------- */
+.dashboard{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:20px;
+    margin-bottom:22px;
+    animation:rise .6s .12s ease both;
+}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px 16px;
+    text-align:center;
+}
+.stat-value{font-size:30px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.stat.accent .stat-value{color:var(--accent)}
+.stat-label{margin-top:8px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:2.5px}
 
-    transition:.2s;
-
+.progress-info{
+    display:flex;justify-content:space-between;align-items:center;
+    margin:18px 2px 8px;color:var(--muted);font-size:12px;font-weight:600;letter-spacing:1px;
+}
+.progress-info strong{color:var(--text)}
+.bar{height:8px;background:var(--bg-2);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+.fill{
+    height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,#5d8fe6,var(--accent));
+    transition:width 1s .4s cubic-bezier(.2,.8,.2,1);
 }
 
-.home:hover{
-
-    background:#222;
-
-    border-color:#444;
-
-    transform:translateY(-2px);
-
+/* ---------- 현재 위치 ---------- */
+.current{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    margin-bottom:18px;padding:14px 18px;
+    background:var(--accent-soft);
+    border:1px solid rgba(138,180,255,.35);
+    border-radius:14px;
+    cursor:pointer;
+    font-family:inherit;color:var(--text);width:100%;text-align:left;
+    transition:transform .2s,border-color .2s;
+    animation:rise .6s .2s ease both;
 }
+.current:hover{transform:translateY(-2px);border-color:var(--accent)}
+.current[hidden]{display:none}
+.current small{display:block;color:var(--accent);font-size:10px;font-weight:700;letter-spacing:3px;margin-bottom:4px}
+.current b{font-size:18px;font-weight:800;letter-spacing:1px}
+.current span{color:var(--muted);font-size:12px;white-space:nowrap}
 
-
-/* ========================= */
-/* 진행 정보 */
-/* ========================= */
-
-.status{
-
-    max-width:900px;
-
-    margin:0 auto 25px;
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    color:#777;
-
-    font-size:12px;
-
-}
-
-.status strong{
-
-    color:#ddd;
-
-}
-
-
-/* ========================= */
-/* Day Grid */
-/* ========================= */
-
+/* ---------- 그리드 ---------- */
 .grid{
-
     display:grid;
-
-    grid-template-columns:
-        repeat(5, minmax(0, 1fr));
-
-    gap:12px;
-
-    max-width:900px;
-
-    margin:0 auto;
-
+    grid-template-columns:repeat(auto-fill,minmax(84px,1fr));
+    gap:10px;
 }
-
-
-/* ========================= */
-/* Day 버튼 */
-/* ========================= */
 
 .day{
-
-    position:relative;
-
-    height:62px;
-
-    background:#181818;
-
-    border:1px solid #303030;
-
-    color:#ddd;
-
+    position:relative;min-width:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+    height:74px;
+    background:var(--bg-2);
+    border:1px solid var(--line);
     border-radius:14px;
-
-    cursor:pointer;
-
-    font-family:inherit;
-
-    font-size:12px;
-
-    font-weight:700;
-
-    letter-spacing:.5px;
-
-    transition:
-
-        transform .2s,
-
-        background .2s,
-
-        border-color .2s,
-
-        box-shadow .2s;
-
+    color:var(--text);
+    font-family:inherit;cursor:pointer;
+    opacity:0;animation:pop .45s ease forwards;
+    transition:transform .2s,background .2s,border-color .2s,box-shadow .2s,color .2s;
 }
-
-
-/* 기록이 있는 날 */
+.day .d{font-size:9px;font-weight:700;letter-spacing:2.5px;color:var(--muted)}
+.day .n{font-size:20px;font-weight:800;letter-spacing:-.5px}
 
 .day.completed{
-
-    background:
-        linear-gradient(
-            145deg,
-            #20252b,
-            #15181c
-        );
-
-    border-color:#48515b;
-
-    color:#f2f2f2;
-
+    background:linear-gradient(160deg,#242932,#1a1e25);
+    border-color:var(--line-2);
 }
-
-
-/* 마우스를 올렸을 때 */
-
+.day.completed .d{color:var(--accent)}
 .day.completed:hover{
-
     transform:translateY(-4px);
-
-    background:#252b32;
-
-    border-color:#697582;
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,.35);
-
+    background:#2a303a;
+    border-color:var(--accent);
+    box-shadow:0 10px 26px rgba(0,0,0,.4);
 }
 
-
-/* 미기록 */
-
-.day.locked{
-
-    background:#111;
-
-    border-color:#1d1d1d;
-
-    color:#4b4b4b;
-
-}
-
-.day.locked:hover{
-
-    background:#151515;
-
-    color:#666;
-
-}
-
-
-/* 최근 기록 */
+.day.locked{background:#111317;border-color:#1a1d22}
+.day.locked .d,.day.locked .n{color:var(--dim)}
+.day.locked:hover{transform:translateY(-2px);background:#15181c;border-color:var(--line)}
 
 .day.latest{
-
-    border-color:#8b8b8b;
-
-    box-shadow:
-        0 0 0 1px rgba(255,255,255,.08),
-        0 0 22px rgba(255,255,255,.07);
-
+    border-color:var(--accent);
+    box-shadow:0 0 0 1px var(--accent-soft),0 0 22px rgba(138,180,255,.2);
 }
-
-
-/* 최근 기록 표시 점 */
-
 .day.latest::after{
-
-    content:"";
-
-    position:absolute;
-
-    top:8px;
-    right:9px;
-
-    width:5px;
-    height:5px;
-
-    border-radius:50%;
-
-    background:#fff;
-
+    content:"CURRENT";
+    position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+    background:var(--accent);color:#0b0d12;
+    font-size:8px;font-weight:800;letter-spacing:1.2px;
+    padding:2px 7px;border-radius:99px;
 }
 
-
-/* ========================= */
-/* 모달 */
-/* ========================= */
-
+/* ---------- 기록 카드 ---------- */
 .modal{
-
-    position:fixed;
-
-    inset:0;
-
-    background:rgba(0,0,0,.78);
-
-    backdrop-filter:blur(7px);
-
-    display:none;
-
-    justify-content:center;
-
-    align-items:center;
-
+    position:fixed;inset:0;z-index:100;
+    background:rgba(5,6,8,.78);
+    backdrop-filter:blur(8px);
+    display:none;justify-content:center;align-items:center;
     padding:20px;
-
-    z-index:100;
-
 }
-
 .box{
-
-    width:520px;
-
-    max-width:100%;
-
-    background:#151515;
-
-    border:1px solid #303030;
-
+    width:560px;max-width:100%;max-height:88vh;
+    display:flex;flex-direction:column;
+    background:var(--card);
+    border:1px solid var(--line-2);
     border-radius:22px;
-
     padding:30px;
-
-    box-shadow:
-        0 25px 80px rgba(0,0,0,.6);
-
-    animation:appear .2s ease;
-
+    box-shadow:0 30px 90px rgba(0,0,0,.6);
+    animation:appear .22s ease;
 }
-
-@keyframes appear{
-
-    from{
-
-        opacity:0;
-
-        transform:translateY(10px) scale(.98);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(0) scale(1);
-
-    }
-
-}
-
-
-.modal-day{
-
-    color:#777;
-
-    font-size:11px;
-
-    font-weight:700;
-
-    letter-spacing:3px;
-
-    margin-bottom:10px;
-
-}
-
-.box h2{
-
-    font-size:25px;
-
-    margin-bottom:18px;
-
-}
-
+.modal-day{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:4px}
+.divider{height:1px;background:var(--line);margin:16px 0}
+.box h2{font-size:24px;font-weight:800;letter-spacing:-.5px;line-height:1.3}
 #content{
-
-    color:#cfcfcf;
-
-    font-size:14px;
-
-    line-height:1.8;
-
-    white-space:pre-line;
-
+    color:#cfd3da;font-size:14.5px;line-height:1.85;
+    white-space:pre-line;overflow-y:auto;flex:1;min-height:60px;
 }
+.empty #title{color:var(--muted)}
+.empty #content{color:var(--muted)}
+
+.nav{display:flex;gap:10px;margin-top:6px}
+.nav button{
+    flex:1;min-height:48px;
+    background:var(--bg-2);color:var(--text);
+    border:1px solid var(--line);border-radius:12px;
+    font-family:inherit;font-size:12px;font-weight:700;letter-spacing:1.5px;
+    cursor:pointer;
+    transition:transform .2s,border-color .2s,background .2s;
+}
+.nav button:hover:not(:disabled){transform:translateY(-2px);border-color:var(--accent);background:#20242b}
+.nav button:disabled{opacity:.3;cursor:not-allowed}
 
 .close{
-
-    margin-top:25px;
-
-    padding:11px 20px;
-
-    border:1px solid #333;
-
-    background:#202020;
-
-    color:white;
-
-    border-radius:10px;
-
-    cursor:pointer;
-
-    font-family:inherit;
-
-    transition:.2s;
-
+    margin-top:12px;min-height:46px;width:100%;
+    background:transparent;color:var(--muted);
+    border:1px solid var(--line);border-radius:12px;
+    font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    transition:color .2s,border-color .2s;
 }
+.close:hover{color:var(--text);border-color:var(--line-2)}
 
-.close:hover{
+/* ---------- 애니메이션 ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes appear{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
 
-    background:#2b2b2b;
-
-}
-
-
-/* ========================= */
-/* 모바일 */
-/* ========================= */
-
+/* ---------- 반응형 ---------- */
 @media(max-width:768px){
-
-    body{
-
-        padding:
-
-            75px
-            14px
-            35px;
-
-    }
-
-    .home{
-
-        top:15px;
-
-        left:15px;
-
-        padding:9px 12px;
-
-        font-size:12px;
-
-    }
-
-    h1{
-
-        font-size:30px;
-
-    }
-
-    .description{
-
-        font-size:12px;
-
-    }
-
-    .status{
-
-        margin-bottom:18px;
-
-        padding:0 3px;
-
-    }
-
-    .grid{
-
-        gap:8px;
-
-    }
-
-    .day{
-
-        height:54px;
-
-        border-radius:11px;
-
-        font-size:10px;
-
-    }
-
-    .box{
-
-        padding:24px;
-
-        border-radius:19px;
-
-    }
-
+    body{padding:74px 14px 50px}
+    .home{top:14px;left:14px;padding:9px 13px;font-size:12px}
+    h1{font-size:26px;letter-spacing:4px}
+    .description{font-size:12px}
+    .dashboard{padding:14px;border-radius:16px}
+    .stats{gap:8px}
+    .stat{padding:14px 6px}
+    .stat-value{font-size:22px}
+    .stat-label{font-size:9px;letter-spacing:1.5px}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px}
+    .day{height:60px;border-radius:12px}
+    .day .n{font-size:16px}
+    .day .d{font-size:8px;letter-spacing:1.5px}
+    .box{padding:22px;border-radius:18px;max-height:92vh}
+    .box h2{font-size:21px}
+    #content{font-size:14px}
 }
-
-
-/* ========================= */
-/* 작은 스마트폰 */
-/* ========================= */
-
 @media(max-width:420px){
-
-    h1{
-
-        font-size:26px;
-
-    }
-
-    .grid{
-
-        gap:6px;
-
-    }
-
-    .day{
-
-        height:48px;
-
-        border-radius:10px;
-
-        font-size:9px;
-
-    }
-
-    .status{
-
-        font-size:10px;
-
-    }
-
-    .box h2{
-
-        font-size:21px;
-
-    }
-
-    #content{
-
-        font-size:13px;
-
-    }
-
+    .grid{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+    .day{height:54px;border-radius:10px}
+    .day .n{font-size:14px}
+    .current span{display:none}
 }
-
-
-/* ========================= */
-/* 아주 작은 화면 */
-/* ========================= */
-
-@media(max-width:340px){
-
-    .grid{
-
-        gap:4px;
-
-    }
-
-    .day{
-
-        height:43px;
-
-        font-size:8px;
-
-    }
-
+@media(prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
-
 </style>
-
 </head>
-
 
 <body>
 
+<button class="home" onclick="location.href='../'">🏠 메인 화면</button>
 
-<!-- ========================= -->
-<!-- 메인으로 -->
-<!-- ========================= -->
+<div class="wrap">
 
-<button
-    class="home"
-    onclick="location.href='../'"
->
-    🏠 메인 화면
-</button>
-
-
-<!-- ========================= -->
-<!-- 제목 -->
-<!-- ========================= -->
-
-<div class="header">
-
-    <div class="header-label">
-        PROJECT 365
+    <div class="header">
+        <div class="eyebrow">PROJECT 365</div>
+        <h1>DAY REPORT</h1>
+        <div class="description">365일 동안의 프로젝트 기록</div>
     </div>
 
-    <h1>
-        Day Report
-    </h1>
+    <div class="dashboard">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="completedCount">0</div>
+                <div class="stat-label">DAYS RECORDED</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="progressPct">0%</div>
+                <div class="stat-label">PROGRESS</div>
+            </div>
+            <div class="stat accent">
+                <div class="stat-value" id="latestDay">-</div>
+                <div class="stat-label">LATEST</div>
+            </div>
+        </div>
 
-    <div class="description">
-        365일 동안의 프로젝트 기록
+        <div class="progress-info">
+            <div><strong id="progressText">0</strong> / 365 DAYS</div>
+            <div id="progressPct2">0%</div>
+        </div>
+        <div class="bar"><div class="fill" id="fill"></div></div>
     </div>
+
+    <button class="current" id="current" hidden>
+        <div>
+            <small>CURRENT</small>
+            <b id="currentDay">DAY 000</b>
+        </div>
+        <span id="currentTitle"></span>
+    </button>
+
+    <div class="grid" id="grid"></div>
 
 </div>
 
-
-<!-- ========================= -->
-<!-- 진행 정보 -->
-<!-- ========================= -->
-
-<div class="status">
-
-    <div>
-        기록된 날:
-        <strong id="completedCount">0</strong>
-        / 365
-    </div>
-
-    <div>
-        최근:
-        <strong id="latestDay">-</strong>
-    </div>
-
-</div>
-
-
-<!-- ========================= -->
-<!-- Day Grid -->
-<!-- ========================= -->
-
-<div
-    class="grid"
-    id="grid"
-></div>
-
-
-<!-- ========================= -->
-<!-- 모달 -->
-<!-- ========================= -->
-
-<div
-    class="modal"
-    id="modal"
->
-
-    <div class="box">
-
-        <div
-            class="modal-day"
-            id="modalDay"
-        ></div>
-
+<div class="modal" id="modal">
+    <div class="box" id="box">
+        <div class="modal-day" id="modalDay"></div>
+        <div class="divider"></div>
         <h2 id="title"></h2>
-
+        <div class="divider"></div>
         <p id="content"></p>
-
-        <button
-            class="close"
-            onclick="closeModal()"
-        >
-            닫기
-        </button>
-
+        <div class="divider"></div>
+        <div class="nav">
+            <button id="prevBtn" onclick="moveDay(-1)">← PREVIOUS</button>
+            <button id="nextBtn" onclick="moveDay(1)">NEXT →</button>
+        </div>
+        <button class="close" onclick="closeModal()">닫기</button>
     </div>
-
 </div>
-
-
-<!-- ========================= -->
-<!-- report.js -->
-<!-- ========================= -->
 
 <script src="../report.js"></script>
 
-
 <script>
-
-/* ========================= */
-/* 기본 설정 */
-/* ========================= */
-
 const TOTAL_DAYS = 365;
+const grid = document.getElementById("grid");
+let currentDay = null;
 
-const grid =
-    document.getElementById("grid");
+const pad = n => String(n).padStart(3, "0");
+const findReport = day => reports.find(r => r.day === day);
 
+/* 가장 최근 기록 */
+const latestReport = reports.length > 0
+    ? reports.reduce((l, c) => c.day > l.day ? c : l)
+    : null;
 
-/* ========================= */
-/* 가장 최근 기록 찾기 */
-/* ========================= */
+/* 대시보드 */
+const count = reports.length;
+const pct = count / TOTAL_DAYS * 100;
+const pctText = (Number.isInteger(pct) ? pct : pct.toFixed(1)) + "%";
 
-const latestReport =
-    reports.length > 0
+document.getElementById("completedCount").textContent = count;
+document.getElementById("progressPct").textContent = pctText;
+document.getElementById("progressPct2").textContent = pctText;
+document.getElementById("progressText").textContent = count;
+document.getElementById("latestDay").textContent = latestReport ? "DAY " + pad(latestReport.day) : "-";
+requestAnimationFrame(() => {
+    document.getElementById("fill").style.width = Math.min(pct, 100) + "%";
+});
 
-        ? reports.reduce(
-            (latest, current) =>
-                current.day > latest.day
-                    ? current
-                    : latest
-        )
+/* 현재 위치 배너 */
+if (latestReport) {
+    const cur = document.getElementById("current");
+    cur.hidden = false;
+    document.getElementById("currentDay").textContent = "DAY " + pad(latestReport.day);
+    document.getElementById("currentTitle").textContent = latestReport.title;
+    cur.onclick = () => openReport(latestReport.day);
+}
 
-        : null;
-
-
-/* ========================= */
-/* 기록된 날짜 수 */
-/* ========================= */
-
-document.getElementById(
-    "completedCount"
-).textContent = reports.length;
-
-
-document.getElementById(
-    "latestDay"
-).textContent =
-
-latestReport
-
-    ? `DAY ${String(latestReport.day).padStart(3,"0")}`
-
-    : "-";
-
-
-/* ========================= */
-/* 365개 버튼 생성 */
-/* ========================= */
-
-for(
-    let i = 1;
-    i <= TOTAL_DAYS;
-    i++
-){
-
-    const btn =
-        document.createElement("button");
-
-
+/* 365개 타일 생성 */
+for (let i = 1; i <= TOTAL_DAYS; i++) {
+    const btn = document.createElement("button");
     btn.className = "day";
+    btn.innerHTML = `<span class="d">DAY</span><span class="n">${pad(i)}</span>`;
+    btn.style.animationDelay = Math.min(i * 3, 700) + "ms";
 
+    const data = findReport(i);
 
-    btn.textContent =
-        "DAY " +
-        String(i).padStart(3,"0");
-
-
-    /* 해당 날짜의 기록 찾기 */
-
-    const data =
-        reports.find(
-            report => report.day === i
-        );
-
-
-    /* ========================= */
-    /* 기록 있음 */
-    /* ========================= */
-
-    if(data){
-
-        btn.classList.add(
-            "completed"
-        );
-
-
-        /* 가장 최근 기록 */
-
-        if(
-            latestReport &&
-            data.day === latestReport.day
-        ){
-
-            btn.classList.add(
-                "latest"
-            );
-
+    if (data) {
+        btn.classList.add("completed");
+        if (latestReport && data.day === latestReport.day) {
+            btn.classList.add("latest");
         }
-
+    } else {
+        btn.classList.add("locked");
     }
 
-
-    /* ========================= */
-    /* 기록 없음 */
-    /* ========================= */
-
-    else{
-
-        btn.classList.add(
-            "locked"
-        );
-
-    }
-
-
-    /* ========================= */
-    /* 클릭 */
-    /* ========================= */
-
-    btn.onclick =
-        () => openReport(i);
-
-
+    btn.onclick = () => openReport(i);
     grid.appendChild(btn);
-
 }
 
-
-/* ========================= */
 /* 기록 열기 */
-/* ========================= */
+function openReport(day) {
+    if (day < 1 || day > TOTAL_DAYS) return;
+    currentDay = day;
 
-function openReport(day){
+    const data = findReport(day);
+    const box = document.getElementById("box");
 
-    const data =
-        reports.find(
-            report => report.day === day
-        );
+    document.getElementById("modal").style.display = "flex";
+    document.getElementById("modalDay").textContent = "DAY " + pad(day);
 
-
-    document.getElementById(
-        "modal"
-    ).style.display = "flex";
-
-
-    if(data){
-
-        document.getElementById(
-            "modalDay"
-        ).textContent =
-
-            "DAY " +
-            String(day).padStart(3,"0");
-
-
-        document.getElementById(
-            "title"
-        ).innerText =
-            data.title;
-
-
-        document.getElementById(
-            "content"
-        ).innerText =
-            data.content.trim();
-
+    if (data) {
+        box.classList.remove("empty");
+        document.getElementById("title").innerText = data.title;
+        document.getElementById("content").innerText = data.content.trim();
+    } else {
+        box.classList.add("empty");
+        document.getElementById("title").innerText = "기록 없음";
+        document.getElementById("content").innerText = "아직 이 날의 활동 기록이 없습니다.";
     }
 
-    else{
+    document.getElementById("prevBtn").disabled = day <= 1;
+    document.getElementById("nextBtn").disabled = day >= TOTAL_DAYS;
 
-        document.getElementById(
-            "modalDay"
-        ).textContent =
-
-            "DAY " +
-            String(day).padStart(3,"0");
-
-
-        document.getElementById(
-            "title"
-        ).innerText =
-            "기록 없음";
-
-
-        document.getElementById(
-            "content"
-        ).innerText =
-            "아직 이 날의 활동 기록이 없습니다.";
-
-    }
-
+    /* 애니메이션 재시작 */
+    box.style.animation = "none";
+    box.offsetHeight;
+    box.style.animation = "";
+    document.getElementById("content").scrollTop = 0;
 }
 
-
-/* ========================= */
-/* 모달 닫기 */
-/* ========================= */
-
-function closeModal(){
-
-    document.getElementById(
-        "modal"
-    ).style.display = "none";
-
+/* 이전 / 다음 Day */
+function moveDay(step) {
+    if (currentDay === null) return;
+    openReport(currentDay + step);
 }
 
+/* 닫기 */
+function closeModal() {
+    document.getElementById("modal").style.display = "none";
+    currentDay = null;
+}
 
-/* ========================= */
 /* 배경 클릭으로 닫기 */
-/* ========================= */
+document.getElementById("modal").addEventListener("click", function (e) {
+    if (e.target === this) closeModal();
+});
 
-document.getElementById(
-    "modal"
-).addEventListener(
-    "click",
-    function(event){
-
-        if(event.target === this){
-
-            closeModal();
-
-        }
-
-    }
-);
-
-
-/* ========================= */
-/* ESC로 닫기 */
-/* ========================= */
-
-document.addEventListener(
-    "keydown",
-    function(event){
-
-        if(event.key === "Escape"){
-
-            closeModal();
-
-        }
-
-    }
-);
-
+/* 키보드: ESC 닫기, 좌우 화살표 이동 */
+document.addEventListener("keydown", function (e) {
+    if (currentDay === null) return;
+    if (e.key === "Escape") closeModal();
+    else if (e.key === "ArrowLeft") moveDay(-1);
+    else if (e.key === "ArrowRight") moveDay(1);
+});
 </script>
 
-
 </body>
-
 </html>
