@@ -1,221 +1,284 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Project 365</title>
-
 <style>
+:root{--bg:#0a0b0c;--panel:#111315;--line:#2a2e32;--fg:#e8eaec;--dim:#8b9197;--acc:#6fd3c4;--mx:50%;--my:40%}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{background:var(--bg);color:var(--fg);font-family:"Segoe UI","Apple SD Gothic Neo","Malgun Gothic",Arial,sans-serif;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(900px circle at var(--mx) var(--my),rgba(160,200,215,.055),transparent 60%)}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+/* HOME */
+.home{position:absolute;top:20px;left:20px;z-index:5;display:flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;background:var(--panel);border:1px solid var(--line);border-radius:8px;font-size:14px;transition:.2s}
+.home svg{width:18px;height:18px}
+.home:hover{background:#1b1e21;border-color:#444a50}
 
-body{
-    background:#0b0b0b;
-    color:white;
-    font-family:Arial, Helvetica, sans-serif;
-    min-height:100vh;
-}
+.room{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:90px 24px 40px}
+.title{text-align:center;margin-bottom:36px}
+.title small{display:block;font-size:12px;letter-spacing:.32em;color:var(--dim);margin-bottom:8px}
+.title h1{font-size:30px;font-weight:600;letter-spacing:.18em}
+.title p{margin-top:8px;font-size:14px;color:var(--dim)}
 
-.home{
-    position:absolute;
-    top:20px;
-    left:20px;
-    padding:10px 16px;
-    background:#181818;
-    border:1px solid #333;
-    border-radius:8px;
-    cursor:pointer;
-    color:white;
-    transition:.2s;
-}
+/* STAGE */
+.stage{position:relative;display:grid;grid-template-columns:1fr 230px 1fr;align-items:center;gap:0 70px;width:100%;max-width:1100px}
+.col{display:flex;flex-direction:column;gap:22px;align-items:center}
+.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.lines path{fill:none;stroke:#3a4046;stroke-width:1;transition:.25s}
+.lines circle{fill:#3a4046;transition:.25s}
+.lines .on{stroke:var(--acc);filter:drop-shadow(0 0 3px var(--acc))}
+.lines circle.on{fill:var(--acc)}
 
-.home:hover{
-    background:#252525;
-}
+/* OBJECT */
+.obj{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:190px;padding:12px 10px;border-radius:12px;transition:.25s}
+.obj svg{width:104px;height:104px;transition:transform .25s,filter .25s;filter:brightness(.85)}
+.obj:hover svg,.obj:focus-visible svg{transform:translateY(-6px);filter:brightness(1.2) drop-shadow(0 6px 14px rgba(111,211,196,.22))}
+.name{margin-top:8px;font-size:12px;letter-spacing:.16em;color:var(--dim);transition:.25s}
+.ko{font-size:13px;color:#b3b8bd;margin-top:2px}
+.obj:hover .name,.obj:focus-visible .name,.obj:hover .ko{color:#fff}
+.st{margin-top:6px;font-size:10.5px;letter-spacing:.14em;color:var(--acc);opacity:0;transform:translateY(-3px);transition:.25s}
+.obj:hover .st,.obj:focus-visible .st{opacity:1;transform:none}
 
-.room{
-    width:100%;
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    padding:80px 20px 40px;
-}
+/* SVG palette */
+.s{fill:none;stroke:#c9ced2;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.f{fill:#15171a;stroke:#c9ced2;stroke-width:1.6;stroke-linejoin:round}
+.a{fill:var(--acc);stroke:none}
+.as{fill:none;stroke:var(--acc);stroke-width:1.6;stroke-linecap:round}
+.t{font:600 5.5px "Segoe UI",Arial,sans-serif;fill:#c9ced2;letter-spacing:.5px}
 
-.title{
-    font-size:36px;
-    margin-bottom:60px;
-    text-align:center;
-}
+/* CORE */
+.core{position:relative;z-index:1;width:230px;height:230px;justify-self:center}
+.core svg{width:100%;height:100%;overflow:visible}
+.r1{transform-origin:100px 100px;animation:spin 40s linear infinite}
+.r2{transform-origin:100px 100px;animation:spin 26s linear infinite reverse}
+.orb{transform-origin:100px 100px;animation:spin 14s linear infinite}
+.glow{animation:pulse 4s ease-in-out infinite}
+.blink{animation:blink 2.4s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{opacity:.35}}
+@keyframes blink{50%{opacity:.25}}
 
-.objects{
-    display:flex;
-    gap:80px;
-    align-items:flex-end;
-    justify-content:center;
-    flex-wrap:wrap;
-}
+.tip{position:relative;z-index:1;margin-top:40px;color:#6b7177;font-size:13px;text-align:center}
 
-.object{
-    text-align:center;
-    cursor:pointer;
-    transition:.2s;
-}
+/* BOOT */
+#boot{position:fixed;inset:0;z-index:50;background:#050506;display:flex;align-items:center;justify-content:center;transition:opacity .45s}
+#boot.out{opacity:0;pointer-events:none}
+.bx{font-family:"Consolas","Courier New",monospace;text-align:center}
+.bx h2{font-size:26px;letter-spacing:.3em;font-weight:500;opacity:0;transition:opacity .4s}
+.bx .i{margin-top:10px;font-size:11px;letter-spacing:.25em;color:var(--dim);opacity:0;transition:opacity .3s}
+.bx ul{list-style:none;margin:16px auto 0;width:200px;text-align:left;font-size:12px;letter-spacing:.1em;color:#b3b8bd}
+.bx li{display:flex;justify-content:space-between;opacity:0;transition:opacity .2s;line-height:1.7}
+.bx li b{color:var(--acc);font-weight:400}
+.bx .ok{margin-top:12px;font-size:12px;letter-spacing:.25em;color:var(--acc);opacity:0;transition:opacity .3s}
+.show{opacity:1!important}
+.room{opacity:0;transition:opacity .6s}
+.ready .room,.ready .home{opacity:1}
+.home{opacity:0;transition:opacity .6s,background .2s}
 
-.object:hover{
-    transform:translateY(-6px);
-}
+@media (hover:none){.st{opacity:1;transform:none}}
 
-.icon{
-    font-size:90px;
-    margin-bottom:10px;
-}
+/* TABLET */
+@media (max-width:1024px){.stage{grid-template-columns:1fr 190px 1fr;gap:0 30px}.core{width:190px;height:190px}.obj{width:160px}.obj svg{width:88px;height:88px}}
 
-.locked{
-    opacity:.25;
-    cursor:not-allowed;
-}
-
-.locked:hover{
-    transform:none;
-}
-
-.tip{
-    margin-top:50px;
-    color:#777;
-    font-size:14px;
-    text-align:center;
-}
-
-/* ===================== */
-/* 모바일 */
-/* ===================== */
-
+/* MOBILE */
 @media (max-width:768px){
-
-    .home{
-        top:15px;
-        left:15px;
-        font-size:14px;
-        padding:10px 14px;
-    }
-
-    .title{
-        font-size:28px;
-        margin-bottom:40px;
-    }
-
-    .objects{
-        flex-direction:column;
-        gap:35px;
-        align-items:center;
-    }
-
-    .icon{
-        font-size:80px;
-    }
-
-    .object{
-        width:220px;
-        padding:15px;
-        border:1px solid #222;
-        border-radius:12px;
-        background:#111;
-    }
-
-    .tip{
-        margin-top:35px;
-        width:90%;
-        line-height:1.6;
-    }
-
+ .home{top:15px;left:15px}
+ .room{padding:80px 16px 36px}
+ .title h1{font-size:24px}
+ .stage{grid-template-columns:1fr 1fr;gap:14px;max-width:420px}
+ .col{display:contents}
+ .core{grid-column:1/-1;order:-1;width:170px;height:170px;margin-bottom:6px}
+ .lines{display:none}
+ .obj{width:100%;background:var(--panel);border:1px solid #23272a;padding:14px 8px}
+ .obj svg{width:80px;height:80px}
 }
+@media (max-width:480px){.title h1{font-size:20px}.core{width:150px;height:150px}.obj svg{width:68px;height:68px}.name{font-size:11px;letter-spacing:.1em}}
 
-/* 작은 휴대폰 */
-
-@media (max-width:480px){
-
-    .title{
-        font-size:22px;
-    }
-
-    .icon{
-        font-size:70px;
-    }
-
-    .object{
-        width:180px;
-        font-size:15px;
-    }
-
-    .home{
-        font-size:13px;
-    }
-
-}
-
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01s!important}}
 </style>
-
 </head>
-
 <body>
 
-<button class="home" onclick="location.href='../'">
-🏠 메인
-</button>
+<!-- 부팅 화면 -->
+<div id="boot" aria-hidden="true"><div class="bx">
+ <h2 id="b1">PROJECT 365</h2>
+ <div class="i" id="b2">SYSTEM INITIALIZING...</div>
+ <ul id="b3"><li>COMPUTER<b>✓</b></li><li>LAB<b>✓</b></li><li>AI SYSTEM<b>✓</b></li><li>DATABASE<b>✓</b></li></ul>
+ <div class="ok" id="b4">ALL SYSTEMS READY</div>
+</div></div>
+
+<a class="home" href="../" aria-label="메인으로">
+ <svg viewBox="0 0 24 24" class="s" style="stroke-width:1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-6h4v6"/></svg>메인
+</a>
 
 <div class="room">
+ <div class="title">
+  <small>PROJECT 365</small>
+  <h1>RESEARCH LAB</h1>
+  <p>Project 365 연구소</p>
+ </div>
 
-    <div class="title">
-        Project 365 연구소
-    </div>
+ <div class="stage" id="stage">
+  <svg class="lines" id="lines" aria-hidden="true"></svg>
 
-    <div class="objects">
+  <div class="col">
+   <!-- 메인 컴퓨터 -->
+   <a class="obj" href="computer/">
+    <svg viewBox="0 0 96 96" aria-hidden="true">
+     <rect class="f" x="12" y="12" width="72" height="48" rx="4"/>
+     <rect x="17" y="17" width="62" height="38" rx="2" fill="#0b0d0f" stroke="#3a4046"/>
+     <text class="t" x="48" y="33" text-anchor="middle">PROJECT 365</text>
+     <path class="as" d="M24 40h20M24 46h30" style="stroke-width:1.2"/>
+     <path class="s" d="M60 47v4M64 44v7M68 41v10" style="stroke-width:1.2"/>
+     <path class="f" d="M40 60l-2 12h20l-2-12"/>
+     <rect class="f" x="28" y="72" width="40" height="6" rx="2"/>
+     <circle class="a" cx="48" cy="57" r="1.3"/>
+    </svg>
+    <div class="name">MAIN COMPUTER</div><div class="ko">메인 컴퓨터</div><div class="st">● ONLINE</div>
+   </a>
+   <!-- 책장 -->
+   <a class="obj" href="../dayreport/">
+    <svg viewBox="0 0 96 96" aria-hidden="true">
+     <rect class="f" x="14" y="10" width="68" height="76" rx="3"/>
+     <path class="s" d="M14 36h68M14 62h68"/>
+     <rect class="f" x="20" y="16" width="7" height="20"/><rect class="f" x="29" y="20" width="9" height="16"/><rect class="f" x="40" y="14" width="6" height="22"/>
+     <rect x="49" y="19" width="8" height="17" fill="var(--acc)" opacity=".85"/><path class="s" d="M62 36l6-19 6 2-5 17"/>
+     <rect class="f" x="20" y="44" width="10" height="18"/><rect class="f" x="32" y="40" width="7" height="22"/><rect class="f" x="41" y="46" width="12" height="16"/>
+     <rect class="f" x="58" y="42" width="6" height="20"/><rect x="66" y="45" width="8" height="17" fill="var(--acc)" opacity=".85"/>
+     <rect class="f" x="20" y="72" width="8" height="14"/><rect class="f" x="30" y="68" width="12" height="18"/><rect class="f" x="44" y="74" width="7" height="12"/><rect class="f" x="53" y="70" width="9" height="16"/>
+    </svg>
+    <div class="name">ARCHIVE</div><div class="ko">책장</div><div class="st">● INDEXED</div>
+   </a>
+   <!-- 실험대 -->
+   <a class="obj" href="lab/">
+    <svg viewBox="0 0 96 96" aria-hidden="true">
+     <rect class="f" x="8" y="66" width="80" height="7" rx="2"/>
+     <path class="s" d="M16 73v16M80 73v16M16 82h64"/>
+     <path class="f" d="M32 20h12M35 20v16L24 62h34L47 36V20"/>
+     <path class="a" d="M28 54h26l4 8H24z" opacity=".85"/>
+     <path class="s" d="M66 30v34M76 30v34M66 30h10" style="stroke-width:1.4"/>
+     <path class="a" d="M67 46h8v17q-4 2-8 0z" opacity=".85"/>
+     <circle class="a" cx="41" cy="46" r="1.6"/>
+    </svg>
+    <div class="name">LABORATORY</div><div class="ko">실험대</div><div class="st">● ONLINE</div>
+   </a>
+  </div>
 
-        <div class="object" onclick="location.href='computer/'">
-            <div class="icon">🖥️</div>
-            메인 컴퓨터
-        </div>
+  <!-- P365 CORE -->
+  <div class="core" id="core" role="img" aria-label="P365 CORE">
+   <svg viewBox="0 0 200 200">
+    <circle class="glow" cx="100" cy="100" r="70" fill="rgba(111,211,196,.06)"/>
+    <circle cx="100" cy="100" r="92" fill="none" stroke="#2a2e32"/>
+    <g class="r1"><circle cx="100" cy="100" r="86" fill="none" stroke="#5c646b" stroke-dasharray="2 6"/><path d="M100 10v8M100 182v8M10 100h8M182 100h8" stroke="#c9ced2" stroke-width="1.5"/></g>
+    <g class="r2"><circle cx="100" cy="100" r="74" fill="none" stroke="#8b9197" stroke-width="1.2" stroke-dasharray="60 24 14 24"/></g>
+    <g class="orb"><circle cx="100" cy="24" r="3" class="a"/></g>
+    <circle cx="100" cy="100" r="56" fill="#111315" stroke="#c9ced2" stroke-width="1.6"/>
+    <circle cx="100" cy="100" r="48" fill="none" stroke="#2f3437"/>
+    <text x="100" y="99" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-weight="600" font-size="24" letter-spacing="3" fill="#f0f2f3">P365</text>
+    <text x="100" y="118" text-anchor="middle" font-family="Segoe UI,Arial,sans-serif" font-size="10" letter-spacing="5" fill="#8b9197">CORE</text>
+    <circle class="a blink" cx="100" cy="132" r="2.2"/>
+   </svg>
+  </div>
 
-        <div class="object" onclick="location.href='../dayreport/'">
-            <div class="icon">📚</div>
-            책장
-        </div>
+  <div class="col">
+   <!-- AI 로봇 -->
+   <a class="obj" href="AIrobot/">
+    <svg viewBox="0 0 96 96" aria-hidden="true">
+     <path class="s" d="M48 8v10"/><circle class="a" cx="48" cy="8" r="2.5"/>
+     <rect class="f" x="26" y="18" width="44" height="32" rx="7"/>
+     <rect x="32" y="27" width="32" height="14" rx="4" fill="#0b0d0f" stroke="#3a4046"/>
+     <circle class="a" cx="41" cy="34" r="3"/><circle class="a" cx="55" cy="34" r="3"/>
+     <path class="s" d="M44 50v4h8v-4"/>
+     <rect class="f" x="30" y="54" width="36" height="28" rx="5"/>
+     <path class="s" d="M30 60l-8 10v8M66 60l8 10v8"/>
+     <circle class="a" cx="42" cy="68" r="2"/><path class="s" d="M50 68h10M50 74h10" style="stroke-width:1.2"/>
+     <path class="s" d="M40 82v6M56 82v6"/>
+    </svg>
+    <div class="name">AI ROBOT</div><div class="ko">AI 로봇</div><div class="st">● STANDBY</div>
+   </a>
+   <!-- 핑계 생성기 -->
+   <a class="obj" href="excusing/">
+    <svg viewBox="0 0 96 96" aria-hidden="true">
+     <path class="f" d="M48 14l30 16v34L48 82 18 64V30z"/>
+     <path class="s" d="M18 30l30 16 30-16M48 46v36"/>
+     <circle class="a" cx="48" cy="26" r="2.6"/><circle class="a" cx="41" cy="30" r="2.2" opacity="0"/>
+     <circle class="a" cx="32" cy="50" r="2.4"/><circle class="a" cx="36" cy="64" r="2.4"/>
+     <circle class="a" cx="60" cy="52" r="2.4"/><circle class="a" cx="68" cy="60" r="2.4"/><circle class="a" cx="64" cy="70" r="2.4" opacity="0"/>
+     <circle class="a" cx="76" cy="50" r="0" />
+    </svg>
+    <div class="name">EXCUSE GENERATOR</div><div class="ko">핑계 생성기</div><div class="st">● READY</div>
+   </a>
+   <!-- 초시계 -->
+   <a class="obj" href="stopwatch/">
+    <svg viewBox="0 0 96 96" aria-hidden="true">
+     <rect class="f" x="42" y="8" width="12" height="9" rx="2"/>
+     <path class="s" d="M48 17v6M74 24l5-5"/>
+     <circle class="f" cx="48" cy="55" r="32"/>
+     <circle class="s" cx="48" cy="55" r="27" stroke-dasharray="1.2 5.4" style="stroke-width:3;stroke:#5c646b"/>
+     <path class="s" d="M48 32v5M48 73v5M25 55h5M66 55h5"/>
+     <path class="as" d="M48 55V39"/><path class="s" d="M48 55l9 6"/>
+     <circle class="a" cx="48" cy="55" r="2.6"/>
+     <text class="t" x="48" y="70" text-anchor="middle" style="font-size:5px">00:00.0</text>
+    </svg>
+    <div class="name">STOPWATCH</div><div class="ko">평범한 초시계</div><div class="st">● IDLE</div>
+   </a>
+  </div>
+ </div>
 
-        <div class="object" onclick="location.href='lab/'">
-            <div class="icon">🧪</div>
-            실험대
-        </div>
-
-        <div class="object" onclick="location.href='AIrobot/'">
-            <div class="icon">🤖</div>
-            AI 로봇
-        </div>
-
-        <div class="object" onclick="location.href='excusing/'">
-            <div class="icon">🎲</div>
-            핑계 생성기
-        </div>
-
-        <div class="object" onclick="location.href='stopwatch/'">
-            <div class="icon">⏱️</div>
-            평범한 초시계
-        </div>
-
-    </div>
-
-    <div class="tip">
-        새로운 오브젝트는 프로젝트가 진행될수록 해금됩니다.
-    </div>
-
+ <div class="tip">새로운 오브젝트는 프로젝트가 진행될수록 해금됩니다.</div>
 </div>
 
+<script>
+/* ---------- 연결선 ---------- */
+const stage=document.getElementById('stage'),core=document.getElementById('core'),lines=document.getElementById('lines');
+const objs=[...document.querySelectorAll('.obj')];
+function draw(){
+ if(innerWidth<=768){lines.innerHTML='';return}
+ const s=stage.getBoundingClientRect(),c=core.getBoundingClientRect();
+ const cx=c.left-s.left+c.width/2,cy=c.top-s.top+c.height/2;let h='';
+ objs.forEach((o,i)=>{
+  const r=o.querySelector('svg').getBoundingClientRect(),L=i<3;
+  const ox=(L?r.right:r.left)-s.left+(L?8:-8),oy=r.top-s.top+r.height/2;
+  const sx=cx+(L?-1:1)*(c.width/2-4),mx=(sx+ox)/2;
+  h+=`<path data-i="${i}" d="M${sx} ${cy}H${mx}V${oy}H${ox}"/><circle data-i="${i}" cx="${ox}" cy="${oy}" r="2.5"/>`;
+ });
+ lines.innerHTML=h;
+}
+objs.forEach((o,i)=>{
+ const on=v=>lines.querySelectorAll(`[data-i="${i}"]`).forEach(e=>e.classList.toggle('on',v));
+ o.addEventListener('mouseenter',()=>on(true));o.addEventListener('mouseleave',()=>on(false));
+ o.addEventListener('focus',()=>on(true));o.addEventListener('blur',()=>on(false));
+});
+addEventListener('resize',draw);draw();
+
+/* ---------- 마우스 환경 조명 (데스크톱 전용) ---------- */
+if(matchMedia('(hover:hover) and (pointer:fine)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
+ let tx=50,ty=40,cx=50,cy=40,raf=0;
+ const root=document.documentElement.style;
+ const tick=()=>{cx+=(tx-cx)*.06;cy+=(ty-cy)*.06;root.setProperty('--mx',cx+'%');root.setProperty('--my',cy+'%');
+  raf=(Math.abs(tx-cx)+Math.abs(ty-cy)>.05)?requestAnimationFrame(tick):0};
+ addEventListener('pointermove',e=>{tx=e.clientX/innerWidth*100;ty=e.clientY/innerHeight*100;if(!raf)raf=requestAnimationFrame(tick)});
+}
+
+/* ---------- 부팅 애니메이션 ---------- */
+const boot=document.getElementById('boot'),$=id=>document.getElementById(id);
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let seen=false;try{seen=localStorage.getItem('p365_lab_booted')==='1'}catch(e){}
+function finish(){document.body.classList.add('ready');boot.classList.add('out');draw();setTimeout(()=>boot.remove(),500);try{localStorage.setItem('p365_lab_booted','1')}catch(e){}}
+if(seen||reduce){
+ /* 재방문: 짧은 페이드만 */
+ setTimeout(finish,150);
+}else{
+ const T=[[50,()=>$('b1').classList.add('show')],[350,()=>$('b2').classList.add('show')],
+  [650,()=>document.querySelectorAll('#b3 li').forEach((li,i)=>setTimeout(()=>li.classList.add('show'),i*120))],
+  [1250,()=>$('b4').classList.add('show')],[1650,finish]];
+ const ids=T.map(([t,f])=>setTimeout(f,t));
+ boot.addEventListener('click',()=>{ids.forEach(clearTimeout);finish()}); /* 클릭하면 건너뛰기 */
+}
+</script>
 </body>
 </html>
