@@ -545,53 +545,123 @@ h1{
 .remaining{margin-top:8px;font-size:12px;color:#6d7192}
 
 /* ========================= */
-/* 모바일 */
+/* 모바일 (겹침 없는 세로 배치) */
 /* ========================= */
 @media(max-width:768px){
 
-    body{overflow:auto;min-height:100vh}
-
-    .center{top:42%;width:90%}
-
-    .project-label{font-size:10px;letter-spacing:4px;margin-bottom:14px}
-    h1{font-size:42px;letter-spacing:-2px}
-    .subtitle{font-size:14px;margin-bottom:32px}
-    .start{width:100%;max-width:260px;padding:15px;font-size:16px}
-
-    .log{top:18px;left:18px;padding:11px 14px;font-size:13px}
-    .sentence{top:65px;left:18px}
-    .top-actions{top:18px;left:18px}
-    .top-actions .mute{padding:11px 12px}
-
-    .japanvoca,.cardgame,.winner,.lucky{right:18px;padding:10px 13px;font-size:11px}
-    .lucky{top:18px}
-    .japanvoca{top:65px}
-    .cardgame{top:112px}
-    .winner{top:159px}
-
-    .funfact{right:18px;padding:11px 14px;font-size:11px}
-    .thebutton-link{top:calc(50% + 46px);right:18px;width:140px;height:42px;font-size:11px}
-
-    .funfact-box{padding:30px 24px}
-    .funfact-text{font-size:16px}
-
-    .recent{
-        left:50%;
-        transform:translateX(-50%);
-        bottom:185px;
-        width:90%;
-        max-width:340px;
+    /* 화면 스크롤 허용 + 그리드로 순서대로 쌓기 */
+    body{
+        height:auto;
+        min-height:100vh;
+        min-height:100dvh;
+        overflow-x:hidden;
+        overflow-y:auto;
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        align-content:start;
+        gap:10px;
+        padding:16px 16px calc(24px + env(safe-area-inset-bottom));
     }
 
-    .recent:hover{transform:translateX(-50%) translateY(-3px)}
+    /* absolute 좌표 전부 해제 */
+    .top-actions,
+    .center,
+    .log,
+    .japanvoca,
+    .cardgame,
+    .winner,
+    .lucky,
+    .funfact,
+    .thebutton-link,
+    .recent,
+    .day{
+        position:static;
+        top:auto;
+        left:auto;
+        right:auto;
+        bottom:auto;
+        transform:none;
+        min-width:0;
+    }
+
+    /* 상단: 일별 활동내역 + 음소거 */
+    .top-actions{
+        grid-column:1 / -1;
+        order:1;
+        display:flex;
+        gap:8px;
+    }
+    .top-actions .log{flex:1;padding:12px 14px;font-size:13px}
+    .top-actions .mute{flex:0 0 auto;padding:12px 14px}
+
+    /* 중앙 타이틀 */
+    .center{
+        grid-column:1 / -1;
+        order:2;
+        width:100%;
+        max-width:none;
+        padding:44px 0 28px;
+    }
+    .project-label{font-size:10px;letter-spacing:4px;margin-bottom:14px}
+    h1{font-size:42px;letter-spacing:-2px;margin-bottom:20px}
+    .title-line{margin-bottom:20px}
+    .subtitle{font-size:14px;margin-bottom:28px}
+    .start{width:100%;max-width:260px;padding:15px;font-size:16px}
+
+    /* 메뉴 버튼: 2열 그리드 */
+    .sentence,
+    .lucky,
+    .japanvoca,
+    .cardgame,
+    .winner,
+    .funfact{
+        width:100%;
+        padding:14px 10px;
+        font-size:12px;
+        letter-spacing:1px;
+        text-align:center;
+    }
+
+    .sentence{order:3}
+    .lucky{order:4}
+    .japanvoca{order:5}
+    .cardgame{order:6}
+    .winner{order:7}
+    .funfact{order:8}
+
+    /* hover 시 위로 살짝 이동 (transform 재정의) */
+    .funfact:hover,
+    .japanvoca:hover,
+    .cardgame:hover,
+    .winner:hover,
+    .lucky:hover,
+    .thebutton-link:hover,
+    .log:hover{transform:translateY(-3px)}
+
+    /* 버튼 누르러 가기: 한 줄 전체 */
+    .thebutton-link{
+        grid-column:1 / -1;
+        order:9;
+        width:100%;
+        height:46px;
+        font-size:12px;
+    }
+
+    /* 최근 활동 / 진행 상황: 한 줄 전체 */
+    .recent{
+        grid-column:1 / -1;
+        order:10;
+        width:100%;
+        max-width:none;
+        margin-top:8px;
+    }
+    .recent:hover{transform:translateY(-3px)}
 
     .day{
-        left:50%;
-        right:auto;
-        bottom:20px;
-        transform:translateX(-50%);
-        width:90%;
-        max-width:340px;
+        grid-column:1 / -1;
+        order:11;
+        width:100%;
+        max-width:none;
         padding:14px 16px;
         grid-template-columns:76px 1fr;
         gap:0 14px;
@@ -601,26 +671,23 @@ h1{
     .ring-percent{font-size:14px}
     .ring-day{font-size:8px}
     .progress-container{margin-top:12px}
+
+    .funfact-box{padding:30px 24px}
+    .funfact-text{font-size:16px}
 }
 
 /* ========================= */
 /* 작은 스마트폰 */
 /* ========================= */
 @media(max-width:480px){
+    body{padding:14px 14px calc(20px + env(safe-area-inset-bottom))}
     h1{font-size:34px}
     .subtitle{font-size:13px}
+    .center{padding:36px 0 22px}
     .activity-content{font-size:12px}
-    .center{top:40%}
+    .sentence,.lucky,.japanvoca,.cardgame,.winner,.funfact{font-size:11px;padding:13px 8px}
 }
-
-@media(prefers-reduced-motion:reduce){
-    .particle,.bg-glow,.thebutton-circle{animation:none}
-}
-</style>
-</head>
-
-<body>
-
+</body>
 <!-- ========================= -->
 <!-- 배경 장식 -->
 <!-- ========================= -->
