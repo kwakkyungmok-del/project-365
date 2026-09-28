@@ -8,21 +8,93 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+    --blue:#6ea8ff;
+    --purple:#a78bfa;
+    --yellow:#f5c84b;
+    --green:#4ade80;
+    --red:#ff2020;
+    --accent:#8b9dff;
+    --panel:rgba(18,18,26,.62);
+    --line:rgba(255,255,255,.09);
 }
 
 body{
-    background:#0b0b0b;
-    color:white;
     height:100vh;
     overflow:hidden;
+    color:#fff;
     font-family:'Inter',Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(ellipse 80% 55% at 50% -10%,rgba(60,90,190,.20),transparent 70%),
+        radial-gradient(ellipse 80% 55% at 50% 110%,rgba(110,70,190,.20),transparent 70%),
+        #09090d;
+    background-attachment:fixed;
+}
+
+/* ========================= */
+/* 배경: 365 / glow / 입자 */
+/* ========================= */
+.bg-365{
+    position:fixed;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    font-size:clamp(150px,44vw,720px);
+    font-weight:900;
+    letter-spacing:-.06em;
+    line-height:1;
+    white-space:nowrap;
+    color:#fff;
+    opacity:.035;
+    pointer-events:none;
+    user-select:none;
+    z-index:0;
+}
+
+.bg-glow{
+    position:fixed;
+    top:50%;left:50%;
+    width:min(720px,110vw);
+    height:min(520px,70vh);
+    transform:translate(-50%,-50%);
+    background:radial-gradient(ellipse at center,rgba(120,130,255,.14),transparent 68%);
+    filter:blur(30px);
+    pointer-events:none;
+    z-index:0;
+    animation:breathe 9s ease-in-out infinite;
+}
+
+@keyframes breathe{
+    0%,100%{opacity:.7}
+    50%{opacity:1}
+}
+
+.particles{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:0;
+}
+
+.particle{
+    position:absolute;
+    bottom:-10px;
+    border-radius:50%;
+    background:rgba(190,200,255,.7);
+    opacity:0;
+    animation:floatUp linear infinite;
+}
+
+@keyframes floatUp{
+    0%{transform:translateY(0);opacity:0}
+    15%{opacity:.45}
+    85%{opacity:.25}
+    100%{transform:translateY(-110vh);opacity:0}
 }
 
 /* ========================= */
@@ -30,267 +102,211 @@ body{
 /* ========================= */
 .center{
     position:absolute;
-    top:50%;
-    left:50%;
+    top:50%;left:50%;
     transform:translate(-50%,-50%);
     text-align:center;
     width:90%;
     max-width:700px;
+    z-index:2;
 }
 
-/* ========================= */
-/* 제목 */
-/* ========================= */
 .project-label{
-    font-size:13px;
+    font-size:12px;
     font-weight:600;
-    letter-spacing:5px;
-    color:#666;
-    margin-bottom:18px;
+    letter-spacing:6px;
+    color:#7c80a0;
+    margin-bottom:20px;
+}
+
+.project-label b{
+    font-weight:800;
+    background:linear-gradient(90deg,var(--blue),var(--purple));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
 }
 
 h1{
-    font-size:64px;
+    font-size:68px;
     font-weight:800;
     letter-spacing:-3px;
     line-height:1.1;
-    margin-bottom:24px;
+    margin-bottom:26px;
+    background:linear-gradient(180deg,#fff 30%,#b9bdd8);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+    filter:drop-shadow(0 0 28px rgba(130,140,255,.28));
 }
 
 .title-line{
-    width:60px;
-    height:2px;
-    background:#555;
-    margin:0 auto 25px auto;
+    width:60px;height:2px;
+    margin:0 auto 26px auto;
+    border-radius:2px;
+    background:linear-gradient(90deg,var(--blue),var(--purple));
+    box-shadow:0 0 14px rgba(140,150,255,.5);
 }
 
-/* ========================= */
-/* 설명 */
-/* ========================= */
 .subtitle{
-    color:#8f8f8f;
+    color:#9598b0;
     font-size:17px;
     line-height:1.6;
-    margin-bottom:45px;
+    margin-bottom:42px;
 }
 
-/* ========================= */
-/* 시작 버튼 */
-/* ========================= */
 .start{
-    background:white;
-    color:black;
+    background:#fff;
+    color:#0b0b10;
     border:none;
     border-radius:12px;
-    padding:18px 42px;
-    font-size:17px;
+    padding:15px 36px;
+    font-size:16px;
     font-weight:700;
+    font-family:inherit;
     cursor:pointer;
+    box-shadow:0 0 0 rgba(255,255,255,0);
     transition:.25s;
 }
 
 .start:hover{
-    transform:translateY(-4px);
-    box-shadow:0 0 25px rgba(255,255,255,.35);
+    transform:translateY(-3px);
+    box-shadow:0 8px 30px rgba(150,160,255,.35),0 0 22px rgba(255,255,255,.25);
 }
 
 /* ========================= */
-/* 일별 활동 버튼 */
+/* 공통 버튼 스타일 */
+/* ========================= */
+.log,
+.japanvoca,
+.cardgame,
+.winner,
+.lucky,
+.funfact,
+.thebutton-link{
+    --c:var(--accent);
+    z-index:3;
+    font-family:inherit;
+    border:1px solid var(--line);
+    background:rgba(20,20,28,.7);
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+    color:#8a8ea8;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.japanvoca,
+.cardgame,
+.winner,
+.lucky,
+.funfact,
+.thebutton-link{
+    position:absolute;
+    right:25px;
+    padding:10px 15px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:2px;
+}
+
+.japanvoca:hover,
+.cardgame:hover,
+.winner:hover,
+.lucky:hover,
+.funfact:hover,
+.thebutton-link:hover{
+    color:#fff;
+    background:rgba(30,30,42,.85);
+    border-color:var(--c);
+    transform:translateY(-3px);
+    box-shadow:0 0 18px color-mix(in srgb,var(--c) 30%,transparent);
+}
+
+.japanvoca{--c:var(--blue);top:75px}
+.cardgame{--c:var(--purple);top:125px}
+.winner{--c:var(--yellow);top:175px}
+.lucky{--c:var(--green);top:25px}
+
+/* 작은 포인트 점 */
+.japanvoca::before,
+.cardgame::before,
+.winner::before,
+.lucky::before,
+.funfact::before{
+    content:"";
+    display:inline-block;
+    width:5px;height:5px;
+    margin-right:8px;
+    vertical-align:middle;
+    border-radius:50%;
+    background:var(--c);
+    box-shadow:0 0 8px var(--c);
+    opacity:.8;
+}
+
+/* ========================= */
+/* 일별 활동 / 문장 공유 */
 /* ========================= */
 .log{
     position:absolute;
-    top:25px;
-    left:25px;
-    border:1px solid #444;
-    background:#141414;
-    color:white;
+    top:25px;left:25px;
     padding:12px 18px;
     border-radius:10px;
-    cursor:pointer;
-    transition:.2s;
+    color:#e8e9f5;
+    font-size:14px;
 }
 
 .log:hover{
-    background:#222;
-}
-
-/* ========================= */
-/* 문장 공유 버튼 */
-/* ========================= */
-.sentence{
-    position:absolute;
-    top:75px;
-    left:25px;
-}
-
-/* ========================= */
-/* 우측 버튼들 */
-/* ========================= */
-.japanvoca{
-    position:absolute;
-    top:75px;
-    right:25px;
-    border:1px solid #333;
-    background:#111;
-    color:#777;
-    padding:10px 15px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:12px;
-    font-weight:600;
-    letter-spacing:2px;
-    transition:.25s;
-}
-
-.japanvoca:hover{
-    color:white;
-    background:#181818;
-    border-color:#555;
+    background:rgba(34,34,48,.85);
+    border-color:rgba(160,170,255,.5);
     transform:translateY(-2px);
-    box-shadow:0 0 18px rgba(255,255,255,.08);
+    box-shadow:0 0 16px rgba(140,150,255,.18);
 }
 
-.cardgame{
-    position:absolute;
-    top:125px;
-    right:25px;
-    border:1px solid #333;
-    background:#111;
-    color:#777;
-    padding:10px 15px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:12px;
-    font-weight:600;
-    letter-spacing:2px;
-    transition:.25s;
-}
-
-.cardgame:hover{
-    color:white;
-    background:#181818;
-    border-color:#555;
-    transform:translateY(-2px);
-    box-shadow:0 0 18px rgba(255,255,255,.08);
-}
-
-.winner{
-    position:absolute;
-    top:175px;
-    right:25px;
-    border:1px solid #333;
-    background:#111;
-    color:#777;
-    padding:10px 15px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:12px;
-    font-weight:600;
-    letter-spacing:2px;
-    transition:.25s;
-}
-
-.winner:hover{
-    color:white;
-    background:#181818;
-    border-color:#555;
-    transform:translateY(-2px);
-    box-shadow:0 0 18px rgba(255,255,255,.08);
-}
-
-.lucky{
-    position:absolute;
-    top:25px;
-    right:25px;
-    border:1px solid #333;
-    background:#111;
-    color:#777;
-    padding:10px 15px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:12px;
-    font-weight:600;
-    letter-spacing:2px;
-    transition:.25s;
-}
-
-.lucky:hover{
-    color:white;
-    background:#181818;
-    border-color:#555;
-    transform:translateY(-2px);
-    box-shadow:0 0 18px rgba(255,255,255,.08);
-}
+.sentence{top:75px;left:25px}
 
 /* ========================= */
 /* FUN FACT 버튼 */
 /* ========================= */
 .funfact{
-    position:absolute;
+    --c:var(--blue);
     top:50%;
-    right:25px;
     transform:translateY(-50%);
-    border:1px solid #333;
-    background:#111;
-    color:#777;
     padding:12px 16px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:12px;
-    font-weight:600;
-    letter-spacing:2px;
-    transition:.25s;
 }
 
-.funfact:hover{
-    color:white;
-    background:#181818;
-    border-color:#555;
-    transform:translateY(-50%) translateY(-2px);
-    box-shadow:0 0 18px rgba(255,255,255,.08);
-}
+.funfact::before{display:none}
+
+.funfact:hover{transform:translateY(-50%) translateY(-3px)}
 
 /* ========================= */
 /* 버튼 누르러 가기 */
 /* ========================= */
 .thebutton-link{
-    position:absolute;
+    --c:var(--red);
     top:calc(50% + 48px);
-    right:25px;
-    width:150px;
-    height:42px;
-
+    width:150px;height:42px;
+    padding:0;
     display:flex;
     align-items:center;
     justify-content:center;
     gap:8px;
-
-    border:1px solid #333;
-    background:#111;
-    color:#777;
-
-    border-radius:10px;
-    cursor:pointer;
-
-    font-size:12px;
-    font-weight:600;
     letter-spacing:1px;
-
-    transition:.25s;
 }
 
-.thebutton-link:hover{
-    color:white;
-    background:#181818;
-    border-color:#555;
-    transform:translateY(-2px);
-    box-shadow:0 0 18px rgba(255,255,255,.08);
-}
+.thebutton-link:hover{box-shadow:0 0 20px rgba(255,32,32,.32)}
 
 .thebutton-circle{
-    width:20px;
-    height:20px;
+    width:20px;height:20px;
     flex-shrink:0;
+    filter:drop-shadow(0 0 5px rgba(255,32,32,.7));
+    animation:pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes pulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.14)}
 }
 
 /* ========================= */
@@ -299,47 +315,38 @@ h1{
 .funfact-overlay{
     display:none;
     position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    background:rgba(0,0,0,.7);
+    inset:0;
+    background:rgba(4,4,10,.72);
+    -webkit-backdrop-filter:blur(6px);
+    backdrop-filter:blur(6px);
     z-index:100;
     align-items:center;
     justify-content:center;
 }
 
-.funfact-overlay.active{
-    display:flex;
-}
+.funfact-overlay.active{display:flex}
 
 .funfact-box{
-    background:#141414;
-    border:1px solid #333;
+    background:rgba(20,20,30,.92);
+    border:1px solid rgba(110,168,255,.28);
     border-radius:16px;
     padding:40px;
     max-width:480px;
     width:90%;
     text-align:center;
+    box-shadow:0 0 50px rgba(90,130,255,.15);
     animation:funfactPop .25s ease;
 }
 
 @keyframes funfactPop{
-    from{
-        opacity:0;
-        transform:scale(.95);
-    }
-
-    to{
-        opacity:1;
-        transform:scale(1);
-    }
+    from{opacity:0;transform:scale(.95)}
+    to{opacity:1;transform:scale(1)}
 }
 
 .funfact-label{
     font-size:12px;
     letter-spacing:3px;
-    color:#666;
+    color:var(--blue);
     margin-bottom:18px;
     font-weight:700;
 }
@@ -351,11 +358,7 @@ h1{
     margin-bottom:28px;
 }
 
-.funfact-buttons{
-    display:flex;
-    gap:10px;
-    justify-content:center;
-}
+.funfact-buttons{display:flex;gap:10px;justify-content:center}
 
 .funfact-again,
 .funfact-close{
@@ -364,72 +367,76 @@ h1{
     padding:12px 24px;
     font-size:14px;
     font-weight:700;
+    font-family:inherit;
     cursor:pointer;
     transition:.2s;
 }
 
-.funfact-again{
-    background:white;
-    color:black;
-}
-
-.funfact-again:hover{
-    transform:translateY(-2px);
-}
-
-.funfact-close{
-    background:#222;
-    color:#aaa;
-}
-
-.funfact-close:hover{
-    background:#2a2a2a;
-    color:white;
-}
+.funfact-again{background:#fff;color:#000}
+.funfact-again:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(255,255,255,.3)}
+.funfact-close{background:#242432;color:#aaa}
+.funfact-close:hover{background:#2e2e40;color:#fff}
 
 /* ========================= */
 /* 최근 활동 */
 /* ========================= */
 .recent{
     position:absolute;
-    left:25px;
-    bottom:25px;
+    left:25px;bottom:25px;
     width:310px;
-    background:#111;
-    border:1px solid #292929;
-    border-radius:14px;
-    padding:18px;
+    background:var(--panel);
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px 44px 18px 18px;
     cursor:pointer;
-    transition:.2s;
+    transition:.25s;
+    z-index:3;
+}
+
+.recent::after{
+    content:"→";
+    position:absolute;
+    right:18px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#6d7192;
+    font-size:18px;
+    transition:.25s;
 }
 
 .recent:hover{
-    background:#171717;
-    border-color:#444;
+    background:rgba(26,26,38,.75);
+    border-color:rgba(160,170,255,.38);
     transform:translateY(-3px);
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
 }
+
+.recent:hover::after{color:#fff;right:14px}
 
 .recent-title{
     font-size:11px;
     font-weight:700;
     letter-spacing:2px;
-    color:#777;
-    margin-bottom:14px;
+    color:#7c80a0;
+    padding-bottom:12px;
+    margin-bottom:6px;
+    border-bottom:1px solid var(--line);
 }
 
-.activity{
-    padding:9px 0;
-}
+.activity{padding:9px 0 2px}
 
 .activity-day{
     font-size:11px;
-    color:#666;
+    font-weight:600;
+    color:var(--accent);
     margin-bottom:5px;
 }
 
 .activity-content{
     font-size:13px;
-    color:#ddd;
+    color:#e2e3ee;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -440,32 +447,70 @@ h1{
 /* ========================= */
 .day{
     position:absolute;
-    right:25px;
-    bottom:25px;
-    color:#888;
-    width:300px;
+    right:25px;bottom:25px;
+    width:330px;
+    color:#9598b0;
+    background:var(--panel);
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+    display:grid;
+    grid-template-columns:96px 1fr;
+    gap:0 18px;
+    align-items:center;
+    z-index:3;
 }
 
-.version{
-    margin-top:6px;
-    font-size:12px;
-    color:#666;
+.ring{
+    position:relative;
+    width:96px;height:96px;
+    grid-row:1 / span 2;
 }
 
-.progress-container{
-    margin-top:16px;
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+
+.ring-bg{fill:none;stroke:rgba(255,255,255,.08);stroke-width:7}
+
+.ring-fg{
+    fill:none;
+    stroke:url(#ringGrad);
+    stroke-width:7;
+    stroke-linecap:round;
+    filter:drop-shadow(0 0 5px rgba(140,150,255,.55));
+    transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1);
 }
 
-.progress-text{
-    font-size:13px;
-    color:#999;
-    margin-bottom:6px;
+.ring-center{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
 }
+
+.ring-percent{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.ring-day{font-size:9px;font-weight:600;letter-spacing:1.5px;color:#7c80a0;margin-top:2px}
+
+#dayText{
+    font-size:15px;
+    font-weight:700;
+    color:#f0f1fa;
+    letter-spacing:.5px;
+    align-self:end;
+}
+
+.version{margin-top:4px;font-size:12px;color:#6d7192}
+
+.progress-container{grid-column:1 / -1;margin-top:16px}
+
+.progress-text{font-size:13px;color:#a4a7c0;margin-bottom:6px}
 
 .progress-bar{
-    width:100%;
-    height:10px;
-    background:#222;
+    width:100%;height:6px;
+    background:rgba(255,255,255,.08);
     border-radius:999px;
     overflow:hidden;
 }
@@ -473,171 +518,94 @@ h1{
 .progress{
     height:100%;
     width:0%;
-    background:white;
+    background:linear-gradient(90deg,var(--blue),var(--purple));
+    box-shadow:0 0 10px rgba(140,150,255,.6);
     transition:.5s;
 }
 
-.remaining{
-    margin-top:8px;
-    font-size:12px;
-    color:#666;
-}
+.remaining{margin-top:8px;font-size:12px;color:#6d7192}
 
 /* ========================= */
 /* 모바일 */
 /* ========================= */
 @media(max-width:768px){
 
-    body{
-        overflow:auto;
-        min-height:100vh;
-    }
+    body{overflow:auto;min-height:100vh}
 
-    .center{
-        position:absolute;
-        top:42%;
-        width:90%;
-    }
+    .center{top:42%;width:90%}
 
-    .project-label{
-        font-size:10px;
-        letter-spacing:4px;
-        margin-bottom:14px;
-    }
+    .project-label{font-size:10px;letter-spacing:4px;margin-bottom:14px}
+    h1{font-size:42px;letter-spacing:-2px}
+    .subtitle{font-size:14px;margin-bottom:32px}
+    .start{width:100%;max-width:260px;padding:15px;font-size:16px}
 
-    h1{
-        font-size:42px;
-        letter-spacing:-2px;
-    }
+    .log{top:18px;left:18px;padding:11px 14px;font-size:13px}
+    .sentence{top:65px;left:18px}
 
-    .subtitle{
-        font-size:14px;
-        margin-bottom:32px;
-    }
+    .japanvoca,.cardgame,.winner,.lucky{right:18px;padding:10px 13px;font-size:11px}
+    .lucky{top:18px}
+    .japanvoca{top:65px}
+    .cardgame{top:112px}
+    .winner{top:159px}
 
-    .start{
-        width:100%;
-        max-width:280px;
-        padding:16px;
-        font-size:16px;
-    }
+    .funfact{right:18px;padding:11px 14px;font-size:11px}
+    .thebutton-link{top:calc(50% + 46px);right:18px;width:140px;height:42px;font-size:11px}
 
-    .log{
-        top:18px;
-        left:18px;
-        padding:10px 14px;
-        font-size:13px;
-    }
-
-    .sentence{
-        top:65px;
-        left:18px;
-    }
-
-    .japanvoca{
-        top:65px;
-        right:18px;
-        padding:9px 13px;
-        font-size:11px;
-    }
-
-    .cardgame{
-        top:112px;
-        right:18px;
-        padding:9px 13px;
-        font-size:11px;
-    }
-
-    .winner{
-        top:159px;
-        right:18px;
-        padding:9px 13px;
-        font-size:11px;
-    }
-
-    .lucky{
-        top:18px;
-        right:18px;
-        padding:9px 13px;
-        font-size:11px;
-    }
-
-    .funfact{
-        right:18px;
-        padding:10px 14px;
-        font-size:11px;
-    }
-
-    .thebutton-link{
-        top:calc(50% + 44px);
-        right:18px;
-        width:140px;
-        height:40px;
-        font-size:11px;
-    }
-
-    .funfact-box{
-        padding:30px 24px;
-    }
-
-    .funfact-text{
-        font-size:16px;
-    }
+    .funfact-box{padding:30px 24px}
+    .funfact-text{font-size:16px}
 
     .recent{
         left:50%;
         transform:translateX(-50%);
-        bottom:145px;
+        bottom:185px;
         width:90%;
-        max-width:320px;
+        max-width:340px;
     }
 
-    .recent:hover{
-        transform:translateX(-50%) translateY(-3px);
-    }
+    .recent:hover{transform:translateX(-50%) translateY(-3px)}
 
     .day{
-        position:absolute;
         left:50%;
         right:auto;
         bottom:20px;
         transform:translateX(-50%);
         width:90%;
-        max-width:320px;
-        text-align:center;
+        max-width:340px;
+        padding:14px 16px;
+        grid-template-columns:76px 1fr;
+        gap:0 14px;
     }
+
+    .ring{width:76px;height:76px}
+    .ring-percent{font-size:14px}
+    .ring-day{font-size:8px}
+    .progress-container{margin-top:12px}
 }
 
 /* ========================= */
 /* 작은 스마트폰 */
 /* ========================= */
 @media(max-width:480px){
+    h1{font-size:34px}
+    .subtitle{font-size:13px}
+    .activity-content{font-size:12px}
+    .center{top:40%}
+}
 
-    h1{
-        font-size:34px;
-    }
-
-    .subtitle{
-        font-size:13px;
-    }
-
-    .recent{
-        bottom:145px;
-    }
-
-    .activity-content{
-        font-size:12px;
-    }
-
-    .asdf{
-        font-size:10px;
-        padding:8px 11px;
-    }
+@media(prefers-reduced-motion:reduce){
+    .particle,.bg-glow,.thebutton-circle{animation:none}
 }
 </style>
 </head>
 
 <body>
+
+<!-- ========================= -->
+<!-- 배경 장식 -->
+<!-- ========================= -->
+<div class="bg-glow"></div>
+<div class="bg-365" aria-hidden="true">365</div>
+<div class="particles" id="particles" aria-hidden="true"></div>
 
 <!-- ========================= -->
 <!-- 설정 -->
@@ -829,7 +797,7 @@ const CURRENT_DAY = getCurrentDay();
 <div class="center">
 
     <div class="project-label">
-        PROJECT 365
+        PROJECT <b>365</b>
     </div>
 
     <h1>
@@ -874,12 +842,34 @@ const CURRENT_DAY = getCurrentDay();
 
 <div class="day">
 
-    <div id="dayText"></div>
+    <div class="ring">
 
-    <div
-        class="version"
-        id="versionText"
-    ></div>
+        <svg viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+                <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#6ea8ff"/>
+                    <stop offset="100%" stop-color="#a78bfa"/>
+                </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="50" cy="50" r="42"/>
+            <circle class="ring-fg" id="ringFg" cx="50" cy="50" r="42"/>
+        </svg>
+
+        <div class="ring-center">
+            <div class="ring-percent" id="ringPercent"></div>
+            <div class="ring-day" id="ringDay"></div>
+        </div>
+
+    </div>
+
+    <div>
+        <div id="dayText"></div>
+
+        <div
+            class="version"
+            id="versionText"
+        ></div>
+    </div>
 
     <div class="progress-container">
 
@@ -932,6 +922,60 @@ document.getElementById("remainingText").textContent =
 
 document.getElementById("progressBar").style.width =
     percent + "%";
+
+
+/* ========================= */
+/* 원형 진행률 링 */
+/* ========================= */
+
+document.getElementById("ringPercent").textContent =
+    `${percent.toFixed(1)}%`;
+
+document.getElementById("ringDay").textContent =
+    `DAY ${String(CURRENT_DAY).padStart(3,"0")}`;
+
+(function(){
+
+    const ring = document.getElementById("ringFg");
+    const circumference = 2 * Math.PI * 42;
+
+    ring.style.strokeDasharray = circumference;
+    ring.style.strokeDashoffset = circumference;
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            ring.style.strokeDashoffset =
+                circumference * (1 - percent / 100);
+        });
+    });
+
+})();
+
+
+/* ========================= */
+/* 배경 입자 (느리고 은은하게) */
+/* ========================= */
+
+(function(){
+
+    const box = document.getElementById("particles");
+
+    for(let i = 0; i < 16; i++){
+
+        const p = document.createElement("span");
+        const size = 1 + Math.random() * 2;
+
+        p.className = "particle";
+        p.style.left = Math.random() * 100 + "%";
+        p.style.width = size + "px";
+        p.style.height = size + "px";
+        p.style.animationDuration = (28 + Math.random() * 30) + "s";
+        p.style.animationDelay = (-Math.random() * 50) + "s";
+
+        box.appendChild(p);
+    }
+
+})();
 
 
 /* ========================= */
