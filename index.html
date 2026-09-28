@@ -266,6 +266,25 @@ h1{
 
 .sentence{top:75px;left:25px}
 
+.top-actions{
+    position:absolute;
+    top:25px;left:25px;
+    display:flex;
+    gap:8px;
+    z-index:3;
+}
+
+.top-actions .log{position:static}
+
+.top-actions .mute{
+    padding:12px 13px;
+    font-size:14px;
+    line-height:1.2;
+}
+
+.mute.off{opacity:.55}
+.mute.off:hover{opacity:1}
+
 /* ========================= */
 /* FUN FACT 버튼 */
 /* ========================= */
@@ -541,6 +560,8 @@ h1{
 
     .log{top:18px;left:18px;padding:11px 14px;font-size:13px}
     .sentence{top:65px;left:18px}
+    .top-actions{top:18px;left:18px}
+    .top-actions .mute{padding:11px 12px}
 
     .japanvoca,.cardgame,.winner,.lucky{right:18px;padding:10px 13px;font-size:11px}
     .lucky{top:18px}
@@ -660,12 +681,26 @@ const CURRENT_DAY = getCurrentDay();
 <!-- ========================= -->
 <!-- 일별 활동내역 -->
 <!-- ========================= -->
-<button
-    class="log"
-    onclick="location.href='dayreport/'"
->
-    📜 일별 활동내역
-</button>
+<div class="top-actions">
+
+    <button
+        class="log"
+        onclick="location.href='dayreport/'"
+    >
+        📜 일별 활동내역
+    </button>
+
+    <button
+        class="log mute"
+        id="muteBtn"
+        onclick="toggleMute()"
+        aria-label="배경음악 켜기/끄기"
+        title="배경음악 켜기/끄기"
+    >
+        🔊
+    </button>
+
+</div>
 
 <!-- ========================= -->
 <!-- 문장 공유 -->
@@ -1055,6 +1090,66 @@ function closeFunFact(){
         .getElementById("funfactOverlay")
         .classList.remove("active");
 }
+
+
+/* ========================= */
+/* 배경 음악 (잔잔하게 / 무한 반복) */
+/* ========================= */
+
+const bgm = new Audio("the_mountain-subtle-513390.mp3");
+
+bgm.loop = true;
+bgm.volume = 0.35;
+bgm.preload = "auto";
+
+/* 음소거 상태 (새로고침해도 유지) */
+const muteBtn = document.getElementById("muteBtn");
+
+function renderMute(){
+
+    const muted = bgm.muted;
+
+    muteBtn.textContent = muted ? "🔈" : "🔊";
+    muteBtn.classList.toggle("off", muted);
+}
+
+function toggleMute(){
+
+    bgm.muted = !bgm.muted;
+
+    try{
+        localStorage.setItem("bgmMuted", bgm.muted ? "1" : "0");
+    }catch(e){}
+
+    renderMute();
+}
+
+try{
+    bgm.muted = localStorage.getItem("bgmMuted") === "1";
+}catch(e){}
+
+renderMute();
+
+function startBgm(){
+
+    bgm.play().then(() => {
+
+        ["click","touchstart","keydown"].forEach(evt => {
+            document.removeEventListener(evt, startBgm);
+        });
+
+    }).catch(() => {
+        /* 자동재생이 차단되면 첫 사용자 입력 때 다시 시도 */
+    });
+}
+
+/* 브라우저 정책상 자동재생이 막힐 수 있으므로
+   먼저 시도하고, 실패하면 첫 클릭/터치/키 입력 때 재생 */
+startBgm();
+
+["click","touchstart","keydown"].forEach(evt => {
+    document.addEventListener(evt, startBgm);
+});
 
 </script>
 
