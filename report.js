@@ -415,7 +415,7 @@ bgm 삭제 및 문장 공유 추가
 
 {
     day:50,
-    title:"Day 50",
+    title:"Day 50 -드디어 50일🎉-",
     content:`
 핑계 생성기 추가
 `
@@ -459,6 +459,119 @@ bgm 삭제 및 문장 공유 추가
     title:"Day 55",
     content:`
 메인 화면 전체 교체
+`
+},
+
+
+{
+    day:56,
+    title:"Day 56",
+    content:`
+바빠서 못 함, 클로드 꺼져
+`
+},
+
+{
+    day:57,
+    title:"Day 57",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:58,
+    title:"Day 58",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:59,
+    title:"Day 59",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:60,
+    title:"Day 60",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:61,
+    title:"Day 61",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:62,
+    title:"Day 62",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:63,
+    title:"Day 63",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:64,
+    title:"Day 64",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:65,
+    title:"Day 65",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:66,
+    title:"Day 66",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:67,
+    title:"Day 67",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:68,
+    title:"Day 68",
+    content:`
+바빠서 못 함
+`
+},
+
+{
+    day:69,
+    title:"Day 69",
+    content:`
+실험실 UI가 모바일에서도 작동하도록 수정
 `
 },
 ];
