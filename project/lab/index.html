@@ -2,8 +2,8 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Chemistry Lab v1.4 — Project 365</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Chemistry Lab v1.0 — Project 365</title>
 <style>
   /* ============================================================
      폰트: Space Grotesk(디스플레이) + IBM Plex Mono(수치/로그)
@@ -500,6 +500,545 @@
     .slot{ width:88px; }
     .flask-wrap{ width:64px; height:80px; }
   }
+
+  /* ============================================================
+     모바일 전용 레이아웃 보정
+     데스크톱 UI와 실험 로직은 유지하고, 좁은 화면에서는
+     가로 스크롤형 사이드바 대신 세로 흐름으로 재배치한다.
+     ============================================================ */
+  @media (max-width: 600px){
+    html, body{
+      height:auto;
+      min-height:100%;
+      overflow-x:hidden;
+      overflow-y:auto;
+      overscroll-behavior-y:contain;
+    }
+    .app{
+      display:flex;
+      flex-direction:column;
+      width:100%;
+      height:auto;
+      min-height:100dvh;
+      overflow:visible;
+    }
+    .toolbar{
+      position:sticky;
+      top:0;
+      height:54px;
+      min-height:54px;
+      padding:0 10px;
+      gap:7px;
+      z-index:80;
+    }
+    .exit-btn{
+      padding:8px 9px;
+      font-size:11px;
+      white-space:nowrap;
+    }
+    .toolbar-title{
+      padding-left:8px;
+      min-width:0;
+    }
+    .toolbar-title .name{font-size:14px}
+    .toolbar-title .sub{display:none}
+    .toolbar-right{gap:0}
+    .discover-badge{
+      padding:6px 9px;
+      font-size:10px;
+      gap:5px;
+    }
+    .main{
+      display:flex;
+      flex-direction:column;
+      min-height:0;
+      overflow:visible;
+    }
+    .sidebar{
+      width:100%;
+      max-height:none;
+      padding:12px 12px 4px;
+      flex-direction:column;
+      overflow:visible;
+      gap:10px;
+      border-right:0;
+      border-bottom:0;
+      background:transparent;
+    }
+    .sidebar .panel-card{
+      width:100%;
+      min-width:0;
+      flex-shrink:1;
+      padding:12px;
+    }
+    .panel-title{font-size:11px;margin-bottom:9px}
+    .element-grid{
+      grid-template-columns:repeat(7,minmax(0,1fr));
+      gap:5px;
+      max-height:190px;
+      padding:0 1px 2px 0;
+    }
+    .element-tile{min-width:0;border-radius:6px}
+    .element-tile .num{font-size:7px;top:2px;left:3px}
+    .element-tile .sym{font-size:clamp(11px,3.5vw,14px)}
+    .substance-search{
+      min-height:40px;
+      font-size:14px;
+      padding:10px;
+    }
+    .filter-chips{gap:6px}
+    .chip{font-size:11px;padding:7px 10px;min-height:30px}
+    .substance-list{
+      max-height:270px;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+    }
+    .substance-row{min-height:44px;padding:9px}
+    .substance-row .formula{font-size:13px}
+    .substance-row .name{font-size:10px}
+    .substance-row .info-btn{width:28px;height:28px;font-size:13px}
+    .armed-hint{font-size:11px}
+    .experiment-area{
+      flex:none;
+      width:100%;
+      min-height:360px;
+      padding:18px 12px 22px;
+      overflow:visible;
+    }
+    .exp-header{
+      align-items:flex-start;
+      gap:8px;
+      flex-direction:column;
+      margin-bottom:8px;
+    }
+    .exp-title{font-size:11px}
+    .exp-hint{font-size:10px;line-height:1.5}
+    .bench{
+      gap:18px 10px;
+      padding:18px 0 8px;
+      justify-content:space-evenly;
+    }
+    .slot{width:calc(33.333% - 10px);max-width:105px;min-width:78px}
+    .flask-wrap{width:64px;height:80px}
+    .flask-neck{left:27px;width:10px;height:22px}
+    .slot-label{font-size:10px;overflow-wrap:anywhere}
+    .slot-label .a{font-size:9px}
+    .bench-controls{
+      gap:8px;
+      margin:12px 0 14px;
+    }
+    .mix-btn{
+      flex:1;
+      min-height:46px;
+      padding:12px 16px;
+      font-size:14px;
+    }
+    .clear-btn{min-height:44px;padding:11px 13px}
+    .feedback{font-size:11px;line-height:1.6}
+    .result-panel{
+      width:100%;
+      padding:14px 13px;
+      overflow-wrap:anywhere;
+    }
+    .result-head{gap:8px;align-items:flex-start}
+    .result-name{font-size:14px}
+    .result-row{font-size:11px;line-height:1.5}
+    .result-row .k{width:70px}
+    .discovery-banner{
+      position:fixed;
+      top:64px;
+      left:12px;
+      right:12px;
+      width:auto;
+      transform:translateY(-160%);
+      padding:12px 14px;
+    }
+    .discovery-banner.show{transform:translateY(0)}
+    .discovery-banner .title{font-size:12px}
+    .discovery-banner .sub{font-size:10px;line-height:1.5}
+    .toast-stack{
+      position:fixed;
+      left:12px;
+      right:12px;
+      bottom:14px;
+      transform:none;
+    }
+    .toast{
+      max-width:100%;
+      white-space:normal;
+      text-align:center;
+      line-height:1.5;
+    }
+    .bottombar{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-rows:auto;
+      gap:9px;
+      padding:12px;
+      max-height:none;
+      overflow:visible;
+    }
+    .bb-card{
+      min-width:0;
+      padding:11px;
+      min-height:112px;
+    }
+    .bb-title{font-size:9px;line-height:1.5}
+    .bb-value{font-size:20px}
+    .bb-note{font-size:10px;line-height:1.5}
+    .bb-card input[type="range"]{margin:12px 0 5px;min-height:20px}
+    .bb-card.log-card{
+      grid-column:1 / -1;
+      max-height:none;
+      min-height:160px;
+    }
+    .log-list{max-height:220px;overflow-y:auto}
+    .log-entry{font-size:10px;line-height:1.5}
+    .modal-backdrop{
+      padding:16px;
+      overflow-y:auto;
+    }
+    .modal-card{
+      width:100%;
+      max-width:380px;
+      max-height:calc(100dvh - 32px);
+      overflow-y:auto;
+      padding:17px;
+    }
+    .modal-grid{font-size:11px}
+    .modal-desc{font-size:12px}
+  }
+  @media (max-width: 360px){
+    .toolbar{gap:5px}
+    .exit-btn{font-size:10px;padding:8px 7px}
+    .toolbar-title .name{font-size:12px}
+    .discover-badge{padding:6px 7px;font-size:9px}
+    .element-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
+    .slot{min-width:72px}
+    .bench{gap:16px 5px}
+    .bottombar{padding:9px;gap:7px}
+    .bb-card{padding:9px}
+  }
+
+
+  /* ============================================================
+     MOBILE LAYOUT V2 — narrow-screen overflow and overlap fixes
+     기존 DOM/JS/반응 데이터는 유지하고 레이아웃만 보강한다.
+     ============================================================ */
+  @media (max-width: 600px){
+    *, *::before, *::after { box-sizing:border-box; }
+    html, body { width:100%; min-width:0; height:auto; min-height:100%; overflow-x:clip; }
+    body { min-height:100dvh; }
+    .app { display:flex; flex-direction:column; width:100%; min-width:0; min-height:100dvh; height:auto; overflow:clip; }
+    .toolbar {
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr) auto;
+      align-items:center;
+      gap:8px;
+      width:100%; min-width:0;
+      padding:0 max(10px, env(safe-area-inset-left)) 0 max(10px, env(safe-area-inset-left));
+    }
+    .exit-btn { min-width:0; max-width:100%; padding:8px 8px; font-size:10px; }
+    .toolbar-title { min-width:0; width:100%; padding-left:8px; overflow:hidden; }
+    .toolbar-title .name { display:block; min-width:0; font-size:clamp(11px,3.5vw,14px); }
+    .toolbar-right { min-width:0; margin-left:0; justify-self:end; }
+    .discover-badge { min-width:0; padding:6px 7px; gap:4px; font-size:9px; }
+    .discover-badge b { font-size:10px; }
+    .main { display:flex; flex-direction:column; width:100%; min-width:0; min-height:0; overflow:visible; }
+    .sidebar { display:flex; flex-direction:column; width:100%; min-width:0; max-width:100%; padding:10px 10px 2px; gap:10px; overflow:visible; }
+    .sidebar .panel-card { width:100%; min-width:0; max-width:100%; padding:11px; }
+    .panel-card, .experiment-area, .bottombar, .bb-card, #resultZone, .result-panel { min-width:0; }
+    .element-grid { width:100%; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; max-height:174px; overflow-y:auto; }
+    .element-tile { min-width:0; width:100%; aspect-ratio:1; }
+    .element-tile .sym { font-size:clamp(10px,3.2vw,13px); }
+    .substance-search { width:100%; max-width:100%; min-width:0; min-height:42px; font-size:16px; }
+    .filter-chips { min-width:0; }
+    .chip { min-height:34px; max-width:100%; }
+    .substance-list { width:100%; min-width:0; max-height:240px; overscroll-behavior:contain; }
+    .substance-row { width:100%; min-width:0; gap:7px; }
+    .substance-row .meta { min-width:0; overflow:hidden; }
+    .substance-row .name { white-space:normal; overflow-wrap:anywhere; }
+    .armed-hint { overflow-wrap:anywhere; }
+    .experiment-area { flex:none; width:100%; max-width:100%; padding:16px 12px 20px; overflow:visible; }
+    .exp-header { width:100%; min-width:0; align-items:flex-start; gap:6px; }
+    .exp-title, .exp-hint { max-width:100%; overflow-wrap:anywhere; }
+    .exp-hint { line-height:1.5; }
+    /* 네 개의 플라스크를 2×2로 배치해 슬롯끼리 밀리지 않게 한다. */
+    .bench {
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      width:100%; max-width:440px; min-width:0;
+      margin:0 auto;
+      gap:20px 12px;
+      padding:14px 2px 10px;
+      justify-items:center;
+      align-items:start;
+    }
+    .slot { width:100%; min-width:0; max-width:150px; gap:7px; }
+    .flask-wrap { width:64px; max-width:100%; height:80px; }
+    .flask-neck { left:27px; width:10px; height:22px; }
+    .slot .remove-btn { right:calc(50% - 43px); top:-5px; width:25px; height:25px; font-size:13px; }
+    .slot-label { width:100%; min-width:0; padding:0 2px; font-size:10px; overflow-wrap:anywhere; }
+    .slot-label .f, .slot-label .a { overflow-wrap:anywhere; }
+    .bench-controls { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); width:100%; gap:8px; margin:12px 0 14px; }
+    .bench-controls button { width:100%; min-width:0; padding-left:8px; padding-right:8px; white-space:normal; }
+    .feedback { overflow-wrap:anywhere; }
+    #resultZone { width:100%; max-width:100%; }
+    .result-panel { width:100%; max-width:100%; margin-left:0; margin-right:0; padding:12px; }
+    .result-head { flex-wrap:wrap; }
+    .result-type { max-width:100%; white-space:normal; }
+    .result-row { align-items:flex-start; min-width:0; overflow-wrap:anywhere; }
+    .result-row .k { width:64px; }
+    .result-row .v { flex:1; min-width:0; overflow-wrap:anywhere; }
+    .bottombar { width:100%; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:10px; padding-bottom:max(12px, env(safe-area-inset-bottom)); }
+    .bb-card { width:100%; min-width:0; padding:10px; overflow:hidden; }
+    .bb-title { overflow-wrap:anywhere; letter-spacing:.04em; }
+    .bb-value { font-size:clamp(17px,5vw,21px); }
+    .bb-note { overflow-wrap:anywhere; }
+    .bb-card.log-card { grid-column:1 / -1; min-width:0; }
+    .log-list { min-width:0; max-height:260px; }
+    .log-entry { min-width:0; overflow-wrap:anywhere; }
+    .log-entry .row1 { gap:6px; flex-wrap:wrap; }
+    .discovery-banner { left:10px; right:10px; width:auto; max-width:calc(100vw - 20px); overflow-wrap:anywhere; }
+    .toast-stack { left:10px; right:10px; max-width:calc(100vw - 20px); }
+    .toast { width:100%; overflow-wrap:anywhere; }
+    .modal-backdrop { align-items:flex-start; justify-content:center; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); overflow-y:auto; }
+    .modal-card { width:100%; max-width:420px; max-height:calc(100dvh - 24px); margin:auto 0; overflow-y:auto; }
+  }
+  @media (max-width: 360px){
+    .toolbar { gap:5px; padding-left:8px; padding-right:8px; }
+    .exit-btn { font-size:9px; padding:8px 6px; }
+    .toolbar-title { padding-left:6px; }
+    .toolbar-title .name { font-size:11px; }
+    .discover-badge { padding:5px 5px; font-size:8px; }
+    .discover-badge b { font-size:9px; }
+    .element-grid { grid-template-columns:repeat(6,minmax(0,1fr)); }
+    .bench { gap:18px 8px; }
+    .flask-wrap { width:58px; height:74px; }
+    .flask-neck { left:24px; width:10px; height:20px; }
+    .slot .remove-btn { right:calc(50% - 39px); }
+    .bottombar { padding:8px; gap:7px; }
+    .bb-card { padding:8px; }
+  }
+
+
+  /* ============================================================
+     MOBILE BENCH DOCK + SLIDING STATUS DRAWER
+     모바일에서는 실험대를 하단에 고정하고, 상태창은 위로 펼친다.
+     ============================================================ */
+  .mobile-status-toggle,
+  .mobile-status-handle { display:none; }
+
+  @media (max-width:600px){
+    html, body {
+      height:100%;
+      min-height:100%;
+      overflow:hidden;
+      overscroll-behavior:none;
+    }
+    body { height:100dvh; min-height:100dvh; }
+    .app {
+      height:100dvh;
+      min-height:100dvh;
+      overflow:hidden;
+    }
+    .toolbar { flex:0 0 54px; }
+    .main {
+      flex:1 1 auto;
+      min-height:0;
+      height:calc(100dvh - 54px);
+      overflow-y:auto;
+      overflow-x:hidden;
+      padding-bottom:310px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .sidebar { padding-bottom:14px; }
+    /* 실험대 도크: 항상 하단에 남아 물질을 플라스크에 넣기 쉽게 한다. */
+    .experiment-area {
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:90;
+      width:100%;
+      height:304px;
+      max-height:48dvh;
+      min-height:245px;
+      padding:9px 12px 54px;
+      overflow-x:hidden;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      background:linear-gradient(180deg, rgba(13,18,24,.98), rgba(7,10,14,.99));
+      border-top:1px solid rgba(79,214,196,.28);
+      box-shadow:0 -12px 32px rgba(0,0,0,.42);
+      scrollbar-width:thin;
+    }
+    .exp-header {
+      margin:0 0 3px;
+      align-items:center;
+      flex-direction:row;
+      gap:8px;
+    }
+    .exp-title { font-size:10px; letter-spacing:.09em; }
+    .exp-hint {
+      font-size:9px;
+      text-align:right;
+      max-width:56%;
+      line-height:1.35;
+    }
+    .bench {
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:4px;
+      padding:5px 0 2px;
+      max-width:100%;
+    }
+    .slot { max-width:none; gap:3px; }
+    .flask-wrap { width:48px; height:60px; }
+    .flask-neck { left:20px; width:8px; height:17px; }
+    .flask-body-mask { height:76%; }
+    .slot .plus { font-size:16px; }
+    .slot .remove-btn {
+      right:calc(50% - 29px);
+      top:-3px;
+      width:22px;
+      height:22px;
+      font-size:12px;
+    }
+    .slot-label { font-size:9px; line-height:1.2; }
+    .slot-label .f { font-size:10px; }
+    .slot-label .a { font-size:8px; }
+    .bench-controls {
+      display:grid;
+      grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+      gap:7px;
+      margin:5px 0 6px;
+    }
+    .bench-controls button { min-height:38px; padding:8px 7px; font-size:11px; }
+    .mix-btn { font-size:12px; }
+    .feedback { font-size:10px; min-height:0; margin:0 0 4px; line-height:1.4; }
+    #resultZone { padding-bottom:6px; }
+    .result-panel { padding:10px; }
+    .mobile-status-toggle {
+      display:flex;
+      position:fixed;
+      z-index:92;
+      left:50%;
+      bottom:calc(8px + env(safe-area-inset-bottom));
+      transform:translateX(-50%);
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:38px;
+      min-width:174px;
+      padding:7px 16px;
+      border:1px solid rgba(79,214,196,.55);
+      border-radius:999px;
+      color:#d9fff8;
+      background:rgba(15,38,40,.98);
+      box-shadow:0 4px 18px rgba(0,0,0,.45);
+      font:600 12px/1.2 var(--font-mono);
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .toggle-arrow { font-size:18px; line-height:10px; }
+    .bottombar {
+      display:grid;
+      position:fixed;
+      z-index:100;
+      left:0;
+      right:0;
+      bottom:0;
+      width:100%;
+      height:min(72dvh,620px);
+      max-height:calc(100dvh - 68px);
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      align-content:start;
+      gap:9px;
+      padding:52px 12px max(16px,env(safe-area-inset-bottom));
+      overflow-x:hidden;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+      border-top:1px solid rgba(79,214,196,.35);
+      border-radius:18px 18px 0 0;
+      background:linear-gradient(180deg,rgba(19,25,30,.99),rgba(7,10,14,.995));
+      box-shadow:0 -16px 45px rgba(0,0,0,.58);
+      transform:translateY(105%);
+      visibility:hidden;
+      pointer-events:none;
+      transition:transform .28s cubic-bezier(.2,.75,.25,1), visibility .28s;
+      scrollbar-width:thin;
+    }
+    .bottombar.is-open {
+      transform:translateY(0);
+      visibility:visible;
+      pointer-events:auto;
+    }
+    .mobile-status-handle {
+      display:flex;
+      position:fixed;
+      top:8px;
+      left:50%;
+      transform:translateX(-50%);
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:34px;
+      padding:6px 14px;
+      border:1px solid var(--border-soft);
+      border-radius:999px;
+      background:rgba(255,255,255,.045);
+      color:var(--text);
+      font:11px/1.2 var(--font-mono);
+      white-space:nowrap;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .bb-card { min-height:118px; padding:12px; }
+    .bb-title { font-size:10px; }
+    .bb-value { font-size:clamp(18px,5vw,22px); }
+    .bb-note { font-size:10px; line-height:1.45; }
+    .bb-card input[type="range"] { min-height:26px; margin:8px 0 4px; }
+    .bb-card.log-card {
+      grid-column:1 / -1;
+      min-height:180px;
+      max-height:none;
+    }
+    .log-list { max-height:260px; }
+    body.mobile-status-open .mobile-status-toggle {
+      opacity:0;
+      pointer-events:none;
+    }
+    body.mobile-status-open .experiment-area { filter:brightness(.5); }
+  }
+  @media (max-width:360px){
+    .experiment-area { padding-left:8px; padding-right:8px; }
+    .flask-wrap { width:43px; height:56px; }
+    .flask-neck { left:18px; width:7px; height:16px; }
+    .slot-label { font-size:8px; }
+    .slot-label .f { font-size:9px; }
+    .mobile-status-toggle { min-width:158px; font-size:11px; }
+    .bottombar { padding-left:8px; padding-right:8px; gap:7px; }
+    .bb-card { padding:9px; }
+  }
+
+  /* 모바일에서는 물질 선택창을 첫 화면에 먼저 보여준다. */
+  @media (max-width:600px){
+    .sidebar { display:flex; flex-direction:column; }
+    .sidebar .panel-card:nth-child(1) { order:2; }
+    .sidebar .panel-card:nth-child(2) { order:1; }
+    .sidebar .panel-card:nth-child(2) .substance-list {
+      max-height: min(30dvh, 230px);
+      min-height: 96px;
+    }
+    .sidebar .panel-card:nth-child(2) .filter-chips {
+      flex-wrap:wrap;
+      max-height:none;
+      overflow:visible;
+    }
+    .sidebar .panel-card:nth-child(2) .substance-row {
+      gap:6px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -559,6 +1098,12 @@
       <div class="feedback" id="feedback"></div>
       <div id="resultZone"></div>
 
+      <button class="mobile-status-toggle" id="mobileStatusToggle" type="button"
+              aria-controls="mobileStatusDrawer" aria-expanded="false">
+        <span class="toggle-arrow" aria-hidden="true">⌃</span>
+        <span>상태창 열기</span>
+      </button>
+
       <div class="discovery-banner" id="discoveryBanner">
         <div class="title">🌟 NEW REACTION DISCOVERED</div>
         <div class="sub" id="discoveryBannerText">—</div>
@@ -571,7 +1116,12 @@
   <!-- ============================================================
        하단 바
        ============================================================ -->
-  <footer class="bottombar">
+  <footer class="bottombar" id="mobileStatusDrawer" aria-label="실험 상태창">
+    <button class="mobile-status-handle" id="mobileStatusHandle" type="button"
+            aria-controls="mobileStatusDrawer" aria-expanded="false">
+      <span class="toggle-arrow" aria-hidden="true">⌄</span>
+      <span>실험대로 돌아가기</span>
+    </button>
     <div class="bb-card">
       <div class="bb-title">Temperature</div>
       <div class="bb-value" id="tempValue">25°C</div>
@@ -1406,6 +1956,35 @@
      ============================================================== */
   document.getElementById('exitBtn').addEventListener('click', function(){
     location.href = '../';
+  });
+
+  /* 모바일 상태창은 별도 drawer로 열고 닫는다. */
+  const mobileStatusDrawer = document.getElementById('mobileStatusDrawer');
+  const mobileStatusToggle = document.getElementById('mobileStatusToggle');
+  const mobileStatusHandle = document.getElementById('mobileStatusHandle');
+
+  function setMobileStatusOpen(open){
+    if (!mobileStatusDrawer || !mobileStatusToggle || !mobileStatusHandle) return;
+    mobileStatusDrawer.classList.toggle('is-open', open);
+    document.body.classList.toggle('mobile-status-open', open);
+    mobileStatusToggle.setAttribute('aria-expanded', String(open));
+    mobileStatusHandle.setAttribute('aria-expanded', String(open));
+    mobileStatusToggle.querySelector('.toggle-arrow').textContent = open ? '⌄' : '⌃';
+    mobileStatusToggle.lastElementChild.textContent = open ? '상태창 열림' : '상태창 열기';
+    if (open) mobileStatusDrawer.scrollTop = 0;
+  }
+
+  mobileStatusToggle.addEventListener('click', function(){
+    setMobileStatusOpen(!mobileStatusDrawer.classList.contains('is-open'));
+  });
+  mobileStatusHandle.addEventListener('click', function(){
+    setMobileStatusOpen(false);
+  });
+  window.addEventListener('keydown', function(event){
+    if (event.key === 'Escape') setMobileStatusOpen(false);
+  });
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 600) setMobileStatusOpen(false);
   });
 
   function init(){
