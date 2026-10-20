@@ -181,6 +181,9 @@ h1{
 .cardgame,
 .winner,
 .lucky,
+.misc-menu,
+.misc-toggle,
+.misc-item,
 .funfact,
 .thebutton-link{
     --c:var(--accent);
@@ -199,6 +202,7 @@ h1{
 .cardgame,
 .winner,
 .lucky,
+.misc-toggle,
 .funfact,
 .thebutton-link{
     position:absolute;
@@ -214,6 +218,8 @@ h1{
 .cardgame:hover,
 .winner:hover,
 .lucky:hover,
+.misc-toggle:hover,
+.misc-item:hover,
 .funfact:hover,
 .thebutton-link:hover{
     color:#fff;
@@ -223,10 +229,70 @@ h1{
     box-shadow:0 0 18px color-mix(in srgb,var(--c) 30%,transparent);
 }
 
-.japanvoca{--c:var(--blue);top:75px}
-.cardgame{--c:var(--purple);top:125px}
-.winner{--c:var(--yellow);top:175px}
-.lucky{--c:var(--green);top:25px}
+.misc-menu{
+    position:absolute;
+    top:25px;
+    right:25px;
+    z-index:10;
+}
+.misc-toggle{
+    position:static;
+    --c:var(--accent);
+    padding:10px 15px;
+    border-radius:10px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:2px;
+}
+.misc-toggle::before{
+    content:"";
+    display:inline-block;
+    width:5px;height:5px;
+    margin-right:8px;
+    vertical-align:middle;
+    border-radius:50%;
+    background:var(--c);
+    box-shadow:0 0 8px var(--c);
+}
+.misc-items{
+    display:none;
+    position:absolute;
+    top:calc(100% + 8px);
+    right:0;
+    min-width:180px;
+    padding:6px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:rgba(15,15,24,.96);
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+    box-shadow:0 12px 32px rgba(0,0,0,.35);
+}
+.misc-menu.open .misc-items{display:grid;gap:4px}
+.misc-item{
+    position:static;
+    width:100%;
+    text-align:left;
+    padding:11px 12px;
+    border-radius:8px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.5px;
+    background:transparent;
+    border:1px solid transparent;
+    color:#c5c7dc;
+}
+.misc-item::before{
+    content:"";
+    display:inline-block;
+    width:5px;height:5px;
+    margin-right:9px;
+    vertical-align:middle;
+    border-radius:50%;
+    background:var(--c,var(--accent));
+    box-shadow:0 0 8px var(--c,var(--accent));
+}
+.misc-item:hover{transform:translateX(-2px)}
 
 /* 작은 포인트 점 */
 .japanvoca::before,
@@ -567,10 +633,8 @@ h1{
     .top-actions,
     .center,
     .log,
-    .japanvoca,
-    .cardgame,
-    .winner,
-    .lucky,
+    .misc-menu,
+    .misc-toggle,
     .funfact,
     .thebutton-link,
     .recent,
@@ -610,10 +674,8 @@ h1{
 
     /* 메뉴 버튼: 2열 그리드 */
     .sentence,
-    .lucky,
-    .japanvoca,
-    .cardgame,
-    .winner,
+    .misc-menu,
+    .misc-toggle,
     .funfact{
         width:100%;
         padding:14px 10px;
@@ -623,18 +685,22 @@ h1{
     }
 
     .sentence{order:3}
-    .lucky{order:4}
-    .japanvoca{order:5}
-    .cardgame{order:6}
-    .winner{order:7}
-    .funfact{order:8}
+    .misc-menu{order:4;width:100%}
+    .misc-toggle{width:100%;text-align:center}
+    .misc-items{
+        position:static;
+        width:100%;
+        min-width:0;
+        margin-top:8px;
+    }
+    .misc-menu.open .misc-items{display:grid}
+    .misc-item{text-align:center;padding:12px 8px}
+    .funfact{order:5}
 
     /* hover 시 위로 살짝 이동 (transform 재정의) */
     .funfact:hover,
-    .japanvoca:hover,
-    .cardgame:hover,
-    .winner:hover,
-    .lucky:hover,
+    .misc-toggle:hover,
+    .misc-item:hover,
     .thebutton-link:hover,
     .log:hover{transform:translateY(-3px)}
 
@@ -685,7 +751,7 @@ h1{
     .subtitle{font-size:13px}
     .center{padding:36px 0 22px}
     .activity-content{font-size:12px}
-    .sentence,.lucky,.japanvoca,.cardgame,.winner,.funfact{font-size:11px;padding:13px 8px}
+    .sentence,.misc-toggle,.funfact{font-size:11px;padding:13px 8px}
 }
 </style>
 </head>
@@ -784,36 +850,29 @@ const CURRENT_DAY = getCurrentDay();
 </button>
 
 <!-- ========================= -->
-<!-- 우측 버튼 -->
+<!-- 잡다한 거 드롭다운 메뉴 -->
 <!-- ========================= -->
 
-<button
-    class="japanvoca"
-    onclick="location.href='japanvoca/'"
->
-    일본어 단어장
-</button>
+<div class="misc-menu" id="miscMenu">
+    <button
+        class="misc-toggle"
+        id="miscToggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="miscItems"
+        onclick="toggleMiscMenu()"
+    >
+        잡다한 거 ▾
+    </button>
 
-<button
-    class="cardgame"
-    onclick="location.href='cardgame/'"
->
-    카드게임
-</button>
-
-<button
-    class="winner"
-    onclick="location.href='winner/'"
->
-    당첨자 뽑기
-</button>
-
-<button
-    class="lucky"
-    onclick="location.href='lucky/'"
->
-    운빨
-</button>
+    <div class="misc-items" id="miscItems">
+        <button class="misc-item" style="--c:var(--green)" onclick="location.href='lucky/'">운빨</button>
+        <button class="misc-item" style="--c:var(--blue)" onclick="location.href='japanvoca/'">일본어 단어장</button>
+        <button class="misc-item" style="--c:var(--purple)" onclick="location.href='cardgame/'">카드게임</button>
+        <button class="misc-item" style="--c:var(--yellow)" onclick="location.href='winner/'">당첨자 뽑기</button>
+        <button class="misc-item" style="--c:var(--red)" onclick="location.href='baseball/'">야구 기록</button>
+    </div>
+</div>
 
 <!-- ========================= -->
 <!-- FUN FACT -->
@@ -1139,6 +1198,35 @@ if(recentReport){
     recentContainer.appendChild(activity);
 }
 
+
+/* ========================= */
+/* 잡다한 거 메뉴 */
+ /* ========================= */
+
+function toggleMiscMenu(){
+    const menu = document.getElementById("miscMenu");
+    const toggle = document.getElementById("miscToggle");
+    const isOpen = menu.classList.toggle("open");
+    toggle.setAttribute("aria-expanded", String(isOpen));
+}
+
+document.addEventListener("click", function(event){
+    const menu = document.getElementById("miscMenu");
+    const toggle = document.getElementById("miscToggle");
+    if(menu && !menu.contains(event.target)){
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+    }
+});
+
+document.addEventListener("keydown", function(event){
+    if(event.key === "Escape"){
+        const menu = document.getElementById("miscMenu");
+        const toggle = document.getElementById("miscToggle");
+        menu.classList.remove("open");
+        toggle.setAttribute("aria-expanded", "false");
+    }
+});
 
 /* ========================= */
 /* FUN FACT 기능 */
