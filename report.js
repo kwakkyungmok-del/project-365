@@ -574,4 +574,68 @@ bgm 삭제 및 문장 공유 추가
 실험실 UI가 모바일에서도 작동하도록 수정
 `
 },
+
+{
+    day:70,
+    title:"Day 70",
+    content:`
+못 했음
+`
+},
+
+{
+    day:71,
+    title:"Day 71",
+    content:`
+못 했음
+`
+},
+    
+{
+    day:72,
+    title:"Day 72",
+    content:`
+못 했음
+`
+},
+    
+{
+    day:73,
+    title:"Day 73",
+    content:`
+못 했음
+`
+},
+    
+{
+    day:74,
+    title:"Day 74",
+    content:`
+못 했음
+`
+},
+    
+{
+    day:75,
+    title:"Day 75",
+    content:`
+못 했음
+`
+},
+    
+{
+    day:76,
+    title:"Day 76",
+    content:`
+못 했음
+`
+},
+
+{
+    day:77,
+    title:"Day 77",
+    content:`
+화면 우측 상단의 미니게임들을 묶음
+`
+},
 ];
